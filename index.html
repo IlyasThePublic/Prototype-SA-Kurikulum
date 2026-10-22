@@ -58,6 +58,7 @@
             terintegrasi antarmatriks dan mencatat riwayat perubahan.</span
           >
         </div>
+        <div id="log-header-container"></div>
         <div class="paper">
           <div class="bar" id="bar">
             <div class="search">
@@ -78,6 +79,7 @@
               />
             </div>
             <select class="f" id="flt" aria-label="Filter" hidden></select>
+            <button class="btn-log-shortcut" id="btn-master-log" style="display:none"></button>
             <button class="btn" id="add"></button>
           </div>
           <div id="view-container">
@@ -425,9 +427,512 @@
             at: "20 Okt 2026, 11.30",
           },
         ],
+        logs: [
+          {
+            id: "LOG-028",
+            master: "cpmk",
+            masterLabel: "Capaian MK (CPMK)",
+            aksi: "tambah",
+            kode: "CPMK11.02",
+            nama: "Mampu berkolaborasi aktif dalam tim pengembangan software dengan metodologi Agile Scrum",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 11.30",
+            keterangan: "Perumusan CPMK11.02 diturunkan dari CPL11 untuk pengampu MK Proyek Pengembangan Agile (krpl2507)",
+            changes: [
+              { field: "kode", label: "Kode CPMK", old: null, new: "CPMK11.02" },
+              { field: "cpl", label: "CPL Induk", old: null, new: ["CPL11"] },
+              { field: "mk", label: "Mata Kuliah Pengampu", old: null, new: ["krpl2507"] }
+            ],
+            detail: {
+              kode: "CPMK11.02",
+              nama: "Mampu berkolaborasi aktif dalam tim pengembangan software dengan metodologi Agile Scrum",
+              cpl: ["CPL11"],
+              mk: ["krpl2507"]
+            }
+          },
+          {
+            id: "LOG-027",
+            master: "cpmk",
+            masterLabel: "Capaian MK (CPMK)",
+            aksi: "tambah",
+            kode: "CPMK11.01",
+            nama: "Mampu mempresentasikan hasil perancangan sistem dan proposal teknis secara lisan dan tulisan",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 11.25",
+            keterangan: "Perumusan CPMK11.01 diturunkan dari CPL11 untuk MK Bahasa Indonesia & Komunikasi Profesi (urpl2501)",
+            changes: [
+              { field: "kode", label: "Kode CPMK", old: null, new: "CPMK11.01" },
+              { field: "cpl", label: "CPL Induk", old: null, new: ["CPL11"] },
+              { field: "mk", label: "Mata Kuliah Pengampu", old: null, new: ["urpl2501"] }
+            ],
+            detail: {
+              kode: "CPMK11.01",
+              nama: "Mampu mempresentasikan hasil perancangan sistem dan proposal teknis secara lisan dan tulisan",
+              cpl: ["CPL11"],
+              mk: ["urpl2501"]
+            }
+          },
+          {
+            id: "LOG-026",
+            master: "cpmk",
+            masterLabel: "Capaian MK (CPMK)",
+            aksi: "tambah",
+            kode: "CPMK04.01",
+            nama: "Mampu merancang test suite, membuat skenario pengujian unit & integration test secara otomatis",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 11.20",
+            keterangan: "Perumusan CPMK04.01 diturunkan dari CPL04 untuk MK Pengujian Perangkat Lunak (krpl2506)",
+            changes: [
+              { field: "kode", label: "Kode CPMK", old: null, new: "CPMK04.01" },
+              { field: "cpl", label: "CPL Induk", old: null, new: ["CPL04"] },
+              { field: "mk", label: "Mata Kuliah Pengampu", old: null, new: ["krpl2506"] }
+            ],
+            detail: {
+              kode: "CPMK04.01",
+              nama: "Mampu merancang test suite, membuat skenario pengujian unit & integration test secara otomatis",
+              cpl: ["CPL04"],
+              mk: ["krpl2506"]
+            }
+          },
+          {
+            id: "LOG-025",
+            master: "cpmk",
+            masterLabel: "Capaian MK (CPMK)",
+            aksi: "tambah",
+            kode: "CPMK03.02",
+            nama: "Mampu merancang arsitektur backend REST API berbasis MVC dengan otentikasi token JWT",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 11.15",
+            keterangan: "Perumusan CPMK03.02 diturunkan dari CPL03 untuk MK Pemrograman Web Lanjut (krpl2505)",
+            changes: [
+              { field: "kode", label: "Kode CPMK", old: null, new: "CPMK03.02" },
+              { field: "cpl", label: "CPL Induk", old: null, new: ["CPL03"] },
+              { field: "mk", label: "Mata Kuliah Pengampu", old: null, new: ["krpl2505"] }
+            ],
+            detail: {
+              kode: "CPMK03.02",
+              nama: "Mampu merancang arsitektur backend REST API berbasis MVC dengan otentikasi token JWT",
+              cpl: ["CPL03"],
+              mk: ["krpl2505"]
+            }
+          },
+          {
+            id: "LOG-024",
+            master: "cpmk",
+            masterLabel: "Capaian MK (CPMK)",
+            aksi: "tambah",
+            kode: "CPMK03.01",
+            nama: "Mampu membangun antarmuka web responsif dan mengonsumsi REST API endpoints",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 11.12",
+            keterangan: "Perumusan CPMK03.01 diturunkan dari CPL03 untuk MK Pemrograman Web Dasar (krpl2502)",
+            changes: [
+              { field: "kode", label: "Kode CPMK", old: null, new: "CPMK03.01" },
+              { field: "cpl", label: "CPL Induk", old: null, new: ["CPL03"] },
+              { field: "mk", label: "Mata Kuliah Pengampu", old: null, new: ["krpl2502"] }
+            ],
+            detail: {
+              kode: "CPMK03.01",
+              nama: "Mampu membangun antarmuka web responsif dan mengonsumsi REST API endpoints",
+              cpl: ["CPL03"],
+              mk: ["krpl2502"]
+            }
+          },
+          {
+            id: "LOG-023",
+            master: "cpmk",
+            masterLabel: "Capaian MK (CPMK)",
+            aksi: "tambah",
+            kode: "CPMK02.02",
+            nama: "Mampu melakukan optimasi query kompleks, indexing, dan transaksi multi-tabel ACID",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 11.10",
+            keterangan: "Perumusan CPMK02.02 diturunkan dari CPL02 untuk MK Basis Data Lanjut (krpl2504)",
+            changes: [
+              { field: "kode", label: "Kode CPMK", old: null, new: "CPMK02.02" },
+              { field: "cpl", label: "CPL Induk", old: null, new: ["CPL02"] },
+              { field: "mk", label: "Mata Kuliah Pengampu", old: null, new: ["krpl2504"] }
+            ],
+            detail: {
+              kode: "CPMK02.02",
+              nama: "Mampu melakukan optimasi query kompleks, indexing, dan transaksi multi-tabel ACID",
+              cpl: ["CPL02"],
+              mk: ["krpl2504"]
+            }
+          },
+          {
+            id: "LOG-022",
+            master: "cpmk",
+            masterLabel: "Capaian MK (CPMK)",
+            aksi: "tambah",
+            kode: "CPMK02.01",
+            nama: "Mampu merancang diagram ERD dan mengimplementasikan skema database relasional ternormalisasi",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 11.05",
+            keterangan: "Perumusan CPMK02.01 diturunkan dari CPL02 untuk MK Basis Data (krpl2501)",
+            changes: [
+              { field: "kode", label: "Kode CPMK", old: null, new: "CPMK02.01" },
+              { field: "cpl", label: "CPL Induk", old: null, new: ["CPL02"] },
+              { field: "mk", label: "Mata Kuliah Pengampu", old: null, new: ["krpl2501"] }
+            ],
+            detail: {
+              kode: "CPMK02.01",
+              nama: "Mampu merancang diagram ERD dan mengimplementasikan skema database relasional ternormalisasi",
+              cpl: ["CPL02"],
+              mk: ["krpl2501"]
+            }
+          },
+          {
+            id: "LOG-021",
+            master: "cpmk",
+            masterLabel: "Capaian MK (CPMK)",
+            aksi: "tambah",
+            kode: "CPMK01.01",
+            nama: "Mampu menyusun dokumen Software Requirements Specification (SRS) sesuai standar industri IEEE 830",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 11.00",
+            keterangan: "Perumusan CPMK01.01 diturunkan dari CPL01 untuk MK Rekayasa Kebutuhan (krpl2503)",
+            changes: [
+              { field: "kode", label: "Kode CPMK", old: null, new: "CPMK01.01" },
+              { field: "cpl", label: "CPL Induk", old: null, new: ["CPL01"] },
+              { field: "mk", label: "Mata Kuliah Pengampu", old: null, new: ["krpl2503"] }
+            ],
+            detail: {
+              kode: "CPMK01.01",
+              nama: "Mampu menyusun dokumen Software Requirements Specification (SRS) sesuai standar industri IEEE 830",
+              cpl: ["CPL01"],
+              mk: ["krpl2503"]
+            }
+          },
+          {
+            id: "LOG-020",
+            master: "mk",
+            masterLabel: "Mata Kuliah (MK)",
+            aksi: "ubah",
+            kode: "krpl2507",
+            nama: "Proyek Pengembangan Agile",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 10.45",
+            keterangan: "Penyesuaian distribusi SKS Praktik (3 -> 4) dan prasyarat kelulusan",
+            changes: [
+              { field: "sksPrak", label: "SKS Praktik", old: 3, new: 4 },
+              { field: "sks", label: "Total SKS", old: 3, new: 4 },
+              { field: "prasyarat", label: "Prasyarat", old: ["krpl2505"], new: ["krpl2505", "krpl2506"] }
+            ],
+            detail: {
+              kode: "krpl2507",
+              nama: "Proyek Pengembangan Agile",
+              sks: 4,
+              sksPrak: 4,
+              prasyarat: ["krpl2505", "krpl2506"]
+            }
+          },
+          {
+            id: "LOG-019",
+            master: "mk",
+            masterLabel: "Mata Kuliah (MK)",
+            aksi: "tambah",
+            kode: "krpl2507",
+            nama: "Proyek Pengembangan Agile",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 10.25",
+            keterangan: "Penetapan MK Proyek Pengembangan Agile pada Semester 3 Kategori Inti RPL",
+            changes: [
+              { field: "kode", label: "Kode MK", old: null, new: "krpl2507" },
+              { field: "kat", label: "Kategori", old: null, new: "Inti RPL" },
+              { field: "sem", label: "Semester", old: null, new: 3 }
+            ],
+            detail: { kode: "krpl2507", nama: "Proyek Pengembangan Agile", sem: 3 }
+          },
+          {
+            id: "LOG-018",
+            master: "mk",
+            masterLabel: "Mata Kuliah (MK)",
+            aksi: "tambah",
+            kode: "krpl2506",
+            nama: "Pengujian Perangkat Lunak",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 10.20",
+            keterangan: "Penetapan MK Pengujian Perangkat Lunak Sem 2 dengan prasyarat krpl2502",
+            changes: [
+              { field: "kode", label: "Kode MK", old: null, new: "krpl2506" },
+              { field: "prasyarat", label: "Prasyarat", old: null, new: ["krpl2502"] }
+            ],
+            detail: { kode: "krpl2506", nama: "Pengujian Perangkat Lunak", sem: 2 }
+          },
+          {
+            id: "LOG-017",
+            master: "mk",
+            masterLabel: "Mata Kuliah (MK)",
+            aksi: "tambah",
+            kode: "krpl2505",
+            nama: "Pemrograman Web Lanjut",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 10.18",
+            keterangan: "Penetapan MK Pemrograman Web Lanjut Sem 2 (4 SKS: 1T/3P) dengan prasyarat krpl2502",
+            changes: [
+              { field: "kode", label: "Kode MK", old: null, new: "krpl2505" }
+            ],
+            detail: { kode: "krpl2505", nama: "Pemrograman Web Lanjut", sem: 2 }
+          },
+          {
+            id: "LOG-016",
+            master: "mk",
+            masterLabel: "Mata Kuliah (MK)",
+            aksi: "tambah",
+            kode: "krpl2504",
+            nama: "Basis Data Lanjut",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 10.15",
+            keterangan: "Penetapan MK Basis Data Lanjut Sem 2 (3 SKS: 1T/2P) dengan prasyarat krpl2501",
+            changes: [
+              { field: "kode", label: "Kode MK", old: null, new: "krpl2504" }
+            ],
+            detail: { kode: "krpl2504", nama: "Basis Data Lanjut", sem: 2 }
+          },
+          {
+            id: "LOG-015",
+            master: "mk",
+            masterLabel: "Mata Kuliah (MK)",
+            aksi: "tambah",
+            kode: "urpl2501",
+            nama: "Bahasa Indonesia & Komunikasi Profesi",
+            user: "Tim kurikulum",
+            at: "18 Okt 2026, 14.12",
+            keterangan: "Penetapan MK Wajib Umum Bahasa Indonesia & Komunikasi Profesi Sem 1 (2 SKS: 2T/0P)",
+            changes: [
+              { field: "kode", label: "Kode MK", old: null, new: "urpl2501" }
+            ],
+            detail: { kode: "urpl2501", nama: "Bahasa Indonesia & Komunikasi Profesi", kat: "Umum" }
+          },
+          {
+            id: "LOG-014",
+            master: "mk",
+            masterLabel: "Mata Kuliah (MK)",
+            aksi: "tambah",
+            kode: "krpl2503",
+            nama: "Rekayasa Kebutuhan",
+            user: "Tim kurikulum",
+            at: "18 Okt 2026, 14.10",
+            keterangan: "Penetapan MK Rekayasa Kebutuhan Sem 1 (2 SKS: 2T/0P)",
+            changes: [
+              { field: "kode", label: "Kode MK", old: null, new: "krpl2503" }
+            ],
+            detail: { kode: "krpl2503", nama: "Rekayasa Kebutuhan", kat: "Inti RPL" }
+          },
+          {
+            id: "LOG-013",
+            master: "mk",
+            masterLabel: "Mata Kuliah (MK)",
+            aksi: "tambah",
+            kode: "krpl2502",
+            nama: "Pemrograman Web Dasar",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 10.06",
+            keterangan: "Penetapan MK Pemrograman Web Dasar Sem 1 (3 SKS: 1T/2P)",
+            changes: [
+              { field: "kode", label: "Kode MK", old: null, new: "krpl2502" }
+            ],
+            detail: { kode: "krpl2502", nama: "Pemrograman Web Dasar" }
+          },
+          {
+            id: "LOG-012",
+            master: "mk",
+            masterLabel: "Mata Kuliah (MK)",
+            aksi: "tambah",
+            kode: "krpl2501",
+            nama: "Basis Data",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 10.05",
+            keterangan: "Penetapan MK Basis Data Sem 1 (3 SKS: 1T/2P)",
+            changes: [
+              { field: "kode", label: "Kode MK", old: null, new: "krpl2501" }
+            ],
+            detail: { kode: "krpl2501", nama: "Basis Data" }
+          },
+          {
+            id: "LOG-011",
+            master: "cpl",
+            masterLabel: "Capaian Pembelajaran (CPL)",
+            aksi: "ubah",
+            kode: "CPL03",
+            nama: "Mampu membangun aplikasi web dan mobile enterprise berbasis standar industri",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 09.50",
+            keterangan: "Penyelarasan redaksi capaian dan penambahan relasi MK krpl2507",
+            changes: [
+              { field: "nama", label: "Pernyataan CPL", old: "Mampu membangun aplikasi web enterprise", new: "Mampu membangun aplikasi web dan mobile enterprise berbasis standar industri" },
+              { field: "mk", label: "Mata Kuliah Terkait", old: ["krpl2502", "krpl2505"], new: ["krpl2502", "krpl2505", "krpl2507"] }
+            ],
+            detail: {
+              kode: "CPL03",
+              nama: "Mampu membangun aplikasi web dan mobile enterprise berbasis standar industri"
+            }
+          },
+          {
+            id: "LOG-010",
+            master: "cpl",
+            masterLabel: "Capaian Pembelajaran (CPL)",
+            aksi: "tambah",
+            kode: "CPL04",
+            nama: "Mampu merancang dan melaksanakan pengujian serta penjaminan mutu perangkat lunak",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 09.41",
+            keterangan: "Perumusan CPL04 diturunkan dari PL03 (QA) dan diwadahi BK04",
+            changes: [
+              { field: "kode", label: "Kode CPL", old: null, new: "CPL04" },
+              { field: "pl", label: "Profil Lulusan", old: null, new: ["PL03"] }
+            ],
+            detail: { kode: "CPL04", jenis: "Hard skill" }
+          },
+          {
+            id: "LOG-009",
+            master: "cpl",
+            masterLabel: "Capaian Pembelajaran (CPL)",
+            aksi: "tambah",
+            kode: "CPL03",
+            nama: "Mampu membangun aplikasi web enterprise",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 09.40",
+            keterangan: "Perumusan CPL03 diturunkan dari PL01 dan diwadahi BK03",
+            changes: [
+              { field: "kode", label: "Kode CPL", old: null, new: "CPL03" },
+              { field: "pl", label: "Profil Lulusan", old: null, new: ["PL01"] }
+            ],
+            detail: { kode: "CPL03", jenis: "Hard skill" }
+          },
+          {
+            id: "LOG-008",
+            master: "cpl",
+            masterLabel: "Capaian Pembelajaran (CPL)",
+            aksi: "tambah",
+            kode: "CPL02",
+            nama: "Mampu merancang arsitektur basis data relasional dan optimasi query",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 09.32",
+            keterangan: "Perumusan CPL02 diturunkan dari PL01 & PL02 dan diwadahi BK02",
+            changes: [
+              { field: "kode", label: "Kode CPL", old: null, new: "CPL02" },
+              { field: "pl", label: "Profil Lulusan", old: null, new: ["PL01", "PL02"] }
+            ],
+            detail: { kode: "CPL02", jenis: "Hard skill" }
+          },
+          {
+            id: "LOG-007",
+            master: "cpl",
+            masterLabel: "Capaian Pembelajaran (CPL)",
+            aksi: "tambah",
+            kode: "CPL01",
+            nama: "Mampu menganalisis kebutuhan perangkat lunak dan proses bisnis",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 09.30",
+            keterangan: "Perumusan CPL01 diturunkan dari PL02 dan diwadahi BK01",
+            changes: [
+              { field: "kode", label: "Kode CPL", old: null, new: "CPL01" },
+              { field: "pl", label: "Profil Lulusan", old: null, new: ["PL02"] }
+            ],
+            detail: { kode: "CPL01", jenis: "Hard skill" }
+          },
+          {
+            id: "LOG-006",
+            master: "bk",
+            masterLabel: "Bahan Kajian (BK)",
+            aksi: "tambah",
+            kode: "BK05",
+            nama: "Kolaborasi Profesional & Agile Scrum",
+            user: "Tim kurikulum",
+            at: "18 Okt 2026, 13.45",
+            keterangan: "Penyusunan Bahan Kajian Kolaborasi Profesional & Agile Scrum untuk MK urpl2501 dan krpl2507",
+            changes: [
+              { field: "kode", label: "Kode BK", old: null, new: "BK05" },
+              { field: "mk", label: "Mata Kuliah Pengampu", old: null, new: ["urpl2501", "krpl2507"] }
+            ],
+            detail: { kode: "BK05", nama: "Kolaborasi Profesional & Agile Scrum" }
+          },
+          {
+            id: "LOG-005",
+            master: "bk",
+            masterLabel: "Bahan Kajian (BK)",
+            aksi: "tambah",
+            kode: "BK04",
+            nama: "Penjaminan Mutu & Pengujian Software",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 09.15",
+            keterangan: "Penyusunan Bahan Kajian Penjaminan Mutu & Pengujian Software untuk MK krpl2506",
+            changes: [
+              { field: "kode", label: "Kode BK", old: null, new: "BK04" }
+            ],
+            detail: { kode: "BK04", nama: "Penjaminan Mutu & Pengujian Software" }
+          },
+          {
+            id: "LOG-004",
+            master: "bk",
+            masterLabel: "Bahan Kajian (BK)",
+            aksi: "tambah",
+            kode: "BK03",
+            nama: "Pemrograman & Rekayasa Web Enterprise",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 09.15",
+            keterangan: "Penyusunan Bahan Kajian Pemrograman & Rekayasa Web Enterprise untuk MK krpl2502, krpl2505, krpl2507",
+            changes: [
+              { field: "kode", label: "Kode BK", old: null, new: "BK03" }
+            ],
+            detail: { kode: "BK03", nama: "Pemrograman & Rekayasa Web Enterprise" }
+          },
+          {
+            id: "LOG-003",
+            master: "bk",
+            masterLabel: "Bahan Kajian (BK)",
+            aksi: "tambah",
+            kode: "BK02",
+            nama: "Basis Data & Manajemen Informasi",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 09.15",
+            keterangan: "Penyusunan Bahan Kajian Basis Data & Manajemen Informasi untuk MK krpl2501, krpl2504",
+            changes: [
+              { field: "kode", label: "Kode BK", old: null, new: "BK02" }
+            ],
+            detail: { kode: "BK02", nama: "Basis Data & Manajemen Informasi" }
+          },
+          {
+            id: "LOG-002",
+            master: "bk",
+            masterLabel: "Bahan Kajian (BK)",
+            aksi: "tambah",
+            kode: "BK01",
+            nama: "Rekayasa Kebutuhan Perangkat Lunak",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 09.15",
+            keterangan: "Penyusunan Bahan Kajian Rekayasa Kebutuhan Perangkat Lunak untuk MK krpl2503",
+            changes: [
+              { field: "kode", label: "Kode BK", old: null, new: "BK01" }
+            ],
+            detail: { kode: "BK01", nama: "Rekayasa Kebutuhan Perangkat Lunak" }
+          },
+          {
+            id: "LOG-001",
+            master: "pl",
+            masterLabel: "Profil Lulusan (PL)",
+            aksi: "tambah",
+            kode: "PL01",
+            nama: "Pengembang Perangkat Lunak",
+            user: "Pak Suhendra",
+            at: "20 Okt 2026, 09.15",
+            keterangan: "Inisialisasi Profil Lulusan Pengembang Perangkat Lunak untuk kurikulum TRPL 2026",
+            changes: [
+              { field: "kode", label: "Kode PL", old: null, new: "PL01" },
+              { field: "cpl", label: "CPL Terkait", old: null, new: ["CPL02", "CPL03", "CPL11"] }
+            ],
+            detail: {
+              kode: "PL01",
+              nama: "Pengembang Perangkat Lunak",
+              cpl: ["CPL02", "CPL03", "CPL11"]
+            }
+          }
+        ],
       };
 
-      // Menu Navigation Definition (12 modules + master data)
+      // Menu Navigation Definition (12 modules + master data + audit log)
       const MENU_GROUPS = [
         {
           title: "Data Master",
@@ -446,6 +951,12 @@
               id: "cpmk",
               label: "Capaian MK (CPMK)",
             },
+          ],
+        },
+        {
+          title: "Riwayat & Audit Log",
+          items: [
+            { id: "log_master", label: "Riwayat Log Master" },
           ],
         },
         {
@@ -809,7 +1320,10 @@
     <div>
       ${g.items
         .map((it) => {
-          const isCur = it.id === tab;
+          const isCur =
+            it.id === tab ||
+            (it.id === "log_master" &&
+              (tab === "log_master" || tab.startsWith("log_")));
           return `<button class="nav" ${isCur ? 'aria-current="page"' : ""} data-t="${it.id}">${it.label}</button>`;
         })
         .join("")}
@@ -818,15 +1332,125 @@
         ).join("");
       }
 
+      const MASTER_META = {
+        all: {
+          name: "Seluruh Master",
+          short: "Semua",
+          badge: "ALL",
+          desc: "seluruh data master kurikulum TRPL",
+        },
+        pl: {
+          name: "Profil Lulusan (PL)",
+          short: "PL",
+          badge: "PL",
+          desc: "Profil Lulusan (PL)",
+        },
+        cpl: {
+          name: "Capaian Pembelajaran (CPL)",
+          short: "CPL",
+          badge: "CPL",
+          desc: "Capaian Pembelajaran Lulusan (CPL)",
+        },
+        bk: {
+          name: "Bahan Kajian (BK)",
+          short: "BK",
+          badge: "BK",
+          desc: "Bahan Kajian (BK)",
+        },
+        mk: {
+          name: "Mata Kuliah (MK)",
+          short: "MK",
+          badge: "MK",
+          desc: "Mata Kuliah (MK)",
+        },
+        cpmk: {
+          name: "Capaian MK (CPMK)",
+          short: "CPMK",
+          badge: "CPMK",
+          desc: "Capaian Pembelajaran Mata Kuliah (CPMK)",
+        },
+      };
+
+      let logMasterFilter = "all";
+      let logActionFilter = "";
+      let logUserFilter = "";
+      let logSearchQuery = "";
+
+      function getFieldLabel(t, k) {
+        const labels = {
+          kode: "Kode",
+          nama: "Nama / Judul",
+          deskripsi: "Deskripsi / Cakupan",
+          jenis: "Jenis / Bentuk",
+          kat: "Kategori MK",
+          sks: "Total SKS",
+          sksTeori: "SKS Teori",
+          sksPrak: "SKS Praktik",
+          sem: "Semester",
+          prasyarat: "Mata Kuliah Prasyarat",
+          pl: "Profil Lulusan Terkait",
+          bk: "Bahan Kajian Terkait",
+          mk: "Mata Kuliah Terkait",
+          cpl: "CPL Terkait",
+        };
+        return labels[k] || k;
+      }
+
+      function formatVal(v) {
+        if (v == null || v === "")
+          return '<span style="color:var(--text-muted)">- Kosong -</span>';
+        if (Array.isArray(v)) {
+          if (!v.length)
+            return '<span style="color:var(--text-muted)">- Tidak ada -</span>';
+          return v
+            .map((item) => `<span class="tag neutral">${esc(item)}</span>`)
+            .join(" ");
+        }
+        if (typeof v === "boolean") return v ? "Ya" : "Tidak";
+        return esc(String(v));
+      }
+
+      function addAuditLog({
+        master,
+        aksi,
+        kode,
+        nama,
+        keterangan,
+        changes = [],
+        detail = {},
+      }) {
+        if (!db.logs) db.logs = [];
+        const nextNum = db.logs.length + 1;
+        const newLog = {
+          id: "LOG-" + String(nextNum).padStart(3, "0"),
+          master,
+          masterLabel: MASTER_META[master]?.name || master.toUpperCase(),
+          aksi,
+          kode,
+          nama: nama || kode,
+          user: USER,
+          at: stamp(),
+          keterangan:
+            keterangan ||
+            `${aksi === "tambah" ? "Menambahkan" : aksi === "ubah" ? "Mengubah" : "Menghapus"} data ${kode}`,
+          changes,
+          detail,
+        };
+        db.logs.unshift(newLog);
+        return newLog;
+      }
+
       // Master Router for Rendering Views
       function render() {
         nav();
         const q = $("q").value.trim().toLowerCase();
-        const f = $("flt");
         const isMaster = tab in E;
+        const isLog = tab === "log_master" || tab.startsWith("log_");
 
         if (isMaster) {
           renderMaster(tab, q);
+        } else if (isLog) {
+          renderLogPage(tab);
         } else {
           renderMatrixOrSpecialView(tab, q);
         }
@@ -834,6 +1458,9 @@
 
       // 1. Render Master Tables (PL, CPL, BK, MK, CPMK)
       function renderMaster(t, q) {
+        if ($("log-header-container"))
+          $("log-header-container").innerHTML = "";
+
         const e = E[t];
         $("crumb").textContent = `${e.group} / ${e.label}`;
         $("title").textContent = e.label;
@@ -842,7 +1469,21 @@
         $("add").style.display = "inline-flex";
         $("add").textContent = "+ " + e.add;
         $("banner-txt").textContent =
-          `Prototype data master kurikulum TRPL. Setiap penambahan atau perubahan tersinkronisasi otomatis ke seluruh matriks relasi OBE.`;
+          `Prototype data master kurikulum TRPL. Setiap penambahan atau perubahan tersinkronisasi otomatis ke seluruh matriks relasi OBE dan tercatat dalam audit log.`;
+
+        const btnLog = $("btn-master-log");
+        if (btnLog) {
+          btnLog.style.display = "inline-flex";
+          btnLog.dataset.targetLogMaster = t;
+          btnLog.dataset.t = "log_master";
+          btnLog.innerHTML = `
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            Riwayat Log ${e.pre}
+          `;
+        }
 
         const f = $("flt");
         if (e.filter) {
@@ -895,6 +1536,403 @@
   `;
       }
 
+      // 2. Render Riwayat Log Master Page
+      function renderLogPage(activeTab) {
+        if (activeTab === "log_pl") logMasterFilter = "pl";
+        else if (activeTab === "log_cpl") logMasterFilter = "cpl";
+        else if (activeTab === "log_bk") logMasterFilter = "bk";
+        else if (activeTab === "log_mk") logMasterFilter = "mk";
+        else if (activeTab === "log_cpmk") logMasterFilter = "cpmk";
+        else if (activeTab === "log_master") {
+          if (!logMasterFilter) logMasterFilter = "all";
+        }
+
+        const meta = MASTER_META[logMasterFilter] || MASTER_META.all;
+        $("crumb").textContent = "Riwayat & Audit Log / " + meta.name;
+        $("title").textContent = "Riwayat Log " + meta.name;
+        $("lead").textContent =
+          "Audit trail dan rekam jejak aktivitas perubahan " +
+          meta.desc +
+          " kurikulum TRPL sesuai standar akreditasi dan tata kelola akademik OBE.";
+        $("banner-txt").textContent =
+          "Seluruh rekaman log tersimpan secara kronologis dan permanen untuk kebutuhan audit mutu kurikulum, akreditasi prodi, dan penjaminan mutu Politeknik Astra.";
+        $("bar").style.display = "none";
+        const btnLog = $("btn-master-log");
+        if (btnLog) btnLog.style.display = "none";
+
+        const allLogs = db.logs || [];
+        const scopedLogs =
+          logMasterFilter === "all"
+            ? allLogs
+            : allLogs.filter((l) => l.master === logMasterFilter);
+
+        const totalCount = scopedLogs.length;
+        const addCount = scopedLogs.filter((l) => l.aksi === "tambah").length;
+        const editCount = scopedLogs.filter((l) => l.aksi === "ubah").length;
+        const delCount = scopedLogs.filter((l) => l.aksi === "hapus").length;
+
+        const masterKeys = ["all", "pl", "cpl", "bk", "mk", "cpmk"];
+        const masterCounts = {
+          all: allLogs.length,
+          pl: allLogs.filter((l) => l.master === "pl").length,
+          cpl: allLogs.filter((l) => l.master === "cpl").length,
+          bk: allLogs.filter((l) => l.master === "bk").length,
+          mk: allLogs.filter((l) => l.master === "mk").length,
+          cpmk: allLogs.filter((l) => l.master === "cpmk").length,
+        };
+
+        // Render Header: Stats Cards & Segmented Master Tabs
+        $("log-header-container").innerHTML = `
+          <div class="log-stats-grid">
+            <div class="log-stat-card">
+              <div class="log-stat-icon all">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+              <div class="log-stat-info">
+                <span class="log-stat-value">${totalCount}</span>
+                <span class="log-stat-label">Total Aktivitas Log</span>
+              </div>
+            </div>
+            <div class="log-stat-card">
+              <div class="log-stat-icon add">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 5v14M5 12h14"></path>
+                </svg>
+              </div>
+              <div class="log-stat-info">
+                <span class="log-stat-value">${addCount}</span>
+                <span class="log-stat-label">Data Ditambahkan</span>
+              </div>
+            </div>
+            <div class="log-stat-card">
+              <div class="log-stat-icon edit">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </div>
+              <div class="log-stat-info">
+                <span class="log-stat-value">${editCount}</span>
+                <span class="log-stat-label">Data Diperbarui</span>
+              </div>
+            </div>
+            <div class="log-stat-card">
+              <div class="log-stat-icon del">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </div>
+              <div class="log-stat-info">
+                <span class="log-stat-value">${delCount}</span>
+                <span class="log-stat-label">Data Dihapus</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="log-master-tabs">
+            ${masterKeys
+              .map(
+                (k) => `
+              <button class="log-tab-btn ${k === logMasterFilter ? "active" : ""}" data-log-master="${k}">
+                <span>${esc(MASTER_META[k].name)}</span>
+                <span class="log-tab-count">${masterCounts[k]}</span>
+              </button>
+            `,
+              )
+              .join("")}
+          </div>
+        `;
+
+        // Render Body: Toolbar + Table Container
+        $("view-container").innerHTML = `
+          <div class="log-toolbar">
+            <div class="log-search-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+              </svg>
+              <input id="log-q" type="search" placeholder="Cari kode, nama, user, atau keterangan..." value="${esc(logSearchQuery)}" aria-label="Cari Log">
+            </div>
+
+            <select class="log-select" id="log-flt-action" aria-label="Filter Aksi">
+              <option value="">Semua Aksi</option>
+              <option value="tambah" ${logActionFilter === "tambah" ? "selected" : ""}>Tambah Data</option>
+              <option value="ubah" ${logActionFilter === "ubah" ? "selected" : ""}>Ubah Data</option>
+              <option value="hapus" ${logActionFilter === "hapus" ? "selected" : ""}>Hapus Data</option>
+            </select>
+
+            <select class="log-select" id="log-flt-user" aria-label="Filter Pengguna">
+              <option value="">Semua Pengguna</option>
+              ${[...new Set(allLogs.map((l) => l.user))]
+                .map(
+                  (u) =>
+                    `<option value="${esc(u)}" ${logUserFilter === u ? "selected" : ""}>${esc(u)}</option>`,
+                )
+                .join("")}
+            </select>
+
+            ${
+              logSearchQuery || logActionFilter || logUserFilter
+                ? `<button class="log-reset-btn" id="log-btn-reset">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                    Reset Filter
+                  </button>`
+                : ""
+            }
+          </div>
+
+          <div id="log-table-area"></div>
+        `;
+
+        renderLogTable();
+      }
+
+      function renderLogTable() {
+        const allLogs = db.logs || [];
+        const scopedLogs =
+          logMasterFilter === "all"
+            ? allLogs
+            : allLogs.filter((l) => l.master === logMasterFilter);
+
+        const filtered = scopedLogs.filter((l) => {
+          if (logActionFilter && l.aksi !== logActionFilter) return false;
+          if (logUserFilter && l.user !== logUserFilter) return false;
+          if (logSearchQuery) {
+            const qStr = (
+              l.id +
+              " " +
+              l.kode +
+              " " +
+              (l.nama || "") +
+              " " +
+              (l.keterangan || "") +
+              " " +
+              l.user +
+              " " +
+              l.masterLabel
+            ).toLowerCase();
+            if (!qStr.includes(logSearchQuery)) return false;
+          }
+          return true;
+        });
+
+        const area = $("log-table-area");
+        if (!area) return;
+
+        area.innerHTML = `
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:125px">ID & Waktu</th>
+                  <th style="width:95px">Master</th>
+                  <th style="width:105px">Aksi</th>
+                  <th style="min-width:180px">Entitas Terkait</th>
+                  <th style="min-width:280px">Keterangan & Perubahan</th>
+                  <th style="width:170px">Pengguna</th>
+                  <th style="width:80px">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filtered
+                  .map((l) => {
+                    const initials = (l.user || "TK")
+                      .split(" ")
+                      .map((w) => w[0])
+                      .join("")
+                      .slice(0, 2)
+                      .toUpperCase();
+
+                    const changeSnippet =
+                      l.changes && l.changes.length
+                        ? `<div class="log-changes-snippet">
+                            ${l.changes
+                              .slice(0, 3)
+                              .map(
+                                (c) =>
+                                  `<span class="log-change-chip"><b>${esc(c.label || c.field)}</b>${c.old != null && c.new != null ? `: ${esc(String(c.old))} &rarr; ${esc(String(c.new))}` : ""}</span>`,
+                              )
+                              .join("")}
+                            ${l.changes.length > 3 ? `<span class="log-change-chip">+${l.changes.length - 3} lainnya</span>` : ""}
+                          </div>`
+                        : "";
+
+                    return `
+                      <tr>
+                        <td>
+                          <span class="kode" style="font-size:12px;color:var(--text-muted)">${esc(l.id)}</span>
+                          <span class="by" style="font-weight:500;color:var(--text)">${esc(l.at)}</span>
+                        </td>
+                        <td>
+                          <span class="badge-master ${l.master}">${esc(MASTER_META[l.master]?.short || l.master)}</span>
+                        </td>
+                        <td>
+                          <span class="badge-action ${l.aksi}">
+                            ${l.aksi === "tambah" ? "Tambah" : l.aksi === "ubah" ? "Ubah" : "Hapus"}
+                          </span>
+                        </td>
+                        <td>
+                          <span class="kode">${esc(l.kode)}</span><br>
+                          <b>${esc(l.nama)}</b>
+                        </td>
+                        <td>
+                          <span>${esc(l.keterangan)}</span>
+                          ${changeSnippet}
+                        </td>
+                        <td>
+                          <div class="log-user-pill">
+                            <span class="log-user-av">${esc(initials)}</span>
+                            <span>${esc(l.user)}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <button class="ib" data-log-id="${esc(l.id)}" title="Lihat detail riwayat perubahan">Detail</button>
+                        </td>
+                      </tr>
+                    `;
+                  })
+                  .join("")}
+              </tbody>
+            </table>
+          </div>
+          <div id="log-empty">
+            ${
+              filtered.length
+                ? ""
+                : `<div class="empty">
+                    <b>Tidak ada riwayat log yang sesuai</b><br>
+                    Coba sesuaikan kata kunci pencarian, filter master, atau filter aksi.
+                  </div>`
+            }
+          </div>
+          <div class="foot">
+            Menampilkan ${filtered.length} dari ${scopedLogs.length} riwayat log (${MASTER_META[logMasterFilter]?.name || "Master"})
+          </div>
+        `;
+      }
+
+      function openLogDetail(logId) {
+        const l = (db.logs || []).find((x) => x.id === logId);
+        if (!l) return;
+
+        const initials = (l.user || "TK")
+          .split(" ")
+          .map((w) => w[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase();
+
+        let detailSection = "";
+
+        if (l.aksi === "ubah") {
+          if (l.changes && l.changes.length) {
+            detailSection = `
+              <h3 style="font-size:14px;font-weight:600;margin:16px 0 8px;color:var(--text)">Perbandingan Perubahan Nilai:</h3>
+              <table class="log-diff-table">
+                <thead>
+                  <tr>
+                    <th>Atribut / Kolom</th>
+                    <th>Sebelum Perubahan</th>
+                    <th>Sesudah Perubahan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${l.changes
+                    .map(
+                      (c) => `
+                    <tr>
+                      <td><b>${esc(c.label || c.field)}</b></td>
+                      <td><span class="log-diff-old">${formatVal(c.old)}</span></td>
+                      <td><span class="log-diff-new">${formatVal(c.new)}</span></td>
+                    </tr>
+                  `,
+                    )
+                    .join("")}
+                </tbody>
+              </table>
+            `;
+          } else {
+            detailSection = `<p class="s">Data diperbarui tanpa perubahan field utama.</p>`;
+          }
+        } else if (l.aksi === "tambah") {
+          const snapshot = l.detail || {};
+          detailSection = `
+            <h3 style="font-size:14px;font-weight:600;margin:16px 0 8px;color:var(--text)">Snapshot Data Yang Dibuat:</h3>
+            <div class="log-snapshot-grid">
+              ${Object.keys(snapshot)
+                .filter((k) => k !== "by" && k !== "at")
+                .map(
+                  (k) => `
+                <div class="log-snapshot-item">
+                  <label>${esc(getFieldLabel(l.master, k))}</label>
+                  <strong>${formatVal(snapshot[k])}</strong>
+                </div>
+              `,
+                )
+                .join("")}
+            </div>
+          `;
+        } else if (l.aksi === "hapus") {
+          const snapshot = l.detail || {};
+          detailSection = `
+            <div class="banner" style="margin:14px 0 10px;background:var(--danger-bg);color:var(--danger);border-color:var(--danger)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              <span>Entitas ini telah dihapus permanen dari kurikulum aktif TRPL dan tercatat dalam arsip audit log.</span>
+            </div>
+            <h3 style="font-size:14px;font-weight:600;margin:14px 0 8px;color:var(--text)">Snapshot Terakhir Sebelum Dihapus:</h3>
+            <div class="log-snapshot-grid">
+              ${Object.keys(snapshot)
+                .filter((k) => k !== "by" && k !== "at")
+                .map(
+                  (k) => `
+                <div class="log-snapshot-item">
+                  <label>${esc(getFieldLabel(l.master, k))}</label>
+                  <strong>${formatVal(snapshot[k])}</strong>
+                </div>
+              `,
+                )
+                .join("")}
+            </div>
+          `;
+        }
+
+        open(`
+          <div class="log-modal">
+            <h2>Detail Riwayat Log #${esc(l.id)}</h2>
+            <p class="s">Catatan aktivitas perubahan data master pada kurikulum TRPL Politeknik Astra.</p>
+
+            <div class="log-modal-header-card">
+              <div>
+                <span class="badge-master ${l.master}" style="margin-right:6px">${esc(MASTER_META[l.master]?.name || l.master)}</span>
+                <span class="badge-action ${l.aksi}">${l.aksi === "tambah" ? "Ditambahkan" : l.aksi === "ubah" ? "Diperbarui" : "Dihapus"}</span>
+                <div class="log-modal-entity" style="margin-top:6px">${esc(l.kode)} – ${esc(l.nama)}</div>
+              </div>
+              <div class="log-user-pill">
+                <span class="log-user-av">${esc(initials)}</span>
+                <div style="line-height:1.2">
+                  <div style="font-weight:600;font-size:12px">${esc(l.user)}</div>
+                  <div style="font-size:11px;color:var(--text-muted)">${esc(l.at)}</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="font-size:13px;line-height:1.5;margin-bottom:12px;color:var(--text)">
+              <strong>Keterangan Aktivitas:</strong><br>
+              <span style="color:var(--text-secondary)">${esc(l.keterangan)}</span>
+            </div>
+
+            ${detailSection}
+
+            <div class="mf" style="margin-top:24px">
+              <button class="btn" data-x style="margin:0">Tutup Detail</button>
+            </div>
+          </div>
+        `);
+      }
+
       // Helper: Menemukan metadata modul dari MENU_GROUPS
       function getMenuModule(id) {
         for (const g of MENU_GROUPS) {
@@ -904,8 +1942,11 @@
         return { group: "Kurikulum OBE", label: id };
       }
 
-      // 2. Render Matrix & Analysis Views (Under Construction)
+      // 3. Render Matrix & Analysis Views (Under Construction)
       function renderMatrixOrSpecialView(id) {
+        if ($("log-header-container"))
+          $("log-header-container").innerHTML = "";
+        if ($("btn-master-log")) $("btn-master-log").style.display = "none";
         const item = getMenuModule(id);
         $("crumb").textContent = `${item.group} / ${item.label}`;
         $("title").textContent = item.label;
@@ -1210,8 +2251,54 @@
         o.at = stamp();
 
         const isNew = edit == null;
-        if (isNew) db[tab].push(o);
-        else db[tab][edit] = o;
+        if (isNew) {
+          db[tab].push(o);
+          addAuditLog({
+            master: tab,
+            aksi: "tambah",
+            kode: o.kode,
+            nama: o.nama || o.kode,
+            keterangan: `Menambahkan data baru ${o.kode} - ${o.nama || ""}`,
+            changes: Object.keys(o)
+              .filter((k) => k !== "by" && k !== "at")
+              .map((k) => ({
+                field: k,
+                label: getFieldLabel(tab, k),
+                old: null,
+                new: o[k],
+              })),
+            detail: { ...o },
+          });
+        } else {
+          const prev = db[tab][edit];
+          const changes = [];
+          const allKeys = new Set([...Object.keys(prev), ...Object.keys(o)]);
+          allKeys.forEach((k) => {
+            if (k === "by" || k === "at") return;
+            const oldVal = prev[k];
+            const newVal = o[k];
+            if (JSON.stringify(oldVal ?? "") !== JSON.stringify(newVal ?? "")) {
+              changes.push({
+                field: k,
+                label: getFieldLabel(tab, k),
+                old: oldVal,
+                new: newVal,
+              });
+            }
+          });
+          db[tab][edit] = o;
+          addAuditLog({
+            master: tab,
+            aksi: "ubah",
+            kode: o.kode,
+            nama: o.nama || o.kode,
+            keterangan: changes.length
+              ? `Memperbarui ${changes.length} atribut: ${changes.map((c) => c.label).join(", ")}`
+              : `Menyimpan pembaruan data ${o.kode}`,
+            changes,
+            detail: { sebelum: { ...prev }, sesudah: { ...o } },
+          });
+        }
 
         close();
         render();
@@ -1259,7 +2346,25 @@
           toggleSidebar();
         } else if (b.id === "sidebar-backdrop") {
           closeMobileSidebar();
+        } else if (b.dataset.logMaster) {
+          logMasterFilter = b.dataset.logMaster;
+          tab = "log_master";
+          render();
+        } else if (b.id === "btn-master-log" || b.dataset.targetLogMaster) {
+          logMasterFilter = b.dataset.targetLogMaster || "all";
+          tab = "log_master";
+          render();
+        } else if (b.dataset.logId) {
+          openLogDetail(b.dataset.logId);
+        } else if (b.id === "log-btn-reset") {
+          logActionFilter = "";
+          logUserFilter = "";
+          logSearchQuery = "";
+          render();
         } else if (b.dataset.t) {
+          if (b.dataset.t === "log_master") {
+            logMasterFilter = "all";
+          }
           tab = b.dataset.t;
           $("q").value = "";
           render();
@@ -1276,6 +2381,22 @@
           save();
         } else if (b.dataset.ok != null && b.dataset.ok !== "") {
           const r = db[tab].splice(+b.dataset.ok, 1)[0];
+          addAuditLog({
+            master: tab,
+            aksi: "hapus",
+            kode: r.kode,
+            nama: r.nama || r.kode,
+            keterangan: `Menghapus data ${r.kode} - ${r.nama || ""} dari kurikulum aktif`,
+            changes: Object.keys(r)
+              .filter((k) => k !== "by" && k !== "at")
+              .map((k) => ({
+                field: k,
+                label: getFieldLabel(tab, k),
+                old: r[k],
+                new: null,
+              })),
+            detail: { ...r },
+          });
           close();
           render();
           toast("Data telah dihapus: " + r.kode);
@@ -1293,7 +2414,24 @@
         }
       });
 
+      document.addEventListener("input", (ev) => {
+        if (ev.target.id === "log-q") {
+          logSearchQuery = ev.target.value.trim().toLowerCase();
+          renderLogTable();
+        }
+      });
+
       document.addEventListener("change", (ev) => {
+        if (ev.target.id === "log-flt-action") {
+          logActionFilter = ev.target.value;
+          renderLogTable();
+          return;
+        }
+        if (ev.target.id === "log-flt-user") {
+          logUserFilter = ev.target.value;
+          renderLogTable();
+          return;
+        }
         if (ev.target.name === "pl") {
           const n = document.querySelectorAll("[name=pl]:checked").length;
           const c = $("cnt");
