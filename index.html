@@ -1,0 +1,1295 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Kurikulum TRPL – Sistem Kurikulum OBE</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="global.css" />
+  </head>
+  <body>
+    <header class="appbar">
+      <button
+        id="toggle-sidebar"
+        class="icon-btn"
+        aria-label="Sembunyikan / Tampilkan Sidebar"
+        title="Sembunyikan / Tampilkan Sidebar"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+        </svg>
+      </button>
+      <img
+        class="logo"
+        src="https://pmb.polytechnic.astra.ac.id/Images/IMG_Logo.png"
+        alt="Politeknik Astra"
+      />
+      <span class="div"></span>
+      <span class="t">Kurikulum TRPL</span>
+      <span class="sp"></span>
+      <div class="who">
+        <div class="who-info">
+          <span class="who-name">Pak Suhendra</span>
+          <span class="who-role">Tim Kurikulum</span>
+        </div>
+        <span class="av">PS</span>
+      </div>
+    </header>
+    <div class="app">
+      <aside id="aside-nav"></aside>
+      <main>
+        <div class="crumb" id="crumb"></div>
+        <h1 id="title"></h1>
+        <p class="lead" id="lead"></p>
+        <div class="banner" id="banner">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+            /></svg
+          ><span id="banner-txt"
+            >Prototype sistem kurikulum OBE TRPL Politeknik Astra. Data saling
+            terintegrasi antarmatriks dan mencatat riwayat perubahan.</span
+          >
+        </div>
+        <div class="paper">
+          <div class="bar" id="bar">
+            <div class="search">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                /></svg
+              ><input
+                id="q"
+                type="search"
+                placeholder="Cari kode atau nama..."
+                aria-label="Cari"
+              />
+            </div>
+            <select class="f" id="flt" aria-label="Filter" hidden></select>
+            <button class="btn" id="add"></button>
+          </div>
+          <div id="view-container">
+            <div class="scroll">
+              <table>
+                <thead id="th"></thead>
+                <tbody id="tb"></tbody>
+              </table>
+            </div>
+            <div id="empty"></div>
+            <div class="foot" id="foot"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <div class="ov" id="ov" role="dialog" aria-modal="true">
+      <div class="modal" id="modal"></div>
+    </div>
+    <div id="toast" role="status"></div>
+
+    <script>
+      const USER = "Pak Suhendra";
+      const stamp = () =>
+        new Date().toLocaleString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      const S = (k, n, d, by, at) => ({
+        kode: k,
+        nama: n,
+        deskripsi: d,
+        by: by || USER,
+        at: at || "20 Okt 2026, 09.15",
+      });
+
+      // Relational Mock Database
+      const db = {
+        pl: [
+          {
+            ...S(
+              "PL01",
+              "Pengembang Perangkat Lunak",
+              "Merancang, membangun, dan memelihara aplikasi desktop, web, dan mobile enterprise.",
+            ),
+            cpl: ["CPL02", "CPL03", "CPL11"],
+          },
+          {
+            ...S(
+              "PL02",
+              "Analis Sistem Informasi",
+              "Menganalisis proses bisnis, memodelkan kebutuhan sistem, dan menyusun spesifikasi teknis software.",
+            ),
+            cpl: ["CPL01", "CPL02", "CPL11"],
+          },
+          {
+            ...S(
+              "PL03",
+              "Penguji Mutu Perangkat Lunak (QA)",
+              "Merancang skenario pengujian fungsional dan otomatisasi untuk menjamin kualitas perangkat lunak.",
+            ),
+            cpl: ["CPL04", "CPL11"],
+          },
+          {
+            ...S(
+              "PL04",
+              "Teknopreneur Perangkat Lunak",
+              "Mengidentifikasi peluang inovasi digital, mengelola produk teknologi, dan memimpin startup mandiri.",
+              "Tim kurikulum",
+              "18 Okt 2026, 13.40",
+            ),
+            cpl: ["CPL11"],
+          },
+        ],
+        cpl: [
+          {
+            kode: "CPL01",
+            nama: "Mampu menganalisis kebutuhan perangkat lunak dan proses bisnis",
+            jenis: "Hard skill",
+            pl: ["PL02"],
+            bk: ["BK01"],
+            mk: ["krpl2503"],
+            by: USER,
+            at: "20 Okt 2026, 09.30",
+          },
+          {
+            kode: "CPL02",
+            nama: "Mampu merancang arsitektur basis data relasional dan optimasi query",
+            jenis: "Hard skill",
+            pl: ["PL01", "PL02"],
+            bk: ["BK02"],
+            mk: ["krpl2501", "krpl2504"],
+            by: USER,
+            at: "20 Okt 2026, 09.32",
+          },
+          {
+            kode: "CPL03",
+            nama: "Mampu membangun aplikasi web dan mobile enterprise berbasis standar industri",
+            jenis: "Hard skill",
+            pl: ["PL01"],
+            bk: ["BK03"],
+            mk: ["krpl2502", "krpl2505", "krpl2507"],
+            by: USER,
+            at: "20 Okt 2026, 09.40",
+          },
+          {
+            kode: "CPL04",
+            nama: "Mampu merancang dan melaksanakan pengujian serta penjaminan mutu perangkat lunak",
+            jenis: "Hard skill",
+            pl: ["PL03"],
+            bk: ["BK04"],
+            mk: ["krpl2506"],
+            by: USER,
+            at: "20 Okt 2026, 09.41",
+          },
+          {
+            kode: "CPL11",
+            nama: "Mampu bekerja sama dalam tim lintas disiplin dan berkomunikasi secara profesional",
+            jenis: "Soft skill",
+            pl: ["PL01", "PL02", "PL03", "PL04"],
+            bk: ["BK05"],
+            mk: ["urpl2501", "krpl2507"],
+            by: "Tim kurikulum",
+            at: "18 Okt 2026, 13.55",
+          },
+        ],
+        bk: [
+          {
+            kode: "BK01",
+            nama: "Rekayasa Kebutuhan Perangkat Lunak",
+            deskripsi:
+              "Teknik elisitasi, analisis kelayakan, pemodelan use case, dan dokumentasi SRS.",
+            mk: ["krpl2503"],
+            by: USER,
+            at: "20 Okt 2026, 09.15",
+          },
+          {
+            kode: "BK02",
+            nama: "Basis Data & Manajemen Informasi",
+            deskripsi:
+              "Pemodelan data konseptual-logikal-fisikal, normalisasi, indexing, dan transaksi SQL.",
+            mk: ["krpl2501", "krpl2504"],
+            by: USER,
+            at: "20 Okt 2026, 09.15",
+          },
+          {
+            kode: "BK03",
+            nama: "Pemrograman & Rekayasa Web Enterprise",
+            deskripsi:
+              "Client-side modern, arsitektur microservices, REST API, dan full-stack framework.",
+            mk: ["krpl2502", "krpl2505", "krpl2507"],
+            by: USER,
+            at: "20 Okt 2026, 09.15",
+          },
+          {
+            kode: "BK04",
+            nama: "Penjaminan Mutu & Pengujian Software",
+            deskripsi:
+              "Prinsip QA/QC, unit testing, test-driven development (TDD), dan automasi test CI/CD.",
+            mk: ["krpl2506"],
+            by: USER,
+            at: "20 Okt 2026, 09.15",
+          },
+          {
+            kode: "BK05",
+            nama: "Kolaborasi Profesional & Agile Scrum",
+            deskripsi:
+              "Metodologi Agile, Scrum sprint delivery, manajemen repositori git, dan komunikasi profesi.",
+            mk: ["urpl2501", "krpl2507"],
+            by: "Tim kurikulum",
+            at: "18 Okt 2026, 13.45",
+          },
+        ],
+        mk: [
+          {
+            kode: "krpl2501",
+            nama: "Basis Data",
+            kat: "Inti RPL",
+            sks: 3,
+            sksTeori: 1,
+            sksPrak: 2,
+            sem: 1,
+            jenis: "Praktik",
+            prasyarat: [],
+            by: USER,
+            at: "20 Okt 2026, 10.05",
+          },
+          {
+            kode: "krpl2502",
+            nama: "Pemrograman Web Dasar",
+            kat: "Inti RPL",
+            sks: 3,
+            sksTeori: 1,
+            sksPrak: 2,
+            sem: 1,
+            jenis: "Praktik",
+            prasyarat: [],
+            by: USER,
+            at: "20 Okt 2026, 10.06",
+          },
+          {
+            kode: "krpl2503",
+            nama: "Rekayasa Kebutuhan",
+            kat: "Inti RPL",
+            sks: 2,
+            sksTeori: 2,
+            sksPrak: 0,
+            sem: 1,
+            jenis: "Teori",
+            prasyarat: [],
+            by: "Tim kurikulum",
+            at: "18 Okt 2026, 14.10",
+          },
+          {
+            kode: "urpl2501",
+            nama: "Bahasa Indonesia & Komunikasi Profesi",
+            kat: "Umum",
+            sks: 2,
+            sksTeori: 2,
+            sksPrak: 0,
+            sem: 1,
+            jenis: "Teori",
+            prasyarat: [],
+            by: "Tim kurikulum",
+            at: "18 Okt 2026, 14.12",
+          },
+          {
+            kode: "krpl2504",
+            nama: "Basis Data Lanjut",
+            kat: "Inti RPL",
+            sks: 3,
+            sksTeori: 1,
+            sksPrak: 2,
+            sem: 2,
+            jenis: "Praktik",
+            prasyarat: ["krpl2501"],
+            by: USER,
+            at: "20 Okt 2026, 10.15",
+          },
+          {
+            kode: "krpl2505",
+            nama: "Pemrograman Web Lanjut",
+            kat: "Inti RPL",
+            sks: 4,
+            sksTeori: 1,
+            sksPrak: 3,
+            sem: 2,
+            jenis: "Praktik",
+            prasyarat: ["krpl2502"],
+            by: USER,
+            at: "20 Okt 2026, 10.18",
+          },
+          {
+            kode: "krpl2506",
+            nama: "Pengujian Perangkat Lunak",
+            kat: "Inti RPL",
+            sks: 3,
+            sksTeori: 1,
+            sksPrak: 2,
+            sem: 2,
+            jenis: "Praktik",
+            prasyarat: ["krpl2502"],
+            by: USER,
+            at: "20 Okt 2026, 10.20",
+          },
+          {
+            kode: "krpl2507",
+            nama: "Proyek Pengembangan Agile",
+            kat: "Inti RPL",
+            sks: 4,
+            sksTeori: 0,
+            sksPrak: 4,
+            sem: 3,
+            jenis: "Praktik",
+            prasyarat: ["krpl2505", "krpl2506"],
+            by: USER,
+            at: "20 Okt 2026, 10.25",
+          },
+        ],
+        cpmk: [
+          {
+            kode: "CPMK01.01",
+            nama: "Mampu menyusun dokumen Software Requirements Specification (SRS) sesuai standar industri IEEE 830",
+            cpl: ["CPL01"],
+            mk: ["krpl2503"],
+            by: USER,
+            at: "20 Okt 2026, 11.00",
+          },
+          {
+            kode: "CPMK02.01",
+            nama: "Mampu merancang diagram ERD dan mengimplementasikan skema database relasional ternormalisasi",
+            cpl: ["CPL02"],
+            mk: ["krpl2501"],
+            by: USER,
+            at: "20 Okt 2026, 11.05",
+          },
+          {
+            kode: "CPMK02.02",
+            nama: "Mampu melakukan optimasi query kompleks, indexing, dan transaksi multi-tabel ACID",
+            cpl: ["CPL02"],
+            mk: ["krpl2504"],
+            by: USER,
+            at: "20 Okt 2026, 11.10",
+          },
+          {
+            kode: "CPMK03.01",
+            nama: "Mampu membangun antarmuka web responsif dan mengonsumsi REST API endpoints",
+            cpl: ["CPL03"],
+            mk: ["krpl2502"],
+            by: USER,
+            at: "20 Okt 2026, 11.12",
+          },
+          {
+            kode: "CPMK03.02",
+            nama: "Mampu merancang arsitektur backend REST API berbasis MVC dengan otentikasi token JWT",
+            cpl: ["CPL03"],
+            mk: ["krpl2505"],
+            by: USER,
+            at: "20 Okt 2026, 11.15",
+          },
+          {
+            kode: "CPMK04.01",
+            nama: "Mampu merancang test suite, membuat skenario pengujian unit & integration test secara otomatis",
+            cpl: ["CPL04"],
+            mk: ["krpl2506"],
+            by: USER,
+            at: "20 Okt 2026, 11.20",
+          },
+          {
+            kode: "CPMK11.01",
+            nama: "Mampu mempresentasikan hasil perancangan sistem dan proposal teknis secara lisan dan tulisan",
+            cpl: ["CPL11"],
+            mk: ["urpl2501"],
+            by: USER,
+            at: "20 Okt 2026, 11.25",
+          },
+          {
+            kode: "CPMK11.02",
+            nama: "Mampu berkolaborasi aktif dalam tim pengembangan software dengan metodologi Agile Scrum",
+            cpl: ["CPL11"],
+            mk: ["krpl2507"],
+            by: USER,
+            at: "20 Okt 2026, 11.30",
+          },
+        ],
+      };
+
+      // Menu Navigation Definition (12 modules + master data)
+      const MENU_GROUPS = [
+        {
+          title: "Data Master",
+          items: [
+            {
+              id: "pl",
+              label: "Profil Lulusan (PL)",
+            },
+            {
+              id: "cpl",
+              label: "Capaian Pembelajaran (CPL)",
+            },
+            { id: "bk", label: "Bahan Kajian (BK)" },
+            { id: "mk", label: "Mata Kuliah (MK)" },
+            {
+              id: "cpmk",
+              label: "Capaian MK (CPMK)",
+            },
+          ],
+        },
+        {
+          title: "Matriks Relasi OBE",
+          items: [
+            { id: "cpl_pl", label: "Matriks CPL–PL" },
+            { id: "cpl_bk", label: "Matriks CPL–BK" },
+            { id: "bk_mk", label: "Matriks BK–MK" },
+            { id: "cpl_mk", label: "Matriks CPL–MK" },
+            {
+              id: "bk_cpl_mk",
+              label: "Matriks BK–CPL–MK",
+            },
+          ],
+        },
+        {
+          title: "Struktur & Organisasi MK",
+          items: [
+            { id: "susunan_mk", label: "Susunan Mata Kuliah" },
+            {
+              id: "organisasi_mk",
+              label: "Organisasi Mata Kuliah",
+            },
+          ],
+        },
+        {
+          title: "Analisis & Pemenuhan CPL",
+          items: [
+            { id: "pemenuhan_cpl", label: "Pemenuhan CPL" },
+            { id: "cpl_cpmk_mk", label: "CPL–CPMK–MK" },
+            {
+              id: "cpmk_semester",
+              label: "CPMK per Semester",
+            },
+          ],
+        },
+      ];
+
+      const esc = (s) =>
+        String(s ?? "").replace(
+          /[&<>"]/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+        );
+      const $ = (id) => document.getElementById(id);
+
+      const nextCode = (t, pre) => {
+        const n = db[t].filter((r) => r.kode.startsWith(pre)).length + 1;
+        return pre + String(n).padStart(2, "0");
+      };
+
+      const nextCPMKCode = (cplKode) => {
+        const numPart = cplKode.replace(/\D/g, "").padStart(2, "0");
+        const pre = `CPMK${numPart}.`;
+        const existing =
+          db.cpmk.filter((c) => c.kode.startsWith(pre)).length + 1;
+        return `${pre}${String(existing).padStart(2, "0")}`;
+      };
+
+      const mkCode = (kat) => {
+        const p = kat === "Umum" ? "urpl" : "krpl";
+        const n = db.mk.filter((r) => r.kode.startsWith(p + "25")).length + 1;
+        return p + "25" + String(n).padStart(2, "0");
+      };
+
+      // Entity configuration for Master Data
+      const E = {
+        pl: {
+          group: "Data Master",
+          label: "Profil Lulusan (PL)",
+          add: "Tambah PL",
+          lead: "Gambaran peran profesional yang akan dijalani lulusan TRPL di dunia kerja. PL merupakan fondasi utama perumusan seluruh CPL.",
+          pre: "PL",
+          fields: [
+            { k: "kode", l: "Kode PL", h: "Format standar: PL01, PL02, dst." },
+            { k: "nama", l: "Nama Profil Lulusan" },
+            { k: "deskripsi", l: "Deskripsi Profil", t: "area", opt: 1 },
+          ],
+          cols: [
+            "Kode",
+            "Profil Lulusan & Deskripsi",
+            "CPL Terkait",
+          ],
+          row: (r) => {
+            const assigned =
+              r.cpl ||
+              db.cpl
+                .filter((c) => c.pl && c.pl.includes(r.kode))
+                .map((c) => c.kode);
+            return [
+              `<span class="kode">${esc(r.kode)}</span>`,
+              `<b>${esc(r.nama)}</b><br><span class="by">${esc(r.deskripsi)}</span>`,
+              assigned.length
+                ? `<div class="pl-list">${assigned
+                    .map((c) => {
+                      const cpl = db.cpl.find((x) => x.kode === c);
+                      return `<div class="pl-row"><span class="tag neutral" title="${cpl ? esc(cpl.nama) : ""}">${esc(c)}</span>${cpl ? `<span class="pl-name">${esc(cpl.nama)}</span>` : ""}</div>`;
+                    })
+                    .join("")}</div>`
+                : `<span class="tag warn">Belum ada CPL</span>`,
+            ];
+          },
+        },
+        cpl: {
+          group: "Data Master",
+          label: "Capaian Pembelajaran Lulusan (CPL)",
+          add: "Tambah CPL",
+          lead: "Kemampuan terukur yang harus dikuasai oleh setiap lulusan TRPL. Setiap CPL wajib diturunkan dari minimal satu Profil Lulusan (PL).",
+          pre: "CPL",
+          fields: [
+            {
+              k: "kode",
+              l: "Kode CPL",
+              h: "Format standar: CPL01, CPL02, dst.",
+            },
+            { k: "nama", l: "Pernyataan Capaian Pembelajaran" },
+            {
+              k: "jenis",
+              l: "Jenis Kompetensi",
+              t: "sel",
+              o: ["Hard skill", "Soft skill"],
+            },
+            {
+              k: "pl",
+              l: "Diturunkan dari Profil Lulusan (PL)",
+              t: "multi",
+              h: "Pilih minimal satu PL yang mendasari CPL ini.",
+            },
+          ],
+          cols: [
+            "Kode",
+            "Capaian Pembelajaran",
+            "Jenis",
+            "Profil Lulusan (PL)",
+          ],
+          filter: ["Jenis", "Hard skill", "Soft skill"],
+          row: (r) => [
+            `<span class="kode">${esc(r.kode)}</span>`,
+            `<b>${esc(r.nama)}</b>`,
+            `<span class="tag ${r.jenis === "Hard skill" ? "hard" : "softs"}">${r.jenis}</span>`,
+            r.pl && r.pl.length
+              ? `<div class="pl-list">${r.pl
+                  .map((p) => {
+                    const pl = db.pl.find((x) => x.kode === p);
+                    return `<div class="pl-row"><span class="tag neutral">${esc(p)}</span>${pl ? `<span class="pl-name">${esc(pl.nama)}</span>` : ""}</div>`;
+                  })
+                  .join("")}</div>`
+              : '<span class="tag warn">Belum ada PL</span>',
+          ],
+        },
+        bk: {
+          group: "Data Master",
+          label: "Bahan Kajian (BK)",
+          add: "Tambah BK",
+          lead: "Materi kajian keilmuan yang dibutuhkan untuk mencapai CPL. Sesuai prinsip kurikulum OBE, setiap BK wajib diwadahi oleh minimal 1 Mata Kuliah.",
+          pre: "BK",
+          fields: [
+            { k: "kode", l: "Kode BK", h: "Format standar: BK01, BK02, dst." },
+            { k: "nama", l: "Nama Bahan Kajian" },
+            { k: "deskripsi", l: "Cakupan Materi", t: "area", opt: 1 },
+            {
+              k: "mk",
+              l: "Mata Kuliah Pengampu (Minimal 1 MK)",
+              t: "multi-mk",
+              h: "Pilih mata kuliah yang mengajarkan bahan kajian ini.",
+            },
+          ],
+          cols: [
+            "Kode",
+            "Bahan Kajian & Cakupan",
+            "Mata Kuliah Pengampu",
+          ],
+          row: (r) => {
+            const assigned = r.mk || [];
+            return [
+              `<span class="kode">${esc(r.kode)}</span>`,
+              `<b>${esc(r.nama)}</b><br><span class="by">${esc(r.deskripsi)}</span>`,
+              assigned.length
+                ? `<div class="pl-list">${assigned
+                    .map((m) => {
+                      const mk = db.mk.find((x) => x.kode === m);
+                      return `<div class="pl-row"><span class="tag neutral" title="${mk ? esc(mk.nama) : ""}">${esc(m)}</span>${mk ? `<span class="pl-name">${esc(mk.nama)}</span>` : ""}</div>`;
+                    })
+                    .join("")}</div>`
+                : `<span class="tag warn">Belum ada MK (Null)</span>`,
+            ];
+          },
+        },
+        mk: {
+          group: "Data Master",
+          label: "Mata Kuliah (MK)",
+          add: "Tambah MK",
+          lead: "Daftar mata kuliah program studi TRPL lengkap dengan kategori, distribusi SKS (Teori & Praktik), penempatan semester, dan prasyarat.",
+          fields: [
+            {
+              k: "kat",
+              l: "Kategori MK",
+              t: "sel",
+              o: ["Inti RPL", "Umum"],
+              h: "Awalan kode: krpl untuk Inti RPL, urpl untuk Umum.",
+            },
+            { k: "kode", l: "Kode MK", h: "Format: krpl25xx / urpl25xx." },
+            { k: "nama", l: "Nama Mata Kuliah" },
+            { k: "sem", l: "Semester", t: "num", min: 1, max: 8, def: 1 },
+            {
+              k: "sksTeori",
+              l: "SKS Teori (T)",
+              t: "num",
+              min: 0,
+              max: 6,
+              def: 1,
+            },
+            {
+              k: "sksPrak",
+              l: "SKS Praktik (P)",
+              t: "num",
+              min: 0,
+              max: 6,
+              def: 2,
+            },
+            {
+              k: "jenis",
+              l: "Bentuk Pelaksanaan",
+              t: "sel",
+              o: ["Praktik", "Teori"],
+            },
+            {
+              k: "prasyarat",
+              l: "Mata Kuliah Prasyarat (Opsional)",
+              t: "multi-prereq",
+            },
+          ],
+          cols: [
+            "Kode",
+            "Mata Kuliah",
+            "Semester",
+            "Kategori",
+            "SKS (T / P / Total)",
+            "Jenis",
+            "Prasyarat",
+          ],
+          filter: ["Kategori", "Inti RPL", "Umum"],
+          row: (r) => [
+            `<span class="kode">${esc(r.kode)}</span>`,
+            `<b>${esc(r.nama)}</b>`,
+            `Sem ${r.sem || 1}`,
+            `<span class="tag neutral">${r.kat}</span>`,
+            `<b>${(r.sksTeori || 0) + (r.sksPrak || 0)} SKS</b> (${r.sksTeori || 0}T / ${r.sksPrak || 0}P)`,
+            `<span class="tag ${r.jenis === "Praktik" ? "hard" : "softs"}">${r.jenis}</span>`,
+            r.prasyarat && r.prasyarat.length
+              ? r.prasyarat
+                  .map((p) => `<span class="tag neutral">${esc(p)}</span>`)
+                  .join("")
+              : '<span style="color:var(--text-muted)">-</span>',
+          ],
+        },
+        cpmk: {
+          group: "Data Master",
+          label: "Capaian Pembelajaran Mata Kuliah (CPMK)",
+          add: "Tambah CPMK",
+          lead: "Capaian pembelajaran spesifik yang diturunkan dari CPL dan diukur pada mata kuliah tertentu. Penomoran kode terstandarisasi CPMKxx.yy sesuai nomor CPL induk.",
+          fields: [
+            {
+              k: "cpl",
+              l: "CPL Induk",
+              t: "sel-cpl",
+              h: "Pilih CPL yang diturunkan menjadi CPMK ini.",
+            },
+            {
+              k: "mk",
+              l: "Mata Kuliah Pengampu",
+              t: "multi-mk",
+              h: "Pilih MK yang mengukur CPMK ini.",
+            },
+            {
+              k: "kode",
+              l: "Kode CPMK (Terstandarisasi)",
+              h: "Format standar otomatis: CPMK[NoCPL].[NomorUrut], contoh CPMK02.01",
+            },
+            { k: "nama", l: "Pernyataan Capaian Mata Kuliah" },
+          ],
+          cols: [
+            "Kode CPMK",
+            "Pernyataan Capaian MK",
+            "CPL Induk",
+            "Mata Kuliah Pengampu",
+          ],
+          row: (r) => {
+            const assignedCpl = Array.isArray(r.cpl)
+              ? r.cpl
+              : r.cpl
+                ? [r.cpl]
+                : [];
+            const assignedMk = Array.isArray(r.mk) ? r.mk : r.mk ? [r.mk] : [];
+            return [
+              `<span class="kode">${esc(r.kode)}</span>`,
+              `<b>${esc(r.nama)}</b>`,
+              assignedCpl.length
+                ? `<div class="pl-list">${assignedCpl
+                    .map((c) => {
+                      const cpl = db.cpl.find((x) => x.kode === c);
+                      return `<div class="pl-row"><span class="tag neutral" title="${cpl ? esc(cpl.nama) : ""}">${esc(c)}</span>${cpl ? `<span class="pl-name">${esc(cpl.nama)}</span>` : ""}</div>`;
+                    })
+                    .join("")}</div>`
+                : `<span class="tag warn">Belum ada CPL</span>`,
+              assignedMk.length
+                ? `<div class="pl-list">${assignedMk
+                    .map((m) => {
+                      const mk = db.mk.find((x) => x.kode === m);
+                      return `<div class="pl-row"><span class="tag neutral" title="${mk ? esc(mk.nama) : ""}">${esc(m)}</span>${mk ? `<span class="pl-name">${esc(mk.nama)}</span>` : ""}</div>`;
+                    })
+                    .join("")}</div>`
+                : `<span class="tag warn">Belum ada MK (Null)</span>`,
+            ];
+          },
+        },
+      };
+
+      let tab = "pl";
+      let edit = null;
+      let form = {};
+
+      function toast(m) {
+        const t = $("toast");
+        t.textContent = m;
+        t.classList.add("on");
+        clearTimeout(t._t);
+        t._t = setTimeout(() => t.classList.remove("on"), 2600);
+      }
+
+      function toggleSidebar() {
+        const app = document.querySelector(".app");
+        app.classList.toggle("sidebar-hidden");
+        const isHidden = app.classList.contains("sidebar-hidden");
+        const btn = $("toggle-sidebar");
+        if (btn) btn.setAttribute("aria-expanded", !isHidden);
+      }
+
+      function nav() {
+        $("aside-nav").innerHTML = MENU_GROUPS.map(
+          (g) => `
+    <h6>${g.title}</h6>
+    <div>
+      ${g.items
+        .map((it) => {
+          const isCur = it.id === tab;
+          return `<button class="nav" ${isCur ? 'aria-current="page"' : ""} data-t="${it.id}">${it.label}</button>`;
+        })
+        .join("")}
+    </div>
+  `,
+        ).join("");
+      }
+
+      // Master Router for Rendering Views
+      function render() {
+        nav();
+        const q = $("q").value.trim().toLowerCase();
+        const f = $("flt");
+        const isMaster = tab in E;
+
+        if (isMaster) {
+          renderMaster(tab, q);
+        } else {
+          renderMatrixOrSpecialView(tab, q);
+        }
+      }
+
+      // 1. Render Master Tables (PL, CPL, BK, MK, CPMK)
+      function renderMaster(t, q) {
+        const e = E[t];
+        $("crumb").textContent = `${e.group} / ${e.label}`;
+        $("title").textContent = e.label;
+        $("lead").textContent = e.lead;
+        $("bar").style.display = "flex";
+        $("add").style.display = "inline-flex";
+        $("add").textContent = "+ " + e.add;
+        $("banner-txt").textContent =
+          `Prototype data master kurikulum TRPL. Setiap penambahan atau perubahan tersinkronisasi otomatis ke seluruh matriks relasi OBE.`;
+
+        const f = $("flt");
+        if (e.filter) {
+          f.hidden = false;
+          if (f.dataset.t !== t) {
+            f.dataset.t = t;
+            f.innerHTML =
+              `<option value="">Semua ${e.filter[0].toLowerCase()}</option>` +
+              e.filter
+                .slice(1)
+                .map((o) => `<option>${o}</option>`)
+                .join("");
+          }
+        } else {
+          f.hidden = true;
+          f.value = "";
+          f.dataset.t = "";
+        }
+
+        const fv = f.hidden ? "" : f.value;
+        const key = t === "cpl" ? "jenis" : "kat";
+        const rows = db[t]
+          .map((r, i) => [r, i])
+          .filter(
+            ([r]) =>
+              (!q ||
+                (r.kode + " " + (r.nama || "")).toLowerCase().includes(q)) &&
+              (!fv || r[key] === fv),
+          );
+
+        $("view-container").innerHTML = `
+    <div class="scroll">
+      <table>
+        <thead id="th"><tr>${e.cols.map((c) => `<th>${c}</th>`).join("")}<th>Aksi</th></tr></thead>
+        <tbody id="tb">${rows
+          .map(
+            ([r, i]) =>
+              `<tr>${e
+                .row(r)
+                .map((c) => `<td>${c}</td>`)
+                .join(
+                  "",
+                )}<td><div class="act"><button class="ib" data-e="${i}">Ubah</button><button class="ib del" data-d="${i}">Hapus</button></div></td></tr>`,
+          )
+          .join("")}</tbody>
+      </table>
+    </div>
+    <div id="empty">${rows.length ? "" : `<div class="empty"><b>${q || fv ? "Tidak ada data yang cocok" : "Belum ada data"}</b><br>${q || fv ? "Ubah kata kunci pencarian atau filter." : "Klik “" + e.add + "” untuk mulai mengisi."}</div>`}</div>
+    <div class="foot" id="foot">Menampilkan ${rows.length} dari ${db[t].length} data</div>
+  `;
+      }
+
+      // Helper: Menemukan metadata modul dari MENU_GROUPS
+      function getMenuModule(id) {
+        for (const g of MENU_GROUPS) {
+          const item = g.items.find((it) => it.id === id);
+          if (item) return { group: g.title, label: item.label };
+        }
+        return { group: "Kurikulum OBE", label: id };
+      }
+
+      // 2. Render Matrix & Analysis Views (Under Construction)
+      function renderMatrixOrSpecialView(id) {
+        const item = getMenuModule(id);
+        $("crumb").textContent = `${item.group} / ${item.label}`;
+        $("title").textContent = item.label;
+        $("lead").textContent = `Modul ${item.label} sedang dalam tahap perancangan dan standarisasi relasi kurikulum OBE.`;
+        $("banner-txt").textContent = `Data dan visualisasi untuk modul ${item.label} sedang dipersiapkan. Seluruh integrasi matriks akan aktif pada pembaruan sistem berikutnya.`;
+        $("bar").style.display = "none";
+
+        $("view-container").innerHTML = `
+          <div class="uc-card">
+            <div class="uc-icon-box">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+              </svg>
+            </div>
+            <div class="uc-pill">
+              <span class="uc-dot"></span>
+              <span>Under Construction</span>
+            </div>
+            <h2 class="uc-title">${esc(item.label)}</h2>
+            <p class="uc-desc">
+              Halaman ini sedang dalam proses perancangan dan integrasi dengan sistem kurikulum OBE TRPL Politeknik Astra. Seluruh data master tetap dapat dikelola secara normal.
+            </p>
+            <div class="uc-grid">
+              <div class="uc-item">
+                <div class="uc-item-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <strong>Tahap Desain & Relasi</strong>
+                  <p>Penyelarasan matriks kompetensi kurikulum OBE</p>
+                </div>
+              </div>
+              <div class="uc-item">
+                <div class="uc-item-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg>
+                </div>
+                <div>
+                  <strong>Sinkronisasi Master</strong>
+                  <p>Koneksi langsung dengan PL, CPL, BK, MK, & CPMK</p>
+                </div>
+              </div>
+              <div class="uc-item">
+                <div class="uc-item-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <strong>Validasi Otomatis</strong>
+                  <p>Memastikan pemenuhan standar aturan akademik OBE</p>
+                </div>
+              </div>
+            </div>
+            <button class="btn uc-back-btn" data-t="pl">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              Kembali ke Data Master (PL)
+            </button>
+          </div>
+        `;
+      }
+
+      // Modal Form Operations
+      function open(h) {
+        $("modal").innerHTML = h;
+        $("ov").classList.add("on");
+        const x = $("modal").querySelector("input,select,textarea,button");
+        x && x.focus();
+      }
+
+      function close() {
+        $("ov").classList.remove("on");
+      }
+
+      function showForm(i) {
+        const e = E[tab];
+        edit = i;
+        const r = i == null ? {} : db[tab][i];
+        form = { errors: {} };
+        let init = { ...r };
+
+        if (i == null) {
+          if (tab === "mk") {
+            init.kat = "Inti RPL";
+            init.jenis = "Praktik";
+            init.sem = 1;
+            init.sksTeori = 1;
+            init.sksPrak = 2;
+            init.sks = 3;
+            init.prasyarat = [];
+            init.kode = mkCode("Inti RPL");
+          } else if (tab === "cpmk") {
+            const defaultCpl = db.cpl[0] ? db.cpl[0].kode : "CPL01";
+            init.cpl = Array.isArray(r.cpl) ? [...r.cpl] : r.cpl ? [r.cpl] : [defaultCpl];
+            init.mk = Array.isArray(r.mk) ? [...r.mk] : r.mk ? [r.mk] : [db.mk[0] ? db.mk[0].kode : "krpl2501"];
+            init.kode = nextCPMKCode(init.cpl[0] || defaultCpl);
+          } else if (tab === "bk") {
+            init.kode = nextCode("bk", "BK");
+            init.mk = [];
+          } else if (tab === "cpl") {
+            init.kode = nextCode("cpl", "CPL");
+            init.jenis = "Hard skill";
+            init.pl = [];
+            init.bk = [];
+            init.mk = [];
+          } else {
+            init.kode = nextCode(tab, e.pre);
+          }
+        }
+        form.v = init;
+        drawForm();
+      }
+
+      function drawForm(err = {}) {
+        const e = E[tab],
+          v = form.v,
+          i = edit;
+
+        const f = e.fields
+          .map((d) => {
+            let c = "";
+            const val = v[d.k] ?? "";
+
+            if (d.t === "area") {
+              c = `<textarea name="${d.k}" rows="3">${esc(val)}</textarea>`;
+            } else if (d.t === "sel") {
+              c = `<select name="${d.k}">${d.o.map((o) => `<option ${o === val ? "selected" : ""}>${o}</option>`).join("")}</select>`;
+            } else if (d.t === "sel-cpl") {
+              const currentVal = Array.isArray(val) ? val[0] : val;
+              c = `<select name="${d.k}" id="sel-cpl">${db.cpl.map((cpl) => `<option value="${esc(cpl.kode)}" ${cpl.kode === currentVal ? "selected" : ""}>${esc(cpl.kode)} - ${esc(cpl.nama)}</option>`).join("")}</select>`;
+            } else if (d.t === "sel-mk") {
+              c = `<select name="${d.k}">${db.mk.map((mk) => `<option value="${esc(mk.kode)}" ${mk.kode === val ? "selected" : ""}>${esc(mk.kode)} - ${esc(mk.nama)} (Sem ${mk.sem})</option>`).join("")}</select>`;
+            } else if (d.t === "multi") {
+              const n = (v.pl || []).length;
+              c =
+                `<div class="gh"><span class="gt">${d.l}</span><span class="cnt" id="cnt">${n} dari ${db.pl.length} dipilih</span></div>` +
+                (db.pl.length
+                  ? `<div class="chk">${db.pl
+                      .map(
+                        (p) => `
+          <label class="pick">
+            <input type="checkbox" name="pl" value="${esc(p.kode)}" ${(v.pl || []).includes(p.kode) ? "checked" : ""}>
+            <span class="box">
+              <span class="ck"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span>
+              <span class="tx"><b>${esc(p.kode)}</b>${esc(p.nama)}</span>
+            </span>
+          </label>
+        `,
+                      )
+                      .join("")}</div>`
+                  : '<div class="h">Belum ada PL.</div>');
+            } else if (d.t === "multi-mk") {
+              const n = (v.mk || []).length;
+              c =
+                `<div class="gh"><span class="gt">${d.l}</span><span class="cnt">${n} MK dipilih</span></div>` +
+                `<div class="chk">${db.mk
+                  .map(
+                    (m) => `
+          <label class="pick">
+            <input type="checkbox" name="mk" value="${esc(m.kode)}" ${(v.mk || []).includes(m.kode) ? "checked" : ""}>
+            <span class="box">
+              <span class="ck"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span>
+              <span class="tx"><b>${esc(m.kode)}</b>${esc(m.nama)} (Sem ${m.sem})</span>
+            </span>
+          </label>
+        `,
+                  )
+                  .join("")}</div>`;
+            } else if (d.t === "multi-prereq") {
+              const availableMK = db.mk.filter(
+                (m) => !v.kode || m.kode !== v.kode,
+              );
+              c =
+                `<div class="gh"><span class="gt">${d.l}</span></div>` +
+                `<div class="chk">${availableMK
+                  .map(
+                    (m) => `
+          <label class="pick">
+            <input type="checkbox" name="prasyarat" value="${esc(m.kode)}" ${(v.prasyarat || []).includes(m.kode) ? "checked" : ""}>
+            <span class="box">
+              <span class="ck"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span>
+              <span class="tx"><b>${esc(m.kode)}</b>${esc(m.nama)}</span>
+            </span>
+          </label>
+        `,
+                  )
+                  .join("")}</div>`;
+            } else {
+              c = `<input type="${d.t === "num" ? "number" : "text"}" name="${d.k}" value="${esc(val)}" ${d.min != null ? `min="${d.min}"` : ""} ${d.max != null ? `max="${d.max}"` : ""}>`;
+            }
+
+            const isCustomContainer =
+              d.t === "multi" || d.t === "multi-mk" || d.t === "multi-prereq";
+            return `<div class="fld ${err[d.k] ? "err" : ""}">
+      ${isCustomContainer ? `<div class="grp">${c}</div>` : `<div class="tf">${c}<label>${d.l}${d.opt ? " (opsional)" : ""}</label></div>`}
+      ${err[d.k] ? `<div class="e">${err[d.k]}</div>` : d.h ? `<div class="h">${d.h}</div>` : ""}
+    </div>`;
+          })
+          .join("");
+
+        const m =
+          i != null
+            ? `<div class="meta">Terakhir diubah oleh ${esc(db[tab][i].by)}, ${esc(db[tab][i].at)}. Perubahan ini akan tercatat atas nama ${USER}.</div>`
+            : `<div class="meta">Data baru ini akan otomatis tercatat dibuat oleh ${USER}.</div>`;
+        open(
+          `<h2>${i == null ? e.add : "Ubah " + esc(db[tab][i].kode)}</h2><p class="s">Lengkapi isian data sesuai standar kurikulum TRPL Politeknik Astra.</p><form id="fm" novalidate>${f}</form>${m}<div class="mf"><button class="btn ghost" data-x>Batal</button><button class="btn" id="save" style="margin:0">Simpan Data</button></div>`,
+        );
+      }
+
+      function readForm() {
+        const o = { ...form.v };
+        const fm = $("fm");
+        if (!fm) return o;
+        [...fm.elements].forEach((el) => {
+          if (el.name && el.type !== "checkbox") o[el.name] = el.value.trim();
+        });
+        if (tab === "cpl") {
+          o.pl = [...fm.querySelectorAll("[name=pl]:checked")].map(
+            (x) => x.value,
+          );
+        } else if (tab === "cpmk") {
+          o.mk = [...fm.querySelectorAll("[name=mk]:checked")].map(
+            (x) => x.value,
+          );
+          if (o.cpl && !Array.isArray(o.cpl)) {
+            o.cpl = [o.cpl];
+          }
+        } else if (tab === "bk") {
+          o.mk = [...fm.querySelectorAll("[name=mk]:checked")].map(
+            (x) => x.value,
+          );
+        } else if (tab === "mk") {
+          o.prasyarat = [
+            ...fm.querySelectorAll("[name=prasyarat]:checked"),
+          ].map((x) => x.value);
+          o.sksTeori = +(o.sksTeori || 0);
+          o.sksPrak = +(o.sksPrak || 0);
+          o.sks = o.sksTeori + o.sksPrak;
+          o.sem = +(o.sem || 1);
+        }
+        return o;
+      }
+
+      function save() {
+        const o = readForm(),
+          e = E[tab],
+          err = {};
+        e.fields.forEach((d) => {
+          if (
+            d.opt ||
+            d.t === "multi" ||
+            d.t === "multi-mk" ||
+            d.t === "multi-prereq"
+          )
+            return;
+          if (!o[d.k] && o[d.k] !== 0) err[d.k] = "Wajib diisi.";
+        });
+
+        if (
+          !err.kode &&
+          db[tab].some(
+            (r, j) =>
+              r.kode.toLowerCase() === o.kode.toLowerCase() && j !== edit,
+          )
+        ) {
+          err.kode = "Kode " + o.kode + " sudah terdaftar. Gunakan kode lain.";
+        }
+        if (tab === "cpl" && (!o.pl || !o.pl.length)) {
+          err.pl =
+            "Pilih minimal satu PL. CPL wajib diturunkan dari Profil Lulusan.";
+        }
+        if (tab === "bk" && (!o.mk || !o.mk.length)) {
+          err.mk =
+            "Peringatan Kurikulum: Bahan Kajian tidak boleh null MK. Pilih minimal satu mata kuliah pengampu.";
+        }
+        if (tab === "cpmk" && !err.kode && !/^CPMK\d{2}\.\d{2}$/.test(o.kode)) {
+          err.kode =
+            "Format kode CPMK harus terstandarisasi, contoh: CPMK01.01 atau CPMK02.02";
+        }
+
+        form.v = o;
+        if (Object.keys(err).length) {
+          drawForm(err);
+          const x = $("modal").querySelector(
+            ".fld.err input, .fld.err select, .fld.err textarea",
+          );
+          x && x.focus();
+          return;
+        }
+
+        o.by = USER;
+        o.at = stamp();
+
+        const isNew = edit == null;
+        if (isNew) db[tab].push(o);
+        else db[tab][edit] = o;
+
+        close();
+        render();
+        toast(
+          isNew
+            ? "Data berhasil ditambahkan: " + o.kode
+            : "Perubahan tersimpan: " + o.kode,
+        );
+      }
+
+      function askDel(i) {
+        const r = db[tab][i];
+        let used = 0;
+        let reason = "";
+
+        if (tab === "pl") {
+          used = db.cpl.filter((c) => (c.pl || []).includes(r.kode)).length;
+          reason = `masih dipakai oleh ${used} CPL. Hapus atau alihkan relasi CPL tersebut lebih dahulu agar data tetap konsisten.`;
+        } else if (tab === "cpl") {
+          used = db.cpmk.filter((c) => c.cpl === r.kode).length;
+          reason = `masih menjadi induk dari ${used} CPMK. Hapus CPMK turunannya lebih dahulu.`;
+        } else if (tab === "mk") {
+          used = db.cpmk.filter((c) => c.mk === r.kode).length;
+          reason = `masih mengampu ${used} CPMK. Ubah atau hapus CPMK terkait lebih dahulu.`;
+        }
+
+        if (used) {
+          open(
+            `<h2>${esc(r.kode)} Belum Bisa Dihapus</h2><p class="s">${esc(r.kode)} ${reason}</p><div class="mf"><button class="btn" data-x style="margin:0">Mengerti</button></div>`,
+          );
+          return;
+        }
+
+        open(
+          `<h2>Hapus ${esc(r.kode)}?</h2><p class="s">Data <b>${esc(r.nama)}</b> akan dihapus permanen dari kurikulum. Tindakan ini akan tercatat dalam audit log atas nama ${USER}.</p><div class="mf"><button class="btn ghost" data-x>Batal</button><button class="btn danger" data-ok="${i}">Ya, Hapus</button></div>`,
+        );
+      }
+
+      // Event Listeners
+      document.addEventListener("click", (ev) => {
+        const b = ev.target.closest("button, #ov");
+        if (!b) return;
+
+        if (b.id === "toggle-sidebar") {
+          toggleSidebar();
+        } else if (b.dataset.t) {
+          tab = b.dataset.t;
+          $("q").value = "";
+          render();
+        } else if (b.id === "add") {
+          showForm(null);
+        } else if (b.dataset.e != null && b.dataset.e !== "") {
+          showForm(+b.dataset.e);
+        } else if (b.dataset.d != null && b.dataset.d !== "") {
+          askDel(+b.dataset.d);
+        } else if (b.id === "save") {
+          save();
+        } else if (b.dataset.ok != null && b.dataset.ok !== "") {
+          const r = db[tab].splice(+b.dataset.ok, 1)[0];
+          close();
+          render();
+          toast("Data telah dihapus: " + r.kode);
+        } else if ("x" in b.dataset || ev.target === $("ov")) {
+          close();
+        }
+      });
+
+      document.addEventListener("keydown", (ev) => {
+        if (ev.key === "Escape") close();
+      });
+
+      document.addEventListener("change", (ev) => {
+        if (ev.target.name === "pl") {
+          const n = document.querySelectorAll("[name=pl]:checked").length;
+          const c = $("cnt");
+          if (c) c.textContent = n + " dari " + db.pl.length + " dipilih";
+        }
+        if (ev.target.name === "kat" && tab === "mk" && edit == null) {
+          form.v = readForm();
+          form.v.kode = mkCode(form.v.kat);
+          drawForm();
+        }
+        if (ev.target.id === "sel-cpl" && tab === "cpmk" && edit == null) {
+          form.v = readForm();
+          form.v.kode = nextCPMKCode(form.v.cpl);
+          drawForm();
+        }
+      });
+
+      $("q").addEventListener("input", render);
+      $("flt").addEventListener("change", render);
+      $("modal").addEventListener("submit", (ev) => {
+        ev.preventDefault();
+        save();
+      });
+
+      // Initial boot
+      render();
+    </script>
+  </body>
+</html>
