@@ -43,6 +43,7 @@
     </header>
     <div class="app">
       <aside id="aside-nav"></aside>
+      <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
       <main>
         <div class="crumb" id="crumb"></div>
         <h1 id="title"></h1>
@@ -774,12 +775,31 @@
         t._t = setTimeout(() => t.classList.remove("on"), 2600);
       }
 
+      function isMobile() {
+        return window.innerWidth <= 820;
+      }
+
       function toggleSidebar() {
         const app = document.querySelector(".app");
-        app.classList.toggle("sidebar-hidden");
-        const isHidden = app.classList.contains("sidebar-hidden");
         const btn = $("toggle-sidebar");
-        if (btn) btn.setAttribute("aria-expanded", !isHidden);
+        if (isMobile()) {
+          app.classList.toggle("sidebar-mobile-open");
+          const isOpen = app.classList.contains("sidebar-mobile-open");
+          if (btn) btn.setAttribute("aria-expanded", isOpen);
+        } else {
+          app.classList.toggle("sidebar-hidden");
+          const isHidden = app.classList.contains("sidebar-hidden");
+          if (btn) btn.setAttribute("aria-expanded", !isHidden);
+        }
+      }
+
+      function closeMobileSidebar() {
+        const app = document.querySelector(".app");
+        if (app.classList.contains("sidebar-mobile-open")) {
+          app.classList.remove("sidebar-mobile-open");
+          const btn = $("toggle-sidebar");
+          if (btn && isMobile()) btn.setAttribute("aria-expanded", "false");
+        }
       }
 
       function nav() {
@@ -1232,15 +1252,20 @@
 
       // Event Listeners
       document.addEventListener("click", (ev) => {
-        const b = ev.target.closest("button, #ov");
+        const b = ev.target.closest("button, #ov, #sidebar-backdrop");
         if (!b) return;
 
         if (b.id === "toggle-sidebar") {
           toggleSidebar();
+        } else if (b.id === "sidebar-backdrop") {
+          closeMobileSidebar();
         } else if (b.dataset.t) {
           tab = b.dataset.t;
           $("q").value = "";
           render();
+          if (isMobile()) {
+            closeMobileSidebar();
+          }
         } else if (b.id === "add") {
           showForm(null);
         } else if (b.dataset.e != null && b.dataset.e !== "") {
@@ -1260,7 +1285,12 @@
       });
 
       document.addEventListener("keydown", (ev) => {
-        if (ev.key === "Escape") close();
+        if (ev.key === "Escape") {
+          close();
+          if (isMobile()) {
+            closeMobileSidebar();
+          }
+        }
       });
 
       document.addEventListener("change", (ev) => {
@@ -1286,6 +1316,12 @@
       $("modal").addEventListener("submit", (ev) => {
         ev.preventDefault();
         save();
+      });
+
+      window.addEventListener("resize", () => {
+        if (!isMobile()) {
+          closeMobileSidebar();
+        }
       });
 
       // Initial boot

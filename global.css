@@ -525,7 +525,10 @@ tbody tr:hover {
 .by {
   font-size: 12px;
   color: var(--text-muted);
-  white-space: nowrap;
+  display: block;
+  white-space: normal;
+  line-height: 1.45;
+  margin-top: 3px;
 }
 
 .by b {
@@ -985,36 +988,65 @@ tbody tr:hover {
 }
 
 
+.sidebar-backdrop {
+  display: none;
+}
+
 /* Mobile Responsive */
 @media (max-width: 820px) {
   .app {
     grid-template-columns: 1fr;
   }
+
+  /* Sidebar Drawer on Mobile (default tertutup) */
   aside {
-    position: sticky;
+    position: fixed;
     top: 64px;
-    z-index: 10;
-    height: auto;
-    display: flex;
-    overflow-x: auto;
-    padding: 4px 8px;
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
+    left: 0;
+    bottom: 0;
+    width: 270px;
+    max-width: 82vw;
+    height: calc(100vh - 64px);
+    z-index: 14;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    box-shadow: none;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      visibility 0.25s ease,
+      box-shadow 0.25s ease;
   }
-  aside h6 {
-    display: none;
+
+  /* Saat dibuka di mobile */
+  .app.sidebar-mobile-open aside {
+    display: block;
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+    box-shadow: 4px 0 24px rgba(15, 23, 42, 0.15);
   }
-  .app.sidebar-hidden aside {
-    display: none;
+
+  .app.sidebar-mobile-open .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 64px 0 0 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 13;
+    animation: sb-fade-in 0.2s ease;
   }
-  aside > div {
-    display: flex;
-    gap: 4px;
-  }
-  .nav {
-    width: auto;
-    white-space: nowrap;
-    padding: 8px 14px;
+
+  @keyframes sb-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   main {
     padding: 16px;
