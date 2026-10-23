@@ -30,8 +30,6 @@
         src="assets/logo.png"
         alt="Politeknik Astra"
       />
-      <span class="div"></span>
-      <span class="t">Kurikulum TRPL</span>
       <span class="sp"></span>
       <div class="who">
         <div class="who-info">
@@ -48,16 +46,6 @@
         <div class="crumb" id="crumb"></div>
         <h1 id="title"></h1>
         <p class="lead" id="lead"></p>
-        <div class="banner" id="banner">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
-            /></svg
-          ><span id="banner-txt"
-            >Prototype sistem kurikulum OBE TRPL Politeknik Astra. Data saling
-            terintegrasi antarmatriks dan mencatat riwayat perubahan.</span
-          >
-        </div>
         <div id="log-header-container"></div>
         <div class="paper">
           <div class="bar" id="bar">
@@ -1149,6 +1137,7 @@
           label: "Mata Kuliah (MK)",
           add: "Tambah MK",
           lead: "Daftar mata kuliah program studi TRPL lengkap dengan kategori, distribusi SKS (Teori & Praktik), penempatan semester, dan prasyarat.",
+          pre: "MK",
           fields: [
             {
               k: "kat",
@@ -1217,6 +1206,7 @@
           label: "Capaian Pembelajaran Mata Kuliah (CPMK)",
           add: "Tambah CPMK",
           lead: "Capaian pembelajaran spesifik yang diturunkan dari CPL dan diukur pada mata kuliah tertentu. Penomoran kode terstandarisasi CPMKxx.yy sesuai nomor CPL induk.",
+          pre: "CPMK",
           fields: [
             {
               k: "cpl",
@@ -1468,20 +1458,19 @@
         $("bar").style.display = "flex";
         $("add").style.display = "inline-flex";
         $("add").textContent = "+ " + e.add;
-        $("banner-txt").textContent =
-          `Prototype data master kurikulum TRPL. Setiap penambahan atau perubahan tersinkronisasi otomatis ke seluruh matriks relasi OBE dan tercatat dalam audit log.`;
 
         const btnLog = $("btn-master-log");
         if (btnLog) {
           btnLog.style.display = "inline-flex";
           btnLog.dataset.targetLogMaster = t;
           btnLog.dataset.t = "log_master";
+          const masterShort = MASTER_META[t]?.short || e.pre || t.toUpperCase();
           btnLog.innerHTML = `
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
-            Riwayat Log ${e.pre}
+            Riwayat Log ${masterShort}
           `;
         }
 
@@ -1554,8 +1543,6 @@
           "Audit trail dan rekam jejak aktivitas perubahan " +
           meta.desc +
           " kurikulum TRPL sesuai standar akreditasi dan tata kelola akademik OBE.";
-        $("banner-txt").textContent =
-          "Seluruh rekaman log tersimpan secara kronologis dan permanen untuk kebutuhan audit mutu kurikulum, akreditasi prodi, dan penjaminan mutu Politeknik Astra.";
         $("bar").style.display = "none";
         const btnLog = $("btn-master-log");
         if (btnLog) btnLog.style.display = "none";
@@ -1951,7 +1938,6 @@
         $("crumb").textContent = `${item.group} / ${item.label}`;
         $("title").textContent = item.label;
         $("lead").textContent = `Modul ${item.label} sedang dalam tahap perancangan dan standarisasi relasi kurikulum OBE.`;
-        $("banner-txt").textContent = `Data dan visualisasi untuk modul ${item.label} sedang dipersiapkan. Seluruh integrasi matriks akan aktif pada pembaruan sistem berikutnya.`;
         $("bar").style.display = "none";
 
         $("view-container").innerHTML = `
