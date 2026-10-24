@@ -1365,6 +1365,121 @@
       let logActionFilter = "";
       let logUserFilter = "";
       let logSearchQuery = "";
+      let logTimeFilter = "all"; // 'all', 'today', 'yesterday', 'last7', 'last30', 'thisMonth', 'custom'
+      let logDateStart = "";     // YYYY-MM-DD
+      let logDateEnd = "";       // YYYY-MM-DD
+      let logSortOrder = "desc"; // 'desc' (terbaru) or 'asc' (terlama)
+
+      function formatDateShort(isoDateStr) {
+        if (!isoDateStr) return "";
+        const [y, m, d] = isoDateStr.split("-").map(Number);
+        const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+        return `${d} ${months[m - 1]} ${y}`;
+      }
+
+      function parseLogDate(dateStr) {
+        if (!dateStr) return null;
+        if (dateStr instanceof Date) return isNaN(dateStr) ? null : dateStr;
+
+        const idMonths = {
+          jan: 0, januari: 0,
+          feb: 1, februari: 1,
+          mar: 2, maret: 2,
+          apr: 3, april: 3,
+          mei: 4, may: 4,
+          jun: 5, juni: 5,
+          jul: 6, juli: 6,
+          agu: 7, ags: 7, agt: 7, agustus: 7, aug: 7,
+          sep: 8, sept: 8, september: 8,
+          okt: 9, oktober: 9, oct: 9,
+          nov: 10, november: 10,
+          des: 11, desember: 11, dec: 11,
+        };
+
+        const m = String(dateStr)
+          .trim()
+          .match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})(?:[,\s]+(\d{1,2})[.:](\d{1,2}))?/);
+        if (m) {
+          const day = parseInt(m[1], 10);
+          const monStr = m[2].toLowerCase();
+          const year = parseInt(m[3], 10);
+          const hour = m[4] != null ? parseInt(m[4], 10) : 0;
+          const min = m[5] != null ? parseInt(m[5], 10) : 0;
+          const month = idMonths[monStr];
+          if (month !== undefined) {
+            return new Date(year, month, day, hour, min);
+          }
+        }
+
+        const parsed = new Date(dateStr);
+        return isNaN(parsed.getTime()) ? null : parsed;
+      }
+
+      function getLogTimeFilterRange(filterType, customStart, customEnd) {
+        if (!filterType || filterType === "all") return null;
+
+        const now = new Date();
+        const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+        const endOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+
+        if (filterType === "today") {
+          return { start: startOfDay(now), end: endOfDay(now), label: "Hari Ini" };
+        }
+        if (filterType === "yesterday") {
+          const y = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+          return { start: startOfDay(y), end: endOfDay(y), label: "Kemarin" };
+        }
+        if (filterType === "last7") {
+          const s = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+          return { start: startOfDay(s), end: endOfDay(now), label: "7 Hari Terakhir" };
+        }
+        if (filterType === "last30") {
+          const s = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29);
+          return { start: startOfDay(s), end: endOfDay(now), label: "30 Hari Terakhir" };
+        }
+        if (filterType === "thisMonth") {
+          const s = new Date(now.getFullYear(), now.getMonth(), 1);
+          const e = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          return { start: startOfDay(s), end: endOfDay(e), label: "Bulan Ini" };
+        }
+        if (filterType === "custom") {
+          let s = null;
+          let e = null;
+          if (customStart) {
+            const [y, m, d] = customStart.split("-").map(Number);
+            s = new Date(y, m - 1, d, 0, 0, 0, 0);
+          }
+          if (customEnd) {
+            const [y, m, d] = customEnd.split("-").map(Number);
+            e = new Date(y, m - 1, d, 23, 59, 59, 999);
+          }
+          let lbl = "Rentang Kustom";
+          if (customStart && customEnd) {
+            lbl = `${formatDateShort(customStart)} – ${formatDateShort(customEnd)}`;
+          } else if (customStart) {
+            lbl = `Mulai ${formatDateShort(customStart)}`;
+          } else if (customEnd) {
+            lbl = `Sampai ${formatDateShort(customEnd)}`;
+          }
+          return { start: s, end: e, label: lbl };
+        }
+        return null;
+      }
+
+      function updateLogResetBtn() {
+        const btn = $("log-btn-reset");
+        if (!btn) return;
+        const hasFilter = Boolean(
+          logSearchQuery ||
+          logActionFilter ||
+          logUserFilter ||
+          logTimeFilter !== "all" ||
+          logDateStart ||
+          logDateEnd ||
+          logSortOrder !== "desc"
+        );
+        btn.style.display = hasFilter ? "inline-flex" : "none";
+      }
 
       function getFieldLabel(t, k) {
         const labels = {
@@ -1634,12 +1749,21 @@
           </div>
         `;
 
-        // Render Body: Toolbar + Table Container
+        const hasFilter = Boolean(
+          logSearchQuery ||
+          logActionFilter ||
+          logUserFilter ||
+          logTimeFilter !== "all" ||
+          logDateStart ||
+          logDateEnd ||
+          logSortOrder !== "desc"
+        );
+
         $("view-container").innerHTML = `
           <div class="log-toolbar">
             <div class="log-search-box">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/>
               </svg>
               <input id="log-q" type="search" placeholder="Cari kode, nama, user, atau keterangan..." value="${esc(logSearchQuery)}" aria-label="Cari Log">
             </div>
@@ -1661,14 +1785,45 @@
                 .join("")}
             </select>
 
-            ${
-              logSearchQuery || logActionFilter || logUserFilter
-                ? `<button class="log-reset-btn" id="log-btn-reset">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-                    Reset Filter
-                  </button>`
-                : ""
-            }
+            <div class="log-time-select-wrap">
+              <select class="log-select" id="log-flt-time" aria-label="Filter Waktu">
+                <option value="all" ${logTimeFilter === "all" ? "selected" : ""}>Semua Waktu</option>
+                <option value="today" ${logTimeFilter === "today" ? "selected" : ""}>Hari Ini</option>
+                <option value="yesterday" ${logTimeFilter === "yesterday" ? "selected" : ""}>Kemarin</option>
+                <option value="last7" ${logTimeFilter === "last7" ? "selected" : ""}>7 Hari Terakhir</option>
+                <option value="last30" ${logTimeFilter === "last30" ? "selected" : ""}>30 Hari Terakhir</option>
+                <option value="thisMonth" ${logTimeFilter === "thisMonth" ? "selected" : ""}>Bulan Ini</option>
+                <option value="custom" ${logTimeFilter === "custom" ? "selected" : ""}>Rentang Tanggal Kustom...</option>
+              </select>
+            </div>
+
+            <div class="log-date-range" id="log-date-range-wrap" style="${logTimeFilter === "custom" ? "display:inline-flex;" : "display:none;"}">
+              <div class="log-date-group">
+                <span class="log-date-label">Dari:</span>
+                <input type="date" id="log-date-start" class="log-date-input" value="${esc(logDateStart)}" aria-label="Dari Tanggal">
+              </div>
+              <span class="log-date-sep">&ndash;</span>
+              <div class="log-date-group">
+                <span class="log-date-label">Sampai:</span>
+                <input type="date" id="log-date-end" class="log-date-input" value="${esc(logDateEnd)}" aria-label="Sampai Tanggal">
+              </div>
+              <button type="button" class="log-date-clear-btn" id="log-btn-clear-date" title="Kosongkan tanggal" style="${logDateStart || logDateEnd ? "display:inline-flex;" : "display:none;"}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            <select class="log-select" id="log-flt-sort" aria-label="Urutan Waktu">
+              <option value="desc" ${logSortOrder === "desc" ? "selected" : ""}>Waktu: Terbaru &darr;</option>
+              <option value="asc" ${logSortOrder === "asc" ? "selected" : ""}>Waktu: Terlama &uarr;</option>
+            </select>
+
+            <button class="log-reset-btn" id="log-btn-reset" style="${hasFilter ? "display:inline-flex;" : "display:none;"}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+              Reset Filter
+            </button>
           </div>
 
           <div id="log-table-area"></div>
@@ -1683,6 +1838,8 @@
           logMasterFilter === "all"
             ? allLogs
             : allLogs.filter((l) => l.master === logMasterFilter);
+
+        const timeRange = getLogTimeFilterRange(logTimeFilter, logDateStart, logDateEnd);
 
         const filtered = scopedLogs.filter((l) => {
           if (logActionFilter && l.aksi !== logActionFilter) return false;
@@ -1699,12 +1856,34 @@
               " " +
               l.user +
               " " +
-              l.masterLabel
+              l.masterLabel +
+              " " +
+              (l.at || "")
             ).toLowerCase();
             if (!qStr.includes(logSearchQuery)) return false;
           }
+          if (timeRange) {
+            const logDate = parseLogDate(l.at);
+            if (logDate) {
+              if (timeRange.start && logDate < timeRange.start) return false;
+              if (timeRange.end && logDate > timeRange.end) return false;
+            }
+          }
           return true;
         });
+
+        filtered.sort((a, b) => {
+          const dateA = parseLogDate(a.at);
+          const dateB = parseLogDate(b.at);
+          const timeA = dateA ? dateA.getTime() : 0;
+          const timeB = dateB ? dateB.getTime() : 0;
+          return logSortOrder === "asc" ? timeA - timeB : timeB - timeA;
+        });
+
+        const clearBtn = $("log-btn-clear-date");
+        if (clearBtn) {
+          clearBtn.style.display = logDateStart || logDateEnd ? "inline-flex" : "none";
+        }
 
         const area = $("log-table-area");
         if (!area) return;
@@ -1791,12 +1970,23 @@
                 ? ""
                 : `<div class="empty">
                     <b>Tidak ada riwayat log yang sesuai</b><br>
-                    Coba sesuaikan kata kunci pencarian, filter master, atau filter aksi.
+                    Coba sesuaikan kata kunci pencarian, filter master, filter waktu, atau filter aksi.
                   </div>`
             }
           </div>
-          <div class="foot">
-            Menampilkan ${filtered.length} dari ${scopedLogs.length} riwayat log (${MASTER_META[logMasterFilter]?.name || "Master"})
+          <div class="foot" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <span>Menampilkan <b>${filtered.length}</b> dari <b>${scopedLogs.length}</b> riwayat log (${MASTER_META[logMasterFilter]?.name || "Master"})</span>
+            ${
+              timeRange
+                ? `<span class="log-foot-filter-pill">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    Filter Waktu: <b>${esc(timeRange.label)}</b>
+                  </span>`
+                : ""
+            }
           </div>
         `;
       }
@@ -2342,11 +2532,24 @@
           render();
         } else if (b.dataset.logId) {
           openLogDetail(b.dataset.logId);
-        } else if (b.id === "log-btn-reset") {
+        } else if (b.id === "log-btn-reset" || b.closest("#log-btn-reset")) {
           logActionFilter = "";
           logUserFilter = "";
           logSearchQuery = "";
-          render();
+          logTimeFilter = "all";
+          logDateStart = "";
+          logDateEnd = "";
+          logSortOrder = "desc";
+          renderLogPage(tab);
+        } else if (b.id === "log-btn-clear-date" || b.closest("#log-btn-clear-date")) {
+          logDateStart = "";
+          logDateEnd = "";
+          const sInp = $("log-date-start");
+          const eInp = $("log-date-end");
+          if (sInp) sInp.value = "";
+          if (eInp) eInp.value = "";
+          renderLogTable();
+          updateLogResetBtn();
         } else if (b.dataset.t) {
           if (b.dataset.t === "log_master") {
             logMasterFilter = "all";
@@ -2404,6 +2607,15 @@
         if (ev.target.id === "log-q") {
           logSearchQuery = ev.target.value.trim().toLowerCase();
           renderLogTable();
+          updateLogResetBtn();
+        } else if (ev.target.id === "log-date-start") {
+          logDateStart = ev.target.value;
+          renderLogTable();
+          updateLogResetBtn();
+        } else if (ev.target.id === "log-date-end") {
+          logDateEnd = ev.target.value;
+          renderLogTable();
+          updateLogResetBtn();
         }
       });
 
@@ -2411,11 +2623,49 @@
         if (ev.target.id === "log-flt-action") {
           logActionFilter = ev.target.value;
           renderLogTable();
+          updateLogResetBtn();
           return;
         }
         if (ev.target.id === "log-flt-user") {
           logUserFilter = ev.target.value;
           renderLogTable();
+          updateLogResetBtn();
+          return;
+        }
+        if (ev.target.id === "log-flt-time") {
+          logTimeFilter = ev.target.value;
+          const rangeWrap = $("log-date-range-wrap");
+          if (rangeWrap) {
+            rangeWrap.style.display = logTimeFilter === "custom" ? "inline-flex" : "none";
+          }
+          if (logTimeFilter !== "custom") {
+            logDateStart = "";
+            logDateEnd = "";
+            const sInp = $("log-date-start");
+            const eInp = $("log-date-end");
+            if (sInp) sInp.value = "";
+            if (eInp) eInp.value = "";
+          }
+          renderLogTable();
+          updateLogResetBtn();
+          return;
+        }
+        if (ev.target.id === "log-date-start") {
+          logDateStart = ev.target.value;
+          renderLogTable();
+          updateLogResetBtn();
+          return;
+        }
+        if (ev.target.id === "log-date-end") {
+          logDateEnd = ev.target.value;
+          renderLogTable();
+          updateLogResetBtn();
+          return;
+        }
+        if (ev.target.id === "log-flt-sort") {
+          logSortOrder = ev.target.value;
+          renderLogTable();
+          updateLogResetBtn();
           return;
         }
         if (ev.target.name === "pl") {

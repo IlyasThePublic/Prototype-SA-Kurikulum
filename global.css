@@ -1101,6 +1101,21 @@ tbody tr:hover {
   .log-search-box {
     max-width: 100% !important;
   }
+  .log-date-range {
+    width: 100% !important;
+    justify-content: space-between !important;
+    height: auto !important;
+    padding: 8px 12px !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .log-date-group {
+    flex: 1 1 120px !important;
+    justify-content: space-between !important;
+  }
+  .log-date-input {
+    width: 100% !important;
+  }
 }
 
 /* ==========================================================================
@@ -1342,6 +1357,99 @@ tbody tr:hover {
   background: var(--surface);
   color: var(--text);
   border-color: var(--text-muted);
+}
+
+/* Date Range & Time Filter */
+.log-time-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.log-date-range {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0 10px;
+  height: 38px;
+}
+
+.log-date-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.log-date-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.log-date-input {
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  padding: 4px 0;
+  outline: none;
+  cursor: pointer;
+}
+
+.log-date-input:focus {
+  outline: none;
+}
+
+.log-date-sep {
+  color: var(--text-muted);
+  font-size: 13px;
+  user-select: none;
+}
+
+.log-date-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  padding: 0;
+  margin-left: 2px;
+  transition: all 0.15s ease;
+}
+
+.log-date-clear-btn:hover {
+  background: var(--surface);
+  color: #ef4444;
+  border-color: #fca5a5;
+}
+
+.log-foot-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border: 1px solid #bfdbfe;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 12px;
+}
+
+.log-foot-filter-pill svg {
+  flex-shrink: 0;
 }
 
 /* Master Badges */
