@@ -86,7 +86,6 @@
     <div class="ov" id="ov" role="dialog" aria-modal="true">
       <div class="modal" id="modal"></div>
     </div>
-    <div id="toast" role="status"></div>
 
     <script>
       const USER = "Pak Suhendra";
@@ -1268,12 +1267,8 @@
       let edit = null;
       let form = {};
 
-      function toast(m) {
-        const t = $("toast");
-        t.textContent = m;
-        t.classList.add("on");
-        clearTimeout(t._t);
-        t._t = setTimeout(() => t.classList.remove("on"), 2600);
+      function toast() {
+        // Notifikasi dinonaktifkan sepenuhnya
       }
 
       function isMobile() {
@@ -1556,6 +1551,8 @@
           renderMaster(tab, q);
         } else if (isLog) {
           renderLogPage(tab);
+        } else if (tab === "cpl_pl") {
+          renderMatrixCplPl();
         } else {
           renderMatrixOrSpecialView(tab, q);
         }
@@ -2119,6 +2116,689 @@
         return { group: "Kurikulum OBE", label: id };
       }
 
+      // ==========================================================
+      // MATRIKS CPL-PL (2D)
+      // ==========================================================
+      let matrixSearch = "";
+      let matrixJenisFilter = "all";
+      let matrixStatusFilter = "all";
+      let matrixInteractive = false;
+      let matrixHoverCol = null;
+
+      function renderMatrixCplPl() {
+        if ($("log-header-container")) $("log-header-container").innerHTML = "";
+        if ($("btn-master-log")) $("btn-master-log").style.display = "none";
+
+        $("crumb").textContent = "Matriks Relasi OBE / Matriks CPL–PL";
+        $("title").textContent = "Matriks Relasi CPL – Profil Lulusan (2D)";
+        $("lead").textContent =
+          "Pemetaan dua dimensi antara Capaian Pembelajaran Lulusan (CPL) dan Profil Lulusan (PL) TRPL. Memastikan setiap profil lulusan didukung oleh kompetensi yang tepat sesuai standar OBE.";
+        $("bar").style.display = "none";
+
+        const allCpl = db.cpl || [];
+        const allPl = db.pl || [];
+
+        // Overall metrics calculation
+        let totalActiveLinks = 0;
+        let cplWithoutPlCount = 0;
+        let plWithoutCplCount = 0;
+
+        allCpl.forEach((c) => {
+          const links = (c.pl || []).length;
+          totalActiveLinks += links;
+          if (links === 0) cplWithoutPlCount++;
+        });
+
+        allPl.forEach((p) => {
+          const supportingCpl = allCpl.filter((c) =>
+            (c.pl || []).includes(p.kode),
+          ).length;
+          if (supportingCpl === 0) plWithoutCplCount++;
+        });
+
+        const isObeCompliant =
+          cplWithoutPlCount === 0 && plWithoutCplCount === 0;
+
+        // Filter CPL rows according to search & filter criteria
+        const filteredCpl = allCpl.filter((c) => {
+          if (matrixSearch) {
+            const term = (
+              c.kode +
+              " " +
+              (c.nama || "") +
+              " " +
+              (c.jenis || "")
+            ).toLowerCase();
+            if (!term.includes(matrixSearch)) return false;
+          }
+          if (matrixJenisFilter !== "all" && c.jenis !== matrixJenisFilter) {
+            return false;
+          }
+          const links = (c.pl || []).length;
+          if (matrixStatusFilter === "mapped" && links === 0) return false;
+          if (matrixStatusFilter === "unmapped" && links > 0) return false;
+          return true;
+        });
+
+        const hasFilter = Boolean(
+          matrixSearch ||
+            matrixJenisFilter !== "all" ||
+            matrixStatusFilter !== "all",
+        );
+
+        $("view-container").innerHTML = `
+          <div class="matrix-view-wrap">
+            <!-- 1. Top Stat Cards -->
+            <div class="matrix-stats-grid">
+              <div class="matrix-stat-card">
+                <div class="matrix-stat-icon cpl">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                </div>
+                <div class="matrix-stat-info">
+                  <span class="matrix-stat-val">${allCpl.length} CPL</span>
+                  <span class="matrix-stat-label">Capaian Pembelajaran</span>
+                  <span class="matrix-stat-sub">${allCpl.filter((c) => c.jenis === "Hard skill").length} Hard skill &bull; ${allCpl.filter((c) => c.jenis === "Soft skill").length} Soft skill</span>
+                </div>
+              </div>
+
+              <div class="matrix-stat-card">
+                <div class="matrix-stat-icon pl">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <div class="matrix-stat-info">
+                  <span class="matrix-stat-val">${allPl.length} PL</span>
+                  <span class="matrix-stat-label">Profil Lulusan TRPL</span>
+                  <span class="matrix-stat-sub">Seluruh profil aktif kurikulum</span>
+                </div>
+              </div>
+
+              <div class="matrix-stat-card">
+                <div class="matrix-stat-icon relation">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                  </svg>
+                </div>
+                <div class="matrix-stat-info">
+                  <span class="matrix-stat-val">${totalActiveLinks} Tautan</span>
+                  <span class="matrix-stat-label">Relasi Aktif Terpetakan</span>
+                  <span class="matrix-stat-sub">Rata-rata ${allPl.length ? (totalActiveLinks / allPl.length).toFixed(1) : 0} CPL per profil</span>
+                </div>
+              </div>
+
+              <div class="matrix-stat-card">
+                <div class="matrix-stat-icon obe ${isObeCompliant ? "pass" : ""}">
+                  ${
+                    isObeCompliant
+                      ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
+                      : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`
+                  }
+                </div>
+                <div class="matrix-stat-info">
+                  <span class="matrix-stat-val" style="${isObeCompliant ? "color:var(--success)" : "color:var(--warning)"}">${isObeCompliant ? "100% Terpenuhi" : "Perlu Evaluasi"}</span>
+                  <span class="matrix-stat-label">Standar Validasi OBE</span>
+                  <span class="matrix-stat-sub">${isObeCompliant ? "Semua CPL &amp; PL memiliki relasi" : `${cplWithoutPlCount} CPL kosong, ${plWithoutCplCount} PL kosong`}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Interactive Control Toolbar -->
+            <div class="matrix-toolbar">
+              <div class="matrix-toolbar-left">
+                <div class="matrix-search">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input
+                    id="matrix-q"
+                    type="search"
+                    placeholder="Cari CPL (kode / kata kunci)..."
+                    value="${esc(matrixSearch)}"
+                    aria-label="Cari CPL"
+                  />
+                </div>
+
+                <select id="matrix-flt-jenis" class="matrix-select" aria-label="Filter Jenis CPL">
+                  <option value="all" ${matrixJenisFilter === "all" ? "selected" : ""}>Semua Jenis (${allCpl.length})</option>
+                  <option value="Hard skill" ${matrixJenisFilter === "Hard skill" ? "selected" : ""}>Khusus Hard skill</option>
+                  <option value="Soft skill" ${matrixJenisFilter === "Soft skill" ? "selected" : ""}>Khusus Soft skill</option>
+                </select>
+
+                <select id="matrix-flt-status" class="matrix-select" aria-label="Filter Status Relasi">
+                  <option value="all" ${matrixStatusFilter === "all" ? "selected" : ""}>Semua Status Pemetaan</option>
+                  <option value="mapped" ${matrixStatusFilter === "mapped" ? "selected" : ""}>Hanya Yang Terpetakan</option>
+                  <option value="unmapped" ${matrixStatusFilter === "unmapped" ? "selected" : ""}>Belum Terpetakan (0 PL)</option>
+                </select>
+
+                ${
+                  hasFilter
+                    ? `
+                  <button class="matrix-btn-tool" id="matrix-btn-reset" title="Reset filter dan pencarian">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                      <path d="M3 3v5h5"></path>
+                    </svg>
+                    Reset Filter
+                  </button>
+                `
+                    : ""
+                }
+              </div>
+
+              <div class="matrix-toolbar-right">
+                <button
+                  type="button"
+                  id="matrix-toggle-mode"
+                  class="matrix-mode-badge ${matrixInteractive ? "active" : ""}"
+                  title="${matrixInteractive ? "Mode Edit Aktif (Klik untuk mematikan)" : "Mode Edit Mati (Klik untuk mengaktifkan)"}"
+                  role="switch"
+                  aria-checked="${matrixInteractive}"
+                >
+                  <span class="matrix-mode-dot"></span>
+                  <span>Mode Edit</span>
+                </button>
+
+                <button type="button" class="matrix-btn-tool" id="matrix-btn-guide" title="Lihat Panduan Standar OBE Matriks CPL-PL">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  Panduan OBE
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. Scrollable 2D Table Grid -->
+            <div class="matrix-scroll-wrap" id="matrix-scroll-container">
+              <table class="matrix-table ${matrixInteractive ? "" : "view-only"}">
+                <thead>
+                  <tr>
+                    <th class="th-cpl-code" scope="col">Kode CPL</th>
+                    <th class="th-cpl-name" scope="col">Pernyataan Capaian Pembelajaran Lulusan (CPL)</th>
+                    ${allPl
+                      .map((pl) => {
+                        const cplCount = allCpl.filter((c) =>
+                          (c.pl || []).includes(pl.kode),
+                        ).length;
+                        return `
+                        <th class="th-pl" data-col-pl="${esc(pl.kode)}" scope="col">
+                          <div class="pl-head-card">
+                            <div class="pl-head-top">
+                              <span class="pl-head-code">${esc(pl.kode)}</span>
+                              <button
+                                type="button"
+                                class="pl-info-btn"
+                                data-matrix-pl-info="${esc(pl.kode)}"
+                                title="Lihat detail deskripsi ${esc(pl.kode)}"
+                                aria-label="Detail ${esc(pl.kode)}"
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                  <circle cx="12" cy="12" r="10"></circle>
+                                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                              </button>
+                            </div>
+                            <div class="pl-head-title" title="${esc(pl.nama)}">${esc(pl.nama)}</div>
+                            <span class="pl-head-badge" title="Total CPL yang mendukung profil ini">${cplCount} CPL</span>
+                          </div>
+                        </th>
+                      `;
+                      })
+                      .join("")}
+                    <th class="th-summary" scope="col">
+                      <div>Total PL</div>
+                      <span style="font-size:11px;font-weight:400;color:var(--text-muted)">Kontribusi</span>
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  ${
+                    filteredCpl.length
+                      ? filteredCpl
+                          .map((cpl) => {
+                            const assignedPl = cpl.pl || [];
+                            const plCount = assignedPl.length;
+                            const isHard = cpl.jenis === "Hard skill";
+
+                            return `
+                      <tr data-row-cpl="${esc(cpl.kode)}">
+                        <td class="td-cpl-code">
+                          <button
+                            type="button"
+                            class="tag ${isHard ? "hard" : "softs"}"
+                            style="cursor:pointer;border:none;font-weight:700"
+                            data-matrix-cpl-info="${esc(cpl.kode)}"
+                            title="Klik untuk melihat detail CPL ${esc(cpl.kode)}"
+                          >
+                            ${esc(cpl.kode)}
+                          </button>
+                        </td>
+
+                        <td class="td-cpl-name">
+                          <div style="font-weight:500;color:var(--text);line-height:1.4">${esc(cpl.nama)}</div>
+                          <div style="margin-top:4px">
+                            <span class="tag ${isHard ? "hard" : "softs"}" style="font-size:11px;height:20px;line-height:18px">${esc(cpl.jenis || "Hard skill")}</span>
+                          </div>
+                        </td>
+
+                        ${allPl
+                          .map((pl) => {
+                            const isLinked = assignedPl.includes(pl.kode);
+                            return `
+                            <td
+                              class="matrix-cell"
+                              data-cell-cpl="${esc(cpl.kode)}"
+                              data-cell-pl="${esc(pl.kode)}"
+                            >
+                              <button
+                                type="button"
+                                class="matrix-btn ${isLinked ? "linked" : "unlinked"}"
+                                data-matrix-toggle-cpl="${esc(cpl.kode)}"
+                                data-matrix-toggle-pl="${esc(pl.kode)}"
+                                title="${esc(cpl.kode)} &bull; ${esc(pl.kode)}: ${isLinked ? "Terhubung (Klik untuk melepas)" : "Belum terhubung (Klik untuk menghubungkan)"}"
+                                aria-label="${esc(cpl.kode)} ke ${esc(pl.kode)}: ${isLinked ? "Terhubung" : "Tidak Terhubung"}"
+                              >
+                                ${
+                                  isLinked
+                                    ? `<span class="matrix-icon"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span>
+                                     <span>Terhubung</span>`
+                                    : `<span class="matrix-dash">&mdash;</span>
+                                     <span class="matrix-btn-hover-label">
+                                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                       Hubungkan
+                                     </span>`
+                                }
+                              </button>
+                            </td>
+                          `;
+                          })
+                          .join("")}
+
+                        <td class="matrix-cell-summary">
+                          ${
+                            plCount > 0
+                              ? `<span class="matrix-count-badge ok" title="${plCount} dari ${allPl.length} Profil Lulusan">${plCount} PL</span>`
+                              : `<span class="matrix-count-badge warn" title="Peringatan OBE: CPL wajib diturunkan dari minimal 1 PL">⚠️ 0 PL</span>`
+                          }
+                        </td>
+                      </tr>
+                    `;
+                          })
+                          .join("")
+                      : `
+                    <tr>
+                      <td colspan="${allPl.length + 3}" style="text-align:center;padding:48px 16px">
+                        <div class="empty">
+                          <b>Tidak ada data CPL yang sesuai</b><br>
+                          Coba sesuaikan kata kunci pencarian atau filter status yang Anda pilih.
+                        </div>
+                      </td>
+                    </tr>
+                  `
+                  }
+                </tbody>
+
+                <tfoot>
+                  <!-- Summary Row: Total CPL per PL -->
+                  <tr>
+                    <td class="tf-cpl-code" style="font-weight:700">Total</td>
+                    <td class="tf-cpl-name">
+                      <span class="matrix-tf-val">Jumlah CPL Pendukung</span>
+                      <span class="matrix-tf-sub">Akumulasi CPL yang memetakan ke masing-masing profil</span>
+                    </td>
+                    ${allPl
+                      .map((pl) => {
+                        const count = allCpl.filter((c) =>
+                          (c.pl || []).includes(pl.kode),
+                        ).length;
+                        const pct = allCpl.length
+                          ? Math.round((count / allCpl.length) * 100)
+                          : 0;
+                        return `
+                        <td style="text-align:center" data-col-pl="${esc(pl.kode)}">
+                          <span class="matrix-tf-val">${count} CPL</span>
+                          <span class="matrix-tf-sub">${pct}% cakupan</span>
+                        </td>
+                      `;
+                      })
+                      .join("")}
+                    <td style="text-align:center">
+                      <span class="matrix-tf-val">${totalActiveLinks}</span>
+                      <span class="matrix-tf-sub">Total Relasi</span>
+                    </td>
+                  </tr>
+
+                  <!-- Status Row: Standar OBE -->
+                  <tr>
+                    <td class="tf-cpl-code" style="font-weight:700">Kesesuaian</td>
+                    <td class="tf-cpl-name">
+                      <span class="matrix-tf-val">Status Standar OBE</span>
+                      <span class="matrix-tf-sub">Setiap profil wajib memiliki minimal 1 CPL pendukung</span>
+                    </td>
+                    ${allPl
+                      .map((pl) => {
+                        const count = allCpl.filter((c) =>
+                          (c.pl || []).includes(pl.kode),
+                        ).length;
+                        const isOk = count > 0;
+                        return `
+                        <td style="text-align:center" data-col-pl="${esc(pl.kode)}">
+                          <span class="tag ${isOk ? "ok" : "warn"}" style="margin:0;font-size:11px">
+                            ${isOk ? "✓ Terpenuhi" : "⚠️ Perlu CPL"}
+                          </span>
+                        </td>
+                      `;
+                      })
+                      .join("")}
+                    <td style="text-align:center">
+                      <span class="tag ${isObeCompliant ? "ok" : "warn"}" style="margin:0;font-size:11px">
+                        ${isObeCompliant ? "✓ 100% Selaras" : "⚠️ Cek Relasi"}
+                      </span>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <!-- 4. Guidance & Legend Footer Card -->
+            <div class="matrix-guide-card">
+              <div class="matrix-legend-items">
+                <span style="font-weight:600;color:var(--text);font-size:12px">Keterangan Matriks:</span>
+                <div class="matrix-legend-item">
+                  <span class="matrix-legend-chip linked">✓ Terhubung</span>
+                  <span>CPL berkontribusi langsung membentuk Profil Lulusan</span>
+                </div>
+                <div class="matrix-legend-item">
+                  <span class="matrix-legend-chip unlinked">&mdash;</span>
+                  <span>Tidak ada relasi langsung</span>
+                </div>
+              </div>
+
+              <div class="matrix-guide-note">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span><b>Tips Pengoperasian:</b> ${matrixInteractive ? "Mode Edit aktif: Klik langsung pada tombol sel matriks untuk menghubungkan atau memutuskan relasi." : "Aktifkan Mode Edit di kanan atas untuk dapat mengubah relasi sel."} Perubahan akan langsung disinkronkan ke master data dan dicatat dalam audit log.</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function toggleMatrixRelation(cplKode, plKode) {
+        if (!matrixInteractive) {
+          return;
+        }
+
+        const cplObj = (db.cpl || []).find((c) => c.kode === cplKode);
+        const plObj = (db.pl || []).find((p) => p.kode === plKode);
+        if (!cplObj || !plObj) return;
+
+        if (!Array.isArray(cplObj.pl)) cplObj.pl = [];
+        if (!Array.isArray(plObj.cpl)) plObj.cpl = [];
+
+        const isCurrentlyLinked = cplObj.pl.includes(plKode);
+        const prevCplPl = [...cplObj.pl];
+        const prevPlCpl = [...plObj.cpl];
+
+        if (isCurrentlyLinked) {
+          // Disconnect
+          cplObj.pl = cplObj.pl.filter((k) => k !== plKode);
+          plObj.cpl = plObj.cpl.filter((k) => k !== cplKode);
+
+          cplObj.by = USER;
+          cplObj.at = stamp();
+          plObj.by = USER;
+          plObj.at = stamp();
+
+          addAuditLog({
+            master: "cpl",
+            aksi: "ubah",
+            kode: cplKode,
+            nama: cplObj.nama,
+            keterangan: `Memutus relasi ${cplKode} dengan Profil Lulusan ${plKode} (${plObj.nama}) via Matriks 2D`,
+            changes: [
+              {
+                field: "pl",
+                label: "Profil Lulusan Terkait",
+                old: prevCplPl,
+                new: [...cplObj.pl],
+              },
+            ],
+            detail: { cpl: cplKode, pl: plKode, statusRelasi: "Dilepas" },
+          });
+
+          renderMatrixCplPl();
+        } else {
+          // Connect
+          cplObj.pl.push(plKode);
+          if (!plObj.cpl.includes(cplKode)) {
+            plObj.cpl.push(cplKode);
+          }
+
+          cplObj.by = USER;
+          cplObj.at = stamp();
+          plObj.by = USER;
+          plObj.at = stamp();
+
+          addAuditLog({
+            master: "cpl",
+            aksi: "ubah",
+            kode: cplKode,
+            nama: cplObj.nama,
+            keterangan: `Menghubungkan ${cplKode} ke Profil Lulusan ${plKode} (${plObj.nama}) via Matriks 2D`,
+            changes: [
+              {
+                field: "pl",
+                label: "Profil Lulusan Terkait",
+                old: prevCplPl,
+                new: [...cplObj.pl],
+              },
+            ],
+            detail: { cpl: cplKode, pl: plKode, statusRelasi: "Terhubung" },
+          });
+
+          renderMatrixCplPl();
+        }
+      }
+
+      function openMatrixPlDetail(plKode) {
+        const pl = (db.pl || []).find((p) => p.kode === plKode);
+        if (!pl) return;
+
+        const assignedCpl = (db.cpl || []).filter((c) =>
+          (c.pl || []).includes(plKode),
+        );
+
+        open(`
+          <div class="matrix-modal-wrap">
+            <div class="matrix-modal-header">
+              <div>
+                <span class="matrix-modal-badge pl">${esc(pl.kode)}</span>
+                <span style="font-size:12px;color:var(--text-muted);margin-left:8px">Profil Lulusan TRPL</span>
+              </div>
+              <span class="tag neutral">${assignedCpl.length} CPL Terhubung</span>
+            </div>
+
+            <h2 style="font-size:18px;margin:0 0 8px">${esc(pl.nama)}</h2>
+            <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;margin:0 0 16px">
+              ${esc(pl.deskripsi || "Belum ada deskripsi profil lulusan.")}
+            </p>
+
+            <div style="font-size:12px;color:var(--text-muted);background:var(--bg);padding:8px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:16px">
+              Dikelola oleh: <b>${esc(pl.by || USER)}</b> &bull; Terakhir diubah: <b>${esc(pl.at || "-")}</b>
+            </div>
+
+            <h3 style="font-size:13px;font-weight:600;margin:0 0 8px;color:var(--text)">Daftar CPL yang Mendukung Profil Ini (${assignedCpl.length}):</h3>
+            ${
+              assignedCpl.length
+                ? `
+              <div class="matrix-modal-list">
+                ${assignedCpl
+                  .map(
+                    (c) => `
+                  <div class="matrix-modal-item">
+                    <span class="tag ${c.jenis === "Hard skill" ? "hard" : "softs"}" style="margin:0;flex-shrink:0">${esc(c.kode)}</span>
+                    <div style="flex:1">
+                      <div style="font-weight:600;font-size:13px;line-height:1.3">${esc(c.nama)}</div>
+                      <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${esc(c.jenis || "Hard skill")}</div>
+                    </div>
+                  </div>
+                `,
+                  )
+                  .join("")}
+              </div>
+            `
+                : `
+              <div class="banner" style="background:var(--warning-bg);color:var(--warning);border-color:var(--warning)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                <span><b>Peringatan:</b> Profil lulusan ini belum memiliki CPL pendukung. Klik pada sel kolom ${esc(pl.kode)} di matriks untuk menghubungkan CPL.</span>
+              </div>
+            `
+            }
+
+            <div class="mf" style="margin-top:20px">
+              <button class="btn" data-x style="margin:0">Tutup</button>
+            </div>
+          </div>
+        `);
+      }
+
+      function openMatrixCplDetail(cplKode) {
+        const cpl = (db.cpl || []).find((c) => c.kode === cplKode);
+        if (!cpl) return;
+
+        const assignedPl = (cpl.pl || [])
+          .map((pk) => (db.pl || []).find((p) => p.kode === pk))
+          .filter(Boolean);
+        const assignedBk = (cpl.bk || [])
+          .map((bk) => (db.bk || []).find((b) => b.kode === bk))
+          .filter(Boolean);
+        const assignedMk = (cpl.mk || [])
+          .map((mk) => (db.mk || []).find((m) => m.kode === mk))
+          .filter(Boolean);
+
+        open(`
+          <div class="matrix-modal-wrap">
+            <div class="matrix-modal-header">
+              <div>
+                <span class="matrix-modal-badge cpl">${esc(cpl.kode)}</span>
+                <span class="tag ${cpl.jenis === "Hard skill" ? "hard" : "softs"}" style="margin-left:8px">${esc(cpl.jenis || "Hard skill")}</span>
+              </div>
+              <span class="tag neutral">${assignedPl.length} PL Terhubung</span>
+            </div>
+
+            <h2 style="font-size:16px;margin:0 0 12px;line-height:1.4">${esc(cpl.nama)}</h2>
+
+            <div style="font-size:12px;color:var(--text-muted);background:var(--bg);padding:8px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:16px">
+              Dikelola oleh: <b>${esc(cpl.by || USER)}</b> &bull; Terakhir diubah: <b>${esc(cpl.at || "-")}</b>
+            </div>
+
+            <h3 style="font-size:13px;font-weight:600;margin:0 0 6px;color:var(--text)">Profil Lulusan yang Diturunkan (${assignedPl.length}):</h3>
+            ${
+              assignedPl.length
+                ? `
+              <div class="matrix-modal-list" style="margin-bottom:14px;max-height:160px">
+                ${assignedPl
+                  .map(
+                    (p) => `
+                  <div class="matrix-modal-item">
+                    <span class="tag neutral" style="margin:0;flex-shrink:0">${esc(p.kode)}</span>
+                    <div>
+                      <b>${esc(p.nama)}</b>
+                      <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${esc(p.deskripsi || "")}</div>
+                    </div>
+                  </div>
+                `,
+                  )
+                  .join("")}
+              </div>
+            `
+                : `
+              <div class="banner" style="background:var(--warning-bg);color:var(--warning);border-color:var(--warning);margin-bottom:14px">
+                <span><b>Peringatan:</b> CPL ini belum diturunkan ke Profil Lulusan manapun. Sesuai standar OBE, CPL wajib menopang minimal 1 PL.</span>
+              </div>
+            `
+            }
+
+            ${
+              assignedBk.length
+                ? `
+              <h3 style="font-size:13px;font-weight:600;margin:0 0 6px;color:var(--text)">Bahan Kajian (BK) Terkait:</h3>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+                ${assignedBk.map((b) => `<span class="tag neutral"><b>${esc(b.kode)}</b> &bull; ${esc(b.nama)}</span>`).join("")}
+              </div>
+            `
+                : ""
+            }
+
+            ${
+              assignedMk.length
+                ? `
+              <h3 style="font-size:13px;font-weight:600;margin:0 0 6px;color:var(--text)">Mata Kuliah (MK) Pengampu:</h3>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+                ${assignedMk.map((m) => `<span class="tag neutral"><b>${esc(m.kode)}</b> &bull; ${esc(m.nama)}</span>`).join("")}
+              </div>
+            `
+                : ""
+            }
+
+            <div class="mf" style="margin-top:20px">
+              <button class="btn" data-x style="margin:0">Tutup</button>
+            </div>
+          </div>
+        `);
+      }
+
+      function openMatrixGuideModal() {
+        open(`
+          <div class="matrix-modal-wrap">
+            <h2 style="font-size:18px;margin:0 0 8px">Panduan Matriks CPL &ndash; Profil Lulusan (2D)</h2>
+            <p class="s">Standar Penyusunan Kurikulum Berbasis Luaran (Outcome-Based Education &ndash; TRPL)</p>
+
+            <div style="font-size:13px;line-height:1.6;color:var(--text);margin-top:14px">
+              <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px">
+                <b style="color:var(--primary)">Prinsip Dasar OBE KPT / SN-Dikti:</b>
+                <ul style="margin:6px 0 0;padding-left:20px">
+                  <li><b>Profil Lulusan (PL)</b> adalah deskripsi peran profesional dan keahlian nyata lulusan di industri software.</li>
+                  <li><b>Capaian Pembelajaran Lulusan (CPL)</b> merupakan kompetensi terukur (sikap, pengetahuan, keterampilan khusus) yang wajib dikuasai untuk menjalankan peran profil tersebut.</li>
+                  <li><b>Aturan Relasi:</b> Setiap CPL harus mendukung sekurang-kurangnya satu PL. Tidak boleh ada CPL yang berdiri sendiri tanpa profil penampung, dan setiap PL harus didukung oleh fondasi kompetensi CPL.</li>
+                </ul>
+              </div>
+
+              <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px">
+                <b style="color:var(--text)">Cara Mengoperasikan Matriks:</b>
+                <ul style="margin:6px 0 0;padding-left:20px">
+                  <li><b>Klik Sel Langsung:</b> Klik tombol sel untuk menghubungkan atau memutuskan relasi antara baris CPL dan kolom PL. Perubahan langsung tersimpan ke data relasi.</li>
+                  <li><b>Mode Edit:</b> Gunakan sakelar di kanan atas untuk mengaktifkan mode edit jika ingin mengubah relasi sel, atau biarkan mati jika hanya ingin meninjau data.</li>
+                  <li><b>Informasi Lengkap:</b> Klik tombol <span style="display:inline-block;border:1px solid var(--border);border-radius:50%;width:16px;height:16px;line-height:14px;text-align:center;font-size:11px">i</span> pada judul PL atau klik kode CPL untuk melihat rincian deskripsi profil dan mata kuliah terkait.</li>
+                  <li><b>Pencarian &amp; Filter:</b> Saring berdasarkan kata kunci atau status pemetaan untuk mendeteksi kompetensi yang belum terhubung.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="mf" style="margin-top:16px">
+              <button class="btn" data-x style="margin:0">Saya Mengerti</button>
+            </div>
+          </div>
+        `);
+      }
+
       // 3. Render Matrix & Analysis Views (Under Construction)
       function renderMatrixOrSpecialView(id) {
         if ($("log-header-container"))
@@ -2478,11 +3158,6 @@
 
         close();
         render();
-        toast(
-          isNew
-            ? "Data berhasil ditambahkan: " + o.kode
-            : "Perubahan tersimpan: " + o.kode,
-        );
       }
 
       function askDel(i) {
@@ -2550,6 +3225,22 @@
           if (eInp) eInp.value = "";
           renderLogTable();
           updateLogResetBtn();
+        } else if (b.id === "matrix-toggle-mode" || b.closest("#matrix-toggle-mode")) {
+          matrixInteractive = !matrixInteractive;
+          renderMatrixCplPl();
+        } else if (b.id === "matrix-btn-reset" || b.closest("#matrix-btn-reset")) {
+          matrixSearch = "";
+          matrixJenisFilter = "all";
+          matrixStatusFilter = "all";
+          renderMatrixCplPl();
+        } else if (b.id === "matrix-btn-guide" || b.closest("#matrix-btn-guide")) {
+          openMatrixGuideModal();
+        } else if (b.dataset.matrixToggleCpl && b.dataset.matrixTogglePl) {
+          toggleMatrixRelation(b.dataset.matrixToggleCpl, b.dataset.matrixTogglePl);
+        } else if (b.dataset.matrixPlInfo) {
+          openMatrixPlDetail(b.dataset.matrixPlInfo);
+        } else if (b.dataset.matrixCplInfo) {
+          openMatrixCplDetail(b.dataset.matrixCplInfo);
         } else if (b.dataset.t) {
           if (b.dataset.t === "log_master") {
             logMasterFilter = "all";
@@ -2588,7 +3279,6 @@
           });
           close();
           render();
-          toast("Data telah dihapus: " + r.kode);
         } else if ("x" in b.dataset || ev.target === $("ov")) {
           close();
         }
@@ -2604,6 +3294,11 @@
       });
 
       document.addEventListener("input", (ev) => {
+        if (ev.target.id === "matrix-q") {
+          matrixSearch = ev.target.value.trim().toLowerCase();
+          renderMatrixCplPl();
+          return;
+        }
         if (ev.target.id === "log-q") {
           logSearchQuery = ev.target.value.trim().toLowerCase();
           renderLogTable();
@@ -2620,6 +3315,16 @@
       });
 
       document.addEventListener("change", (ev) => {
+        if (ev.target.id === "matrix-flt-jenis") {
+          matrixJenisFilter = ev.target.value;
+          renderMatrixCplPl();
+          return;
+        }
+        if (ev.target.id === "matrix-flt-status") {
+          matrixStatusFilter = ev.target.value;
+          renderMatrixCplPl();
+          return;
+        }
         if (ev.target.id === "log-flt-action") {
           logActionFilter = ev.target.value;
           renderLogTable();
@@ -2682,6 +3387,44 @@
           form.v = readForm();
           form.v.kode = nextCPMKCode(form.v.cpl);
           drawForm();
+        }
+      });
+
+      // Matrix Crosshair Column Hover
+      document.addEventListener("mouseover", (ev) => {
+        if (tab !== "cpl_pl") return;
+        const cell = ev.target.closest(".matrix-cell, th.th-pl");
+        if (cell) {
+          const pl = cell.dataset.cellPl || cell.dataset.colPl;
+          if (pl && pl !== matrixHoverCol) {
+            matrixHoverCol = pl;
+            document
+              .querySelectorAll(`[data-col-pl="${pl}"]`)
+              .forEach((el) => el.classList.add("col-hover"));
+            document
+              .querySelectorAll(`[data-cell-pl="${pl}"]`)
+              .forEach((el) => el.classList.add("col-hover"));
+          }
+        }
+      });
+
+      document.addEventListener("mouseout", (ev) => {
+        if (tab !== "cpl_pl") return;
+        const cell = ev.target.closest(".matrix-cell, th.th-pl");
+        if (cell) {
+          const relTarget = ev.relatedTarget;
+          const nextCell = relTarget
+            ? relTarget.closest(".matrix-cell, th.th-pl")
+            : null;
+          const nextPl = nextCell
+            ? nextCell.dataset.cellPl || nextCell.dataset.colPl
+            : null;
+          if (nextPl !== matrixHoverCol) {
+            document
+              .querySelectorAll(".col-hover")
+              .forEach((el) => el.classList.remove("col-hover"));
+            matrixHoverCol = null;
+          }
         }
       });
 
