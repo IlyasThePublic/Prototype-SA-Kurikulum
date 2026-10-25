@@ -2333,26 +2333,16 @@
                         ).length;
                         return `
                         <th class="th-pl" data-col-pl="${esc(pl.kode)}" scope="col">
-                          <div class="pl-head-card">
-                            <div class="pl-head-top">
-                              <span class="pl-head-code">${esc(pl.kode)}</span>
-                              <button
-                                type="button"
-                                class="pl-info-btn"
-                                data-matrix-pl-info="${esc(pl.kode)}"
-                                title="Lihat detail deskripsi ${esc(pl.kode)}"
-                                aria-label="Detail ${esc(pl.kode)}"
-                              >
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                  <circle cx="12" cy="12" r="10"></circle>
-                                  <line x1="12" y1="16" x2="12" y2="12"></line>
-                                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                </svg>
-                              </button>
-                            </div>
-                            <div class="pl-head-title" title="${esc(pl.nama)}">${esc(pl.nama)}</div>
+                          <button
+                            type="button"
+                            class="pl-head-btn"
+                            data-matrix-pl-info="${esc(pl.kode)}"
+                            title="Klik untuk melihat detail: ${esc(pl.kode)} &bull; ${esc(pl.nama)}"
+                            aria-label="Detail ${esc(pl.kode)}: ${esc(pl.nama)}"
+                          >
+                            <span class="pl-head-code">${esc(pl.kode)}</span>
                             <span class="pl-head-badge" title="Total CPL yang mendukung profil ini">${cplCount} CPL</span>
-                          </div>
+                          </button>
                         </th>
                       `;
                       })
@@ -2454,59 +2444,24 @@
                 <tfoot>
                   <!-- Summary Row: Total CPL per PL -->
                   <tr>
-                    <td class="tf-cpl-code" style="font-weight:700">Total</td>
+                    <td class="tf-cpl-code" style="font-weight:500">Total</td>
                     <td class="tf-cpl-name">
                       <span class="matrix-tf-val">Jumlah CPL Pendukung</span>
-                      <span class="matrix-tf-sub">Akumulasi CPL yang memetakan ke masing-masing profil</span>
                     </td>
                     ${allPl
                       .map((pl) => {
                         const count = allCpl.filter((c) =>
                           (c.pl || []).includes(pl.kode),
                         ).length;
-                        const pct = allCpl.length
-                          ? Math.round((count / allCpl.length) * 100)
-                          : 0;
                         return `
                         <td style="text-align:center" data-col-pl="${esc(pl.kode)}">
-                          <span class="matrix-tf-val">${count} CPL</span>
-                          <span class="matrix-tf-sub">${pct}% cakupan</span>
+                          <span class="matrix-tf-pill ${count > 0 ? "" : "empty"}">${count} CPL</span>
                         </td>
                       `;
                       })
                       .join("")}
                     <td style="text-align:center">
-                      <span class="matrix-tf-val">${totalActiveLinks}</span>
-                      <span class="matrix-tf-sub">Total Relasi</span>
-                    </td>
-                  </tr>
-
-                  <!-- Status Row: Standar OBE -->
-                  <tr>
-                    <td class="tf-cpl-code" style="font-weight:700">Kesesuaian</td>
-                    <td class="tf-cpl-name">
-                      <span class="matrix-tf-val">Status Standar OBE</span>
-                      <span class="matrix-tf-sub">Setiap profil wajib memiliki minimal 1 CPL pendukung</span>
-                    </td>
-                    ${allPl
-                      .map((pl) => {
-                        const count = allCpl.filter((c) =>
-                          (c.pl || []).includes(pl.kode),
-                        ).length;
-                        const isOk = count > 0;
-                        return `
-                        <td style="text-align:center" data-col-pl="${esc(pl.kode)}">
-                          <span class="tag ${isOk ? "ok" : "warn"}" style="margin:0;font-size:11px">
-                            ${isOk ? "✓ Terpenuhi" : "⚠️ Perlu CPL"}
-                          </span>
-                        </td>
-                      `;
-                      })
-                      .join("")}
-                    <td style="text-align:center">
-                      <span class="tag ${isObeCompliant ? "ok" : "warn"}" style="margin:0;font-size:11px">
-                        ${isObeCompliant ? "✓ 100% Selaras" : "⚠️ Cek Relasi"}
-                      </span>
+                      <span class="matrix-tf-pill total">${totalActiveLinks}</span>
                     </td>
                   </tr>
                 </tfoot>

@@ -1884,7 +1884,7 @@ tbody tr:hover {
   padding: 14px 16px;
   font-size: 12px;
   font-weight: 600;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
   border-right: 1px solid var(--border);
   position: sticky;
   top: 0;
@@ -1913,15 +1913,16 @@ tbody tr:hover {
   background: #f1f5f9;
   min-width: 260px;
   max-width: 320px;
-  border-right: 2px solid #cbd5e1 !important;
+  border-right: 1px solid var(--border) !important;
 }
 
 /* Dynamic PL Column Headers */
 .matrix-table th.th-pl {
-  width: 180px;
-  min-width: 165px;
-  max-width: 210px;
+  width: 135px;
+  min-width: 120px;
+  max-width: 160px;
   text-align: center;
+  padding: 8px 6px;
 }
 
 .matrix-table th.th-pl.col-hover {
@@ -1929,18 +1930,24 @@ tbody tr:hover {
   color: var(--primary) !important;
 }
 
-.pl-head-card {
-  display: flex;
+.pl-head-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 6px 8px;
+  display: inline-flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  gap: 5px;
+  gap: 6px;
+  cursor: pointer;
+  color: inherit;
+  font-family: inherit;
+  width: 100%;
 }
 
-.pl-head-top {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.pl-head-btn:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
 }
 
 .pl-head-code {
@@ -1952,37 +1959,6 @@ tbody tr:hover {
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.02em;
-}
-
-.pl-info-btn {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 0;
-}
-
-.pl-info-btn:hover {
-  background: var(--surface);
-  color: var(--primary);
-  border-color: var(--primary);
-}
-
-.pl-head-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .pl-head-badge {
@@ -2001,6 +1977,13 @@ tbody tr:hover {
   min-width: 110px;
   text-align: center;
   background: #f8fafc;
+  font-weight: 500;
+}
+
+/* Remove outer double border on last column */
+.matrix-table th:last-child,
+.matrix-table td:last-child {
+  border-right: none;
 }
 
 /* Body Cells & Sticky Rows */
@@ -2031,7 +2014,7 @@ tbody tr:hover {
   background: var(--surface);
   min-width: 260px;
   max-width: 320px;
-  border-right: 2px solid #cbd5e1 !important;
+  border-right: 1px solid var(--border) !important;
 }
 
 /* Row Hover & Crosshair */
@@ -2162,7 +2145,7 @@ tbody tr:hover {
 /* Summary Column Cell */
 .matrix-cell-summary {
   text-align: center;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .matrix-count-badge {
@@ -2172,7 +2155,7 @@ tbody tr:hover {
   padding: 4px 10px;
   border-radius: 99px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .matrix-count-badge.ok {
@@ -2187,6 +2170,11 @@ tbody tr:hover {
   border: 1px solid #fde68a;
 }
 
+/* Remove bottom border on the last body row to prevent double border with sticky tfoot */
+.matrix-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
 /* Table Footer (Tfoot) */
 .matrix-table tfoot th,
 .matrix-table tfoot td {
@@ -2194,8 +2182,9 @@ tbody tr:hover {
   bottom: 0;
   z-index: 9;
   background: #f8fafc;
-  border-top: 2px solid var(--border);
-  font-weight: 600;
+  border-top: 1px solid var(--border);
+  border-bottom: none;
+  font-weight: 500;
 }
 
 /* Sticky Tfoot Corners */
@@ -2213,12 +2202,12 @@ tbody tr:hover {
   bottom: 0;
   z-index: 14;
   background: #f1f5f9;
-  border-right: 2px solid #cbd5e1 !important;
+  border-right: 1px solid var(--border) !important;
 }
 
 .matrix-tf-val {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text);
   display: block;
 }
@@ -2229,6 +2218,32 @@ tbody tr:hover {
   color: var(--text-muted);
   display: block;
   margin-top: 2px;
+}
+
+.matrix-tf-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.matrix-tf-pill.total {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e40af;
+}
+
+.matrix-tf-pill.empty {
+  background: var(--warning-bg);
+  border-color: #fde68a;
+  color: var(--warning);
 }
 
 /* Bottom Guidance & Legend Card */
