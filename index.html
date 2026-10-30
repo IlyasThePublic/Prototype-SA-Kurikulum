@@ -11,94 +11,144 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
       rel="stylesheet"
     />
+    <!-- Bootstrap 5.3 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="global.css" />
   </head>
   <body>
-    <header class="appbar">
+    <!-- Topbar / App Header -->
+    <header class="app-header d-flex align-items-center px-3 px-lg-4 shadow-sm position-sticky top-0 z-3">
       <button
         id="toggle-sidebar"
-        class="icon-btn"
-        aria-label="Sembunyikan / Tampilkan Sidebar"
-        title="Sembunyikan / Tampilkan Sidebar"
+        class="btn btn-light btn-sm me-2 d-lg-none"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#sidebar-offcanvas"
+        aria-controls="sidebar-offcanvas"
+        aria-label="Menu Navigasi"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
         </svg>
       </button>
+
       <img
-        class="logo"
+        class="app-logo"
         src="assets/logo.png"
         alt="Politeknik Astra"
       />
-      <span class="sp"></span>
-      <button
-        id="btn-reset-db"
-        class="btn-reset-db"
-        type="button"
-        title="Kembalikan semua data ke setelan awal (Reset Database)"
-        aria-label="Reset Database"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-          <path d="M3 3v5h5"/>
-        </svg>
-        <span>Reset Data</span>
-      </button>
-      <div class="who">
-        <div class="who-info">
-          <span class="who-name">Pak Suhendra</span>
-          <span class="who-role">Tim Kurikulum</span>
+
+      <div class="ms-auto d-flex align-items-center gap-2 gap-sm-3">
+        <button
+          id="btn-reset-db"
+          class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1 shadow-none"
+          type="button"
+          title="Kembalikan semua data ke setelan awal (Reset Database)"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+          <span class="d-none d-sm-inline">Reset Data</span>
+        </button>
+
+        <div class="d-flex align-items-center gap-2 border rounded-pill px-2 py-1 bg-white shadow-sm">
+          <div class="text-end d-none d-md-block lh-sm pe-1">
+            <div class="fw-semibold text-dark small">Pak Suhendra</div>
+            <div class="text-muted" style="font-size:11px">Tim Kurikulum</div>
+          </div>
+          <span class="avatar-badge">PS</span>
         </div>
-        <span class="av">PS</span>
       </div>
     </header>
-    <div class="app">
-      <aside id="aside-nav"></aside>
-      <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-      <main>
-        <div class="crumb" id="crumb"></div>
-        <h1 id="title"></h1>
-        <p class="lead" id="lead"></p>
+
+    <!-- Main Container Layout with Sidebar -->
+    <div class="container-fluid p-0 d-flex">
+      <!-- Desktop Sidebar -->
+      <aside class="app-sidebar d-none d-lg-block flex-shrink-0" id="desktop-sidebar">
+        <div id="aside-nav" class="py-2"></div>
+      </aside>
+
+      <!-- Mobile Offcanvas Sidebar -->
+      <div class="offcanvas-lg offcanvas-start d-lg-none" tabindex="-1" id="sidebar-offcanvas" aria-labelledby="sidebar-offcanvas-label">
+        <div class="offcanvas-header border-bottom">
+          <h5 class="offcanvas-title small fw-bold text-uppercase" id="sidebar-offcanvas-label">Menu Kurikulum TRPL</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+          <div id="aside-nav-mobile" class="py-2"></div>
+        </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <main class="flex-grow-1 p-3 p-md-4 overflow-hidden" style="min-width:0">
+        <!-- Breadcrumb & Page Heading -->
+        <nav aria-label="breadcrumb" class="mb-1">
+          <div class="text-muted small fw-medium" id="crumb">Data Master / Profil Lulusan (PL)</div>
+        </nav>
+        <h1 class="h3 fw-bold text-dark mb-1" id="title">Profil Lulusan (PL)</h1>
+        <p class="text-muted small mb-3" id="lead"></p>
+
         <div id="log-header-container"></div>
-        <div class="paper">
-          <div class="bar" id="bar">
-            <div class="search">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path
-                  d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
-                /></svg
-              ><input
-                id="q"
-                type="search"
-                placeholder="Cari kode atau nama..."
-                aria-label="Cari"
-              />
+
+        <!-- Master View Card Paper -->
+        <div class="card shadow-sm border-0 rounded-3 mb-4">
+          <div class="card-header bg-white border-bottom py-3 px-3 px-md-4" id="bar">
+            <div class="row g-2 align-items-center">
+              <div class="col-12 col-md-5 col-lg-4">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-light border-end-0 text-muted">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                  </span>
+                  <input
+                    id="q"
+                    type="search"
+                    class="form-control form-control-sm border-start-0"
+                    placeholder="Cari kode atau nama..."
+                    aria-label="Cari"
+                  />
+                </div>
+              </div>
+              <div class="col-auto">
+                <select class="form-select form-select-sm" id="flt" aria-label="Filter" hidden></select>
+              </div>
+              <div class="col-auto ms-auto d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm" id="btn-master-log" style="display:none"></button>
+                <button class="btn btn-primary btn-sm px-3 fw-semibold shadow-none" id="add"></button>
+              </div>
             </div>
-            <select class="f" id="flt" aria-label="Filter" hidden></select>
-            <button class="btn-log-shortcut" id="btn-master-log" style="display:none"></button>
-            <button class="btn" id="add"></button>
           </div>
-          <div id="view-container">
-            <div class="scroll">
-              <table>
-                <thead id="th"></thead>
+
+          <div class="card-body p-0" id="view-container">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary small fw-semibold" id="th"></thead>
                 <tbody id="tb"></tbody>
               </table>
             </div>
             <div id="empty"></div>
-            <div class="foot" id="foot"></div>
+            <div class="card-footer bg-white border-top text-muted small py-2 px-3 px-md-4" id="foot"></div>
           </div>
         </div>
       </main>
     </div>
-    <div class="ov" id="ov" role="dialog" aria-modal="true">
-      <div class="modal" id="modal"></div>
+
+    <!-- Universal Bootstrap Modal Container -->
+    <div class="modal fade" id="bsModal" tabindex="-1" aria-labelledby="bsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content shadow rounded-3 border-0" id="modal">
+          <!-- Content dynamically injected -->
+        </div>
+      </div>
     </div>
+
+    <!-- Bootstrap 5.3 Bundle JS with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
       const USER = "Pak Suhendra";
@@ -534,22 +584,25 @@
       }
 
       function nav() {
-        $("aside-nav").innerHTML = MENU_GROUPS.map(
+        const navHtml = MENU_GROUPS.map(
           (g) => `
-    <h6>${g.title}</h6>
-    <div>
-      ${g.items
-        .map((it) => {
-          const isCur =
-            it.id === tab ||
-            (it.id === "log_master" &&
-              (tab === "log_master" || tab.startsWith("log_")));
-          return `<button class="nav" ${isCur ? 'aria-current="page"' : ""} data-t="${it.id}">${it.label}</button>`;
-        })
-        .join("")}
-    </div>
-  `,
+          <div class="nav-sidebar-heading">${esc(g.title)}</div>
+          <div class="nav flex-column mb-2">
+            ${g.items
+              .map((it) => {
+                const isCur =
+                  it.id === tab ||
+                  (it.id === "log_master" &&
+                    (tab === "log_master" || tab.startsWith("log_")));
+                return `<button type="button" class="nav-sidebar-link ${isCur ? "active" : ""}" ${isCur ? 'aria-current="page"' : ""} data-t="${esc(it.id)}">${esc(it.label)}</button>`;
+              })
+              .join("")}
+          </div>
+        `,
         ).join("");
+
+        if ($("aside-nav")) $("aside-nav").innerHTML = navHtml;
+        if ($("aside-nav-mobile")) $("aside-nav-mobile").innerHTML = navHtml;
       }
 
       const MASTER_META = {
@@ -2040,16 +2093,33 @@
         `;
       }
 
-      // Modal Form Operations
+      // Modal Form Operations with Bootstrap 5
+      let bsModalInstance = null;
+
+      function getModalInstance() {
+        if (!bsModalInstance && window.bootstrap && $("bsModal")) {
+          bsModalInstance = new bootstrap.Modal($("bsModal"), { backdrop: "static" });
+        }
+        return bsModalInstance;
+      }
+
       function open(h) {
         $("modal").innerHTML = h;
-        $("ov").classList.add("on");
-        const x = $("modal").querySelector("input,select,textarea,button");
-        x && x.focus();
+        const modalInst = getModalInstance();
+        if (modalInst) {
+          modalInst.show();
+        }
+        setTimeout(() => {
+          const x = $("modal").querySelector("input,select,textarea,button:not(.btn-close)");
+          x && x.focus();
+        }, 150);
       }
 
       function close() {
-        $("ov").classList.remove("on");
+        const modalInst = getModalInstance();
+        if (modalInst) {
+          modalInst.hide();
+        }
       }
 
       function showForm(i) {
