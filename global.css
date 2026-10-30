@@ -1900,41 +1900,28 @@ tbody tr:hover {
   left: 0;
   z-index: 15;
   background: #f1f5f9;
-  width: 90px;
-  min-width: 90px;
-  max-width: 90px;
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
   text-align: center;
 }
 
 .matrix-table th.th-cpl-name {
   position: sticky;
   top: 0;
-  left: 90px;
+  left: 100px;
   z-index: 15;
   background: #f1f5f9;
-  width: 270px;
-  min-width: 270px;
-  max-width: 270px;
-}
-
-.matrix-table th.th-cpl-jenis {
-  position: sticky;
-  top: 0;
-  left: 360px;
-  z-index: 15;
-  background: #f1f5f9;
-  width: 110px;
-  min-width: 110px;
-  max-width: 110px;
-  text-align: center;
+  min-width: 260px;
+  max-width: 320px;
   border-right: 1px solid var(--border) !important;
 }
 
 /* Dynamic PL Column Headers */
 .matrix-table th.th-pl {
-  width: 135px;
-  min-width: 120px;
-  max-width: 160px;
+  width: 90px;
+  min-width: 88px;
+  max-width: 96px;
   text-align: center;
   padding: 8px 6px;
 }
@@ -2015,39 +2002,26 @@ tbody tr:hover {
   left: 0;
   z-index: 8;
   background: var(--surface);
-  width: 90px;
-  min-width: 90px;
-  max-width: 90px;
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
   font-weight: 600;
   text-align: center;
 }
 
 .matrix-table td.td-cpl-name {
   position: sticky;
-  left: 90px;
+  left: 100px;
   z-index: 8;
   background: var(--surface);
-  width: 270px;
-  min-width: 270px;
-  max-width: 270px;
-}
-
-.matrix-table td.td-cpl-jenis {
-  position: sticky;
-  left: 360px;
-  z-index: 8;
-  background: var(--surface);
-  width: 110px;
-  min-width: 110px;
-  max-width: 110px;
-  text-align: center;
+  min-width: 260px;
+  max-width: 320px;
   border-right: 1px solid var(--border) !important;
 }
 
 /* Row Hover & Crosshair */
 .matrix-table tr:hover td.td-cpl-code,
-.matrix-table tr:hover td.td-cpl-name,
-.matrix-table tr:hover td.td-cpl-jenis {
+.matrix-table tr:hover td.td-cpl-name {
   background: #f0f7ff !important;
 }
 
@@ -2066,17 +2040,20 @@ tbody tr:hover {
 /* Matrix Interactive Cell Button */
 .matrix-cell {
   text-align: center;
-  padding: 8px !important;
+  padding: 6px !important;
 }
 
 .matrix-btn {
-  width: 100%;
-  min-height: 44px;
-  border-radius: 10px;
+  width: 76px;
+  height: 38px;
+  min-height: 38px;
+  aspect-ratio: 2 / 1;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  padding: 0;
+  gap: 0;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -2146,9 +2123,7 @@ tbody tr:hover {
 .matrix-btn.unlinked:hover .matrix-btn-hover-label {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 600;
+  justify-content: center;
   color: var(--primary);
 }
 
@@ -2227,19 +2202,10 @@ tbody tr:hover {
 
 .matrix-table tfoot td.tf-cpl-name {
   position: sticky;
-  left: 90px;
+  left: 100px;
   bottom: 0;
   z-index: 14;
   background: #f1f5f9;
-}
-
-.matrix-table tfoot td.tf-cpl-jenis {
-  position: sticky;
-  left: 360px;
-  bottom: 0;
-  z-index: 14;
-  background: #f1f5f9;
-  text-align: center;
   border-right: 1px solid var(--border) !important;
 }
 
@@ -2398,92 +2364,6 @@ tbody tr:hover {
   align-items: flex-start;
   gap: 10px;
   font-size: 13px;
-}
-
-/* Mode Edit CPL Row Elements */
-.matrix-cpl-code-btn {
-  cursor: pointer;
-  border: none;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  line-height: 1;
-}
-
-.matrix-table:not(.view-only) .matrix-cpl-code-btn:hover {
-  filter: brightness(0.95);
-  box-shadow: 0 0 0 2px var(--primary-soft);
-}
-
-.matrix-cpl-statement-btn {
-  background: transparent;
-  border: none;
-  padding: 3px 6px;
-  margin: -3px -6px;
-  border-radius: 6px;
-  text-align: left;
-  font: inherit;
-  color: var(--text);
-  font-weight: 500;
-  line-height: 1.45;
-  width: 100%;
-  display: block;
-}
-
-.matrix-table:not(.view-only) .matrix-cpl-statement-btn.editable {
-  cursor: pointer;
-}
-
-.matrix-table:not(.view-only) .matrix-cpl-statement-btn.editable:hover {
-  background: #eff6ff;
-  color: var(--primary);
-}
-
-.matrix-btn-edit-cpl {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--primary);
-  cursor: pointer;
-  line-height: 16px;
-  user-select: none;
-  font-family: inherit;
-}
-
-.matrix-btn-edit-cpl:hover {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  color: var(--primary-hover);
-}
-
-.matrix-btn-toggle-jenis {
-  cursor: pointer !important;
-  border-style: dashed !important;
-}
-
-.matrix-btn-toggle-jenis:hover {
-  filter: brightness(0.92);
-  transform: translateY(-1px);
-}
-
-.matrix-btn-tool.primary {
-  background: var(--primary);
-  color: #ffffff;
-  border-color: var(--primary);
-  font-weight: 500;
-}
-
-.matrix-btn-tool.primary:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
-  color: #ffffff;
 }
 
 

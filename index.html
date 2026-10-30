@@ -2296,22 +2296,6 @@
               </div>
 
               <div class="matrix-toolbar-right">
-                ${
-                  matrixInteractive
-                    ? `
-                  <button
-                    type="button"
-                    class="matrix-btn-tool primary"
-                    id="matrix-btn-add-cpl"
-                    title="Tambah Capaian Pembelajaran Lulusan (CPL) Baru"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>Tambah CPL</span>
-                  </button>
-                `
-                    : ""
-                }
-
                 <button
                   type="button"
                   id="matrix-toggle-mode"
@@ -2342,7 +2326,6 @@
                   <tr>
                     <th class="th-cpl-code" scope="col">Kode CPL</th>
                     <th class="th-cpl-name" scope="col">Pernyataan Capaian Pembelajaran Lulusan (CPL)</th>
-                    <th class="th-cpl-jenis" scope="col">Jenis Kompetensi</th>
                     ${allPl
                       .map((pl) => {
                         const cplCount = allCpl.filter((c) =>
@@ -2358,7 +2341,7 @@
                             aria-label="Detail ${esc(pl.kode)}: ${esc(pl.nama)}"
                           >
                             <span class="pl-head-code">${esc(pl.kode)}</span>
-                            <span class="pl-head-badge" title="Total CPL yang mendukung profil ini">${cplCount} CPL</span>
+                            <span class="matrix-tf-pill ${cplCount > 0 ? "" : "empty"}">${cplCount} CPL</span>
                           </button>
                         </th>
                       `;
@@ -2385,61 +2368,20 @@
                         <td class="td-cpl-code">
                           <button
                             type="button"
-                            class="tag ${isHard ? "hard" : "softs"} matrix-cpl-code-btn"
-                            data-matrix-cpl-btn="${esc(cpl.kode)}"
-                            title="${matrixInteractive ? `Klik untuk mengedit CPL ${esc(cpl.kode)}` : `Klik untuk melihat detail CPL ${esc(cpl.kode)}`}"
+                            class="tag ${isHard ? "hard" : "softs"}"
+                            style="cursor:pointer;border:none;font-weight:700"
+                            data-matrix-cpl-info="${esc(cpl.kode)}"
+                            title="Klik untuk melihat detail CPL ${esc(cpl.kode)}"
                           >
                             ${esc(cpl.kode)}
-                            ${matrixInteractive ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>` : ""}
                           </button>
                         </td>
 
                         <td class="td-cpl-name">
-                          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-                            <button
-                              type="button"
-                              class="matrix-cpl-statement-btn ${matrixInteractive ? "editable" : ""}"
-                              data-matrix-edit-cpl="${esc(cpl.kode)}"
-                              ${matrixInteractive ? "" : "disabled"}
-                              title="${matrixInteractive ? `Klik untuk mengedit pernyataan CPL ${esc(cpl.kode)}` : ""}"
-                              style="flex:1"
-                            >
-                              ${esc(cpl.nama)}
-                            </button>
-                            ${
-                              matrixInteractive
-                                ? `
-                              <button
-                                type="button"
-                                class="matrix-btn-edit-cpl"
-                                data-matrix-edit-cpl="${esc(cpl.kode)}"
-                                title="Ubah pernyataan &amp; data CPL ${esc(cpl.kode)}"
-                                style="flex-shrink:0;margin-top:2px"
-                              >
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                </svg>
-                                <span>Ubah</span>
-                              </button>
-                            `
-                                : ""
-                            }
+                          <div style="font-weight:500;color:var(--text);line-height:1.45">${esc(cpl.nama)}</div>
+                          <div style="margin-top:4px">
+                            <span class="tag ${isHard ? "hard" : "softs"}" style="font-size:11px;height:20px;line-height:18px">${esc(cpl.jenis || "Hard skill")}</span>
                           </div>
-                        </td>
-
-                        <td class="td-cpl-jenis" style="text-align:center">
-                          <button
-                            type="button"
-                            class="tag ${isHard ? "hard" : "softs"} ${matrixInteractive ? "matrix-btn-toggle-jenis" : ""}"
-                            data-matrix-cpl-toggle-jenis="${matrixInteractive ? esc(cpl.kode) : ""}"
-                            title="${matrixInteractive ? `Klik untuk beralih jenis: ${esc(cpl.jenis || "Hard skill")} (Klik untuk ganti)` : esc(cpl.jenis || "Hard skill")}"
-                            style="font-size:11px;height:22px;line-height:20px;margin:0;display:inline-flex;align-items:center;justify-content:center"
-                            ${matrixInteractive ? "" : "disabled"}
-                          >
-                            ${esc(cpl.jenis || "Hard skill")}
-                            ${matrixInteractive ? `<span style="font-size:10px;margin-left:4px;opacity:0.8">⇄</span>` : ""}
-                          </button>
                         </td>
 
                         ${allPl
@@ -2461,12 +2403,10 @@
                               >
                                 ${
                                   isLinked
-                                    ? `<span class="matrix-icon"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span>
-                                     <span>Terhubung</span>`
+                                    ? `<span class="matrix-icon"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span>`
                                     : `<span class="matrix-dash">&mdash;</span>
-                                     <span class="matrix-btn-hover-label">
-                                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                       Hubungkan
+                                     <span class="matrix-btn-hover-label" title="Hubungkan">
+                                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                      </span>`
                                 }
                               </button>
@@ -2498,34 +2438,6 @@
                   `
                   }
                 </tbody>
-
-                <tfoot>
-                  <!-- Summary Row: Total CPL per PL -->
-                  <tr>
-                    <td class="tf-cpl-code" style="font-weight:500">Total</td>
-                    <td class="tf-cpl-name">
-                      <span class="matrix-tf-val">Jumlah CPL Pendukung</span>
-                    </td>
-                    <td class="tf-cpl-jenis" style="text-align:center">
-                      <span class="matrix-tf-sub" style="font-size:11px;color:var(--text-muted)">${allCpl.length} CPL</span>
-                    </td>
-                    ${allPl
-                      .map((pl) => {
-                        const count = allCpl.filter((c) =>
-                          (c.pl || []).includes(pl.kode),
-                        ).length;
-                        return `
-                        <td style="text-align:center" data-col-pl="${esc(pl.kode)}">
-                          <span class="matrix-tf-pill ${count > 0 ? "" : "empty"}">${count} CPL</span>
-                        </td>
-                      `;
-                      })
-                      .join("")}
-                    <td style="text-align:center">
-                      <span class="matrix-tf-pill total">${totalActiveLinks}</span>
-                    </td>
-                  </tr>
-                </tfoot>
               </table>
             </div>
 
@@ -2549,7 +2461,7 @@
                   <line x1="12" y1="16" x2="12" y2="12"></line>
                   <line x1="12" y1="8" x2="12.01" y2="8"></line>
                 </svg>
-                <span><b>Tips Pengoperasian:</b> ${matrixInteractive ? "Mode Edit aktif: Klik langsung pada sel untuk mengubah relasi PL, klik 'Ubah CPL' atau teks pernyataan untuk mengedit isi CPL, atau klik jenis kompetensi untuk beralih Hard/Soft skill." : "Aktifkan Mode Edit di kanan atas untuk dapat mengubah relasi sel atau data CPL."} Perubahan akan langsung disinkronkan ke master data dan dicatat dalam audit log.</span>
+                <span><b>Tips Pengoperasian:</b> ${matrixInteractive ? "Mode Edit aktif: Klik langsung pada sel untuk menghubungkan atau melepas relasi CPL dengan Profil Lulusan (PL)." : "Aktifkan Mode Edit di kanan atas untuk dapat mengubah relasi sel pemetaan CPL–PL."} Data master CPL dikelola secara terpusat melalui Data Master CPL. Perubahan relasi otomatis dicatat dalam audit log.</span>
               </div>
             </div>
           </div>
@@ -2631,419 +2543,6 @@
 
           renderMatrixCplPl();
         }
-      }
-
-      function toggleMatrixCplJenis(cplKode) {
-        if (!matrixInteractive) return;
-        const cplObj = (db.cpl || []).find((c) => c.kode === cplKode);
-        if (!cplObj) return;
-
-        const oldJenis = cplObj.jenis || "Hard skill";
-        const newJenis = oldJenis === "Hard skill" ? "Soft skill" : "Hard skill";
-
-        cplObj.jenis = newJenis;
-        cplObj.by = USER;
-        cplObj.at = stamp();
-
-        addAuditLog({
-          master: "cpl",
-          aksi: "ubah",
-          kode: cplKode,
-          nama: cplObj.nama,
-          keterangan: `Mengubah jenis kompetensi CPL ${cplKode} menjadi ${newJenis} via Matriks 2D`,
-          changes: [
-            {
-              field: "jenis",
-              label: "Jenis Kompetensi",
-              old: oldJenis,
-              new: newJenis,
-            },
-          ],
-          detail: { cpl: cplKode, jenisSebelum: oldJenis, jenisSesudah: newJenis },
-        });
-
-        renderMatrixCplPl();
-      }
-
-      function openMatrixCplEdit(cplKode) {
-        const cpl = (db.cpl || []).find((c) => c.kode === cplKode);
-        if (!cpl) return;
-
-        open(`
-          <div class="matrix-modal-wrap">
-            <div class="matrix-modal-header">
-              <div>
-                <span class="matrix-modal-badge cpl">${esc(cpl.kode)}</span>
-                <span style="font-size:12px;color:var(--text-muted);margin-left:8px">Mode Edit CPL Matriks</span>
-              </div>
-              <span class="tag ${cpl.jenis === "Hard skill" ? "hard" : "softs"}">${esc(cpl.jenis || "Hard skill")}</span>
-            </div>
-
-            <h2 style="font-size:18px;margin:0 0 4px">Ubah Data ${esc(cpl.kode)}</h2>
-            <p class="s" style="margin-bottom:18px">Perbarui pernyataan capaian pembelajaran lulusan dan klasifikasi kompetensi.</p>
-
-            <form id="matrix-cpl-form" novalidate onsubmit="return false;">
-              <input type="hidden" name="origKode" value="${esc(cpl.kode)}">
-
-              <div class="fld" id="fld-matrix-cpl-kode">
-                <div class="tf">
-                  <input type="text" name="kode" id="inp-matrix-cpl-kode" value="${esc(cpl.kode)}" required autocomplete="off">
-                  <label for="inp-matrix-cpl-kode">Kode CPL</label>
-                </div>
-                <div class="h" style="font-size:11px;color:var(--text-muted);margin-top:4px">Format standar: CPL01, CPL02, dst.</div>
-                <div class="e" id="err-matrix-cpl-kode" style="display:none;color:var(--danger);font-size:11px;margin-top:4px"></div>
-              </div>
-
-              <div class="fld" id="fld-matrix-cpl-nama">
-                <div class="tf">
-                  <textarea name="nama" id="inp-matrix-cpl-nama" rows="3" required style="resize:vertical">${esc(cpl.nama)}</textarea>
-                  <label for="inp-matrix-cpl-nama">Pernyataan Capaian Pembelajaran Lulusan (CPL)</label>
-                </div>
-                <div class="h" style="font-size:11px;color:var(--text-muted);margin-top:4px">Deskripsikan kompetensi atau kemampuan terukur yang diharapkan dari lulusan TRPL.</div>
-                <div class="e" id="err-matrix-cpl-nama" style="display:none;color:var(--danger);font-size:11px;margin-top:4px"></div>
-              </div>
-
-              <div class="fld" id="fld-matrix-cpl-jenis">
-                <div class="tf">
-                  <select name="jenis" id="inp-matrix-cpl-jenis">
-                    <option value="Hard skill" ${cpl.jenis === "Hard skill" ? "selected" : ""}>Hard skill (Keterampilan Teknis &amp; Keahlian)</option>
-                    <option value="Soft skill" ${cpl.jenis === "Soft skill" ? "selected" : ""}>Soft skill (Komunikasi, Sikap &amp; Kerja Tim)</option>
-                  </select>
-                  <label for="inp-matrix-cpl-jenis">Jenis Kompetensi</label>
-                </div>
-              </div>
-
-              <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:18px">
-                <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px">Profil Lulusan (PL) Terkait Saat Ini (${(cpl.pl || []).length}):</div>
-                <div style="display:flex;flex-wrap:wrap;gap:6px">
-                  ${
-                    (cpl.pl || []).length
-                      ? (cpl.pl || []).map((pk) => `<span class="tag neutral"><b>${esc(pk)}</b></span>`).join("")
-                      : `<span class="tag warn">Belum ada PL terhubung</span>`
-                  }
-                </div>
-                <div style="font-size:11px;color:var(--text-muted);margin-top:6px">
-                  * Hubungan relasi CPL ke PL dapat langsung diklik pada kotak sel tabel matriks 2D.
-                </div>
-              </div>
-
-              <div style="font-size:12px;color:var(--text-muted);background:var(--bg);padding:8px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:16px">
-                Dikelola oleh: <b>${esc(cpl.by || USER)}</b> &bull; Terakhir diubah: <b>${esc(cpl.at || "-")}</b>
-              </div>
-
-              <div class="mf" style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px">
-                <button type="button" class="btn ghost danger" id="matrix-btn-delete-cpl" data-cpl="${esc(cpl.kode)}" style="color:var(--danger);border-color:var(--danger-bg);background:var(--danger-bg);margin:0">
-                  Hapus CPL
-                </button>
-                <div style="display:flex;gap:8px">
-                  <button type="button" class="btn ghost" data-x style="margin:0">Batal</button>
-                  <button type="button" class="btn" id="matrix-btn-save-cpl" style="margin:0">Simpan Perubahan</button>
-                </div>
-              </div>
-            </form>
-          </div>
-        `);
-      }
-
-      function saveMatrixCplEdit() {
-        const fm = $("matrix-cpl-form");
-        if (!fm) return;
-
-        const origKode = fm.origKode.value;
-        const cplObj = (db.cpl || []).find((c) => c.kode === origKode);
-        if (!cplObj) return;
-
-        const newKode = (fm.kode.value || "").trim().toUpperCase();
-        const newNama = (fm.nama.value || "").trim();
-        const newJenis = fm.jenis.value || "Hard skill";
-
-        const errKode = $("err-matrix-cpl-kode");
-        const errNama = $("err-matrix-cpl-nama");
-        if (errKode) errKode.style.display = "none";
-        if (errNama) errNama.style.display = "none";
-
-        let hasErr = false;
-        if (!newKode) {
-          if (errKode) {
-            errKode.textContent = "Kode CPL wajib diisi.";
-            errKode.style.display = "block";
-          }
-          hasErr = true;
-        } else if (
-          newKode !== origKode &&
-          (db.cpl || []).some((c) => c.kode.toLowerCase() === newKode.toLowerCase())
-        ) {
-          if (errKode) {
-            errKode.textContent = `Kode ${newKode} sudah terdaftar. Gunakan kode lain.`;
-            errKode.style.display = "block";
-          }
-          hasErr = true;
-        }
-
-        if (!newNama) {
-          if (errNama) {
-            errNama.textContent = "Pernyataan CPL wajib diisi.";
-            errNama.style.display = "block";
-          }
-          hasErr = true;
-        }
-
-        if (hasErr) return;
-
-        const prevKode = cplObj.kode;
-        const prevNama = cplObj.nama;
-        const prevJenis = cplObj.jenis || "Hard skill";
-
-        cplObj.nama = newNama;
-        cplObj.jenis = newJenis;
-        cplObj.by = USER;
-        cplObj.at = stamp();
-
-        if (newKode !== origKode) {
-          cplObj.kode = newKode;
-          (db.pl || []).forEach((p) => {
-            if (Array.isArray(p.cpl)) {
-              p.cpl = p.cpl.map((k) => (k === origKode ? newKode : k));
-            }
-          });
-          (db.cpmk || []).forEach((cp) => {
-            if (Array.isArray(cp.cpl)) {
-              cp.cpl = cp.cpl.map((k) => (k === origKode ? newKode : k));
-            } else if (cp.cpl === origKode) {
-              cp.cpl = newKode;
-            }
-          });
-        }
-
-        const changes = [];
-        if (prevKode !== cplObj.kode) {
-          changes.push({
-            field: "kode",
-            label: "Kode CPL",
-            old: prevKode,
-            new: cplObj.kode,
-          });
-        }
-        if (prevNama !== cplObj.nama) {
-          changes.push({
-            field: "nama",
-            label: "Pernyataan CPL",
-            old: prevNama,
-            new: cplObj.nama,
-          });
-        }
-        if (prevJenis !== cplObj.jenis) {
-          changes.push({
-            field: "jenis",
-            label: "Jenis Kompetensi",
-            old: prevJenis,
-            new: cplObj.jenis,
-          });
-        }
-
-        addAuditLog({
-          master: "cpl",
-          aksi: "ubah",
-          kode: cplObj.kode,
-          nama: cplObj.nama,
-          keterangan: changes.length
-            ? `Memperbarui CPL ${cplObj.kode} via Matriks 2D: ${changes.map((c) => c.label).join(", ")}`
-            : `Menyimpan data CPL ${cplObj.kode} via Matriks 2D`,
-          changes,
-          detail: {
-            sebelum: { kode: prevKode, nama: prevNama, jenis: prevJenis },
-            sesudah: { kode: cplObj.kode, nama: cplObj.nama, jenis: cplObj.jenis },
-          },
-        });
-
-        close();
-        renderMatrixCplPl();
-      }
-
-      function openMatrixCplAdd() {
-        const newKode = nextCode("cpl", "CPL");
-        open(`
-          <div class="matrix-modal-wrap">
-            <div class="matrix-modal-header">
-              <div>
-                <span class="matrix-modal-badge cpl">${esc(newKode)}</span>
-                <span style="font-size:12px;color:var(--text-muted);margin-left:8px">Tambah CPL Baru</span>
-              </div>
-              <span class="tag hard">Hard skill</span>
-            </div>
-
-            <h2 style="font-size:18px;margin:0 0 4px">Tambah Capaian Pembelajaran Lulusan (CPL)</h2>
-            <p class="s" style="margin-bottom:18px">Tambahkan CPL baru ke dalam kurikulum TRPL. Relasi dengan Profil Lulusan dapat langsung ditentukan setelahnya pada matriks.</p>
-
-            <form id="matrix-cpl-add-form" novalidate onsubmit="return false;">
-              <div class="fld" id="fld-matrix-add-cpl-kode">
-                <div class="tf">
-                  <input type="text" name="kode" id="inp-matrix-add-cpl-kode" value="${esc(newKode)}" required autocomplete="off">
-                  <label for="inp-matrix-add-cpl-kode">Kode CPL</label>
-                </div>
-                <div class="h" style="font-size:11px;color:var(--text-muted);margin-top:4px">Format standar otomatis: CPL01, CPL02, dst.</div>
-                <div class="e" id="err-matrix-add-cpl-kode" style="display:none;color:var(--danger);font-size:11px;margin-top:4px"></div>
-              </div>
-
-              <div class="fld" id="fld-matrix-add-cpl-nama">
-                <div class="tf">
-                  <textarea name="nama" id="inp-matrix-add-cpl-nama" rows="3" placeholder="Contoh: Mampu merancang arsitektur microservices modern..." required style="resize:vertical"></textarea>
-                  <label for="inp-matrix-add-cpl-nama">Pernyataan Capaian Pembelajaran Lulusan (CPL)</label>
-                </div>
-                <div class="h" style="font-size:11px;color:var(--text-muted);margin-top:4px">Deskripsikan kompetensi atau kemampuan terukur yang harus dikuasai lulusan.</div>
-                <div class="e" id="err-matrix-add-cpl-nama" style="display:none;color:var(--danger);font-size:11px;margin-top:4px"></div>
-              </div>
-
-              <div class="fld" id="fld-matrix-add-cpl-jenis">
-                <div class="tf">
-                  <select name="jenis" id="inp-matrix-add-cpl-jenis">
-                    <option value="Hard skill" selected>Hard skill (Keterampilan Teknis &amp; Keahlian)</option>
-                    <option value="Soft skill">Soft skill (Komunikasi, Sikap &amp; Kerja Tim)</option>
-                  </select>
-                  <label for="inp-matrix-add-cpl-jenis">Jenis Kompetensi</label>
-                </div>
-              </div>
-
-              <div style="font-size:12px;color:var(--text-muted);background:var(--bg);padding:8px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:16px">
-                Data baru ini akan otomatis tercatat dibuat oleh <b>${USER}</b> pada <b>${stamp()}</b>.
-              </div>
-
-              <div class="mf" style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
-                <button type="button" class="btn ghost" data-x style="margin:0">Batal</button>
-                <button type="button" class="btn" id="matrix-btn-save-new-cpl" style="margin:0">Simpan CPL</button>
-              </div>
-            </form>
-          </div>
-        `);
-      }
-
-      function saveMatrixCplAdd() {
-        const fm = $("matrix-cpl-add-form");
-        if (!fm) return;
-        const kode = (fm.kode.value || "").trim().toUpperCase();
-        const nama = (fm.nama.value || "").trim();
-        const jenis = fm.jenis.value || "Hard skill";
-
-        const errKode = $("err-matrix-add-cpl-kode");
-        const errNama = $("err-matrix-add-cpl-nama");
-        if (errKode) errKode.style.display = "none";
-        if (errNama) errNama.style.display = "none";
-
-        let hasErr = false;
-        if (!kode) {
-          if (errKode) {
-            errKode.textContent = "Kode CPL wajib diisi.";
-            errKode.style.display = "block";
-          }
-          hasErr = true;
-        } else if ((db.cpl || []).some((c) => c.kode.toLowerCase() === kode.toLowerCase())) {
-          if (errKode) {
-            errKode.textContent = `Kode ${kode} sudah terdaftar. Gunakan kode lain.`;
-            errKode.style.display = "block";
-          }
-          hasErr = true;
-        }
-
-        if (!nama) {
-          if (errNama) {
-            errNama.textContent = "Pernyataan CPL wajib diisi.";
-            errNama.style.display = "block";
-          }
-          hasErr = true;
-        }
-
-        if (hasErr) return;
-
-        const newObj = {
-          kode,
-          nama,
-          jenis,
-          pl: [],
-          bk: [],
-          mk: [],
-          by: USER,
-          at: stamp(),
-        };
-
-        db.cpl.push(newObj);
-
-        addAuditLog({
-          master: "cpl",
-          aksi: "tambah",
-          kode,
-          nama,
-          keterangan: `Menambahkan CPL baru ${kode} - ${nama} via Matriks 2D`,
-          changes: [
-            { field: "kode", label: "Kode CPL", old: null, new: kode },
-            { field: "nama", label: "Pernyataan CPL", old: null, new: nama },
-            { field: "jenis", label: "Jenis Kompetensi", old: null, new: jenis },
-          ],
-          detail: { ...newObj },
-        });
-
-        close();
-        renderMatrixCplPl();
-      }
-
-      function askDeleteMatrixCpl(cplKode) {
-        const cplObj = (db.cpl || []).find((c) => c.kode === cplKode);
-        if (!cplObj) return;
-
-        const usedByCpmk = (db.cpmk || []).filter(
-          (c) =>
-            c.cpl === cplKode || (Array.isArray(c.cpl) && c.cpl.includes(cplKode)),
-        ).length;
-
-        if (usedByCpmk > 0) {
-          open(`
-            <div class="matrix-modal-wrap">
-              <h2>${esc(cplKode)} Belum Bisa Dihapus</h2>
-              <p class="s">CPL <b>${esc(cplKode)}</b> masih menjadi induk dari <b>${usedByCpmk} CPMK</b>. Hapus atau alihkan CPMK turunannya terlebih dahulu agar data kurikulum tetap konsisten.</p>
-              <div class="mf"><button class="btn" data-x style="margin:0">Mengerti</button></div>
-            </div>
-          `);
-          return;
-        }
-
-        open(`
-          <div class="matrix-modal-wrap">
-            <h2>Hapus ${esc(cplKode)}?</h2>
-            <p class="s">Capaian Pembelajaran Lulusan <b>${esc(cplObj.nama)}</b> akan dihapus permanen dari kurikulum dan matriks OBE. Seluruh relasi dengan Profil Lulusan akan dilepaskan.</p>
-            <div class="mf" style="display:flex;justify-content:flex-end;gap:8px">
-              <button type="button" class="btn ghost" data-matrix-edit-cpl="${esc(cplKode)}" style="margin:0">Kembali</button>
-              <button type="button" class="btn danger" data-matrix-confirm-delete-cpl="${esc(cplKode)}" style="margin:0">Ya, Hapus CPL</button>
-            </div>
-          </div>
-        `);
-      }
-
-      function confirmDeleteMatrixCpl(cplKode) {
-        const idx = (db.cpl || []).findIndex((c) => c.kode === cplKode);
-        if (idx === -1) return;
-
-        const r = db.cpl.splice(idx, 1)[0];
-
-        (db.pl || []).forEach((p) => {
-          if (Array.isArray(p.cpl)) {
-            p.cpl = p.cpl.filter((k) => k !== cplKode);
-          }
-        });
-
-        addAuditLog({
-          master: "cpl",
-          aksi: "hapus",
-          kode: r.kode,
-          nama: r.nama,
-          keterangan: `Menghapus CPL ${r.kode} - ${r.nama} dari kurikulum melalui Matriks 2D`,
-          changes: [
-            { field: "kode", label: "Kode CPL", old: r.kode, new: null },
-            { field: "nama", label: "Pernyataan CPL", old: r.nama, new: null },
-          ],
-          detail: { ...r },
-        });
-
-        close();
-        renderMatrixCplPl();
       }
 
       function openMatrixPlDetail(plKode) {
@@ -3187,12 +2686,8 @@
                 : ""
             }
 
-            <div class="mf" style="margin-top:20px;display:flex;justify-content:space-between;align-items:center">
+            <div class="mf" style="margin-top:20px">
               <button class="btn ghost" data-x style="margin:0">Tutup</button>
-              <button class="btn" data-matrix-edit-cpl="${esc(cpl.kode)}" style="margin:0">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                Ubah Data CPL
-              </button>
             </div>
           </div>
         `);
@@ -3217,10 +2712,9 @@
               <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px">
                 <b style="color:var(--text)">Cara Mengoperasikan Matriks:</b>
                 <ul style="margin:6px 0 0;padding-left:20px">
-                  <li><b>Mode Edit:</b> Aktifkan sakelar Mode Edit di kanan atas untuk mengedit langsung relasi maupun data CPL.</li>
-                  <li><b>Ubah Pernyataan &amp; Jenis CPL:</b> Dalam Mode Edit, klik tombol &quot;Ubah CPL&quot; atau teks pernyataan CPL di kolom kiri untuk memperbarui isi CPL, atau klik badge jenis kompetensi untuk beralih cepat antara Hard skill dan Soft skill.</li>
-                  <li><b>Tambah CPL Baru:</b> Klik tombol &quot;+ Tambah CPL&quot; pada toolbar kanan atas saat Mode Edit aktif.</li>
+                  <li><b>Mode Edit:</b> Aktifkan sakelar Mode Edit di kanan atas untuk mengubah relasi pemetaan sel matriks.</li>
                   <li><b>Klik Sel Relasi:</b> Klik tombol sel matriks untuk menghubungkan atau memutuskan relasi antara baris CPL dan kolom PL. Perubahan langsung tersimpan ke data relasi dan audit log.</li>
+                  <li><b>Master Data Terpusat:</b> Penambahan, perubahan pernyataan, atau klasifikasi CPL dikelola terpusat melalui menu <b>Data Master &gt; Capaian Pembelajaran (CPL)</b>, bukan dari halaman matriks.</li>
                   <li><b>Informasi Lengkap:</b> Klik tombol <span style="display:inline-block;border:1px solid var(--border);border-radius:50%;width:16px;height:16px;line-height:14px;text-align:center;font-size:11px">i</span> pada judul PL atau klik kode CPL untuk melihat rincian pemetaan kurikulum.</li>
                   <li><b>Pencarian &amp; Filter:</b> Saring berdasarkan kata kunci atau status pemetaan untuk mendeteksi kompetensi yang belum terhubung.</li>
                 </ul>
@@ -3625,9 +3119,7 @@
 
       // Event Listeners
       document.addEventListener("click", (ev) => {
-        const b = ev.target.closest(
-          "button, #ov, #sidebar-backdrop, [data-matrix-edit-cpl], [data-matrix-cpl-toggle-jenis], [data-matrix-cpl-btn]",
-        );
+        const b = ev.target.closest("button, #ov, #sidebar-backdrop");
         if (!b) return;
 
         if (b.id === "toggle-sidebar") {
@@ -3672,36 +3164,12 @@
           renderMatrixCplPl();
         } else if (b.id === "matrix-btn-guide" || b.closest("#matrix-btn-guide")) {
           openMatrixGuideModal();
-        } else if (b.id === "matrix-btn-add-cpl" || b.closest("#matrix-btn-add-cpl")) {
-          openMatrixCplAdd();
-        } else if (b.id === "matrix-btn-save-new-cpl") {
-          saveMatrixCplAdd();
-        } else if (b.dataset.matrixEditCpl) {
-          openMatrixCplEdit(b.dataset.matrixEditCpl);
-        } else if (b.dataset.matrixCplToggleJenis) {
-          toggleMatrixCplJenis(b.dataset.matrixCplToggleJenis);
-        } else if (b.id === "matrix-btn-save-cpl") {
-          saveMatrixCplEdit();
-        } else if (b.id === "matrix-btn-delete-cpl") {
-          askDeleteMatrixCpl(b.dataset.cpl);
-        } else if (b.dataset.matrixConfirmDeleteCpl) {
-          confirmDeleteMatrixCpl(b.dataset.matrixConfirmDeleteCpl);
-        } else if (b.dataset.matrixCplBtn) {
-          if (matrixInteractive) {
-            openMatrixCplEdit(b.dataset.matrixCplBtn);
-          } else {
-            openMatrixCplDetail(b.dataset.matrixCplBtn);
-          }
         } else if (b.dataset.matrixToggleCpl && b.dataset.matrixTogglePl) {
           toggleMatrixRelation(b.dataset.matrixToggleCpl, b.dataset.matrixTogglePl);
         } else if (b.dataset.matrixPlInfo) {
           openMatrixPlDetail(b.dataset.matrixPlInfo);
         } else if (b.dataset.matrixCplInfo) {
-          if (matrixInteractive) {
-            openMatrixCplEdit(b.dataset.matrixCplInfo);
-          } else {
-            openMatrixCplDetail(b.dataset.matrixCplInfo);
-          }
+          openMatrixCplDetail(b.dataset.matrixCplInfo);
         } else if (b.dataset.t) {
           if (b.dataset.t === "log_master") {
             logMasterFilter = "all";
