@@ -113,7 +113,8 @@
         "krpl2503",
         "krpl2507",
         "krpl2510",
-        "krpl2516"
+        "krpl2516",
+        "krpl2520"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 09.32"
@@ -140,7 +141,8 @@
         "krpl2511",
         "krpl2514",
         "krpl2518",
-        "krpl2524"
+        "krpl2524",
+        "krpl2520"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 09.35"
@@ -341,7 +343,8 @@
       "mk": [
         "krpl2502",
         "krpl2508",
-        "krpl2510"
+        "krpl2510",
+        "krpl2520"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 09.15"
@@ -1102,6 +1105,7 @@
         "CPL06"
       ],
       "mk": [
+        "krpl2501",
         "krpl2505",
         "krpl2516",
         "krpl2521"
@@ -1220,6 +1224,57 @@
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 12.15"
+    },
+    {
+      "kode": "CPMK02.03",
+      "nama": "Mampu mengimplementasikan konsep Object-Oriented Programming (OOP) lanjut, enkapsulasi, polimorfisme, dan prinsip SOLID",
+      "cpl": [
+        "CPL02"
+      ],
+      "mk": [
+        "krpl2506",
+        "krpl2510"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK02.03.01",
+          "nama": "Menerapkan abstraksi, enkapsulasi, dan pewarisan pada kasus perangkat lunak nyata"
+        },
+        {
+          "kode": "SubCPMK02.03.02",
+          "nama": "Mengimplementasikan prinsip desain SOLID dan interface-based programming secara konsisten"
+        },
+        {
+          "kode": "SubCPMK02.03.03",
+          "nama": "Merancang unit test untuk memverifikasi logika method dan interaksi antar objek"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.15"
+    },
+    {
+      "kode": "CPMK03.04",
+      "nama": "Mampu merancang dan mengintegrasikan arsitektur sistem perangkat lunak terdistribusi skala enterprise",
+      "cpl": [
+        "CPL03",
+        "CPL02"
+      ],
+      "mk": [
+        "krpl2520",
+        "krpl2522"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK03.04.01",
+          "nama": "Menganalisis pola komunikasi asinkron berbasis message broker dan event-driven architecture"
+        },
+        {
+          "kode": "SubCPMK03.04.02",
+          "nama": "Merancang strategi skalabilitas horisontal, caching, dan load balancing pada sistem enterprise"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.20"
     }
   ],
   "logs": [
