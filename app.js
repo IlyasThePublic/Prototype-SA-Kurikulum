@@ -1480,10 +1480,7 @@ function renderMatrixCplPl() {
                 `;
                 })
                 .join("")}
-              <th class="th-summary" scope="col">
-                <div>Total PL</div>
-                <span style="font-size:11px;font-weight:400;color:var(--text-muted)">Kontribusi</span>
-              </th>
+
             </tr>
           </thead>
 
@@ -1501,8 +1498,7 @@ function renderMatrixCplPl() {
                   <td class="td-cpl-code">
                     <button
                       type="button"
-                      class="tag ${isHard ? "hard" : "softs"}"
-                      style="cursor:pointer;border:none;font-weight:700"
+                      class="matrix-cpl-btn ${isHard ? "hard" : "softs"}"
                       data-matrix-cpl-info="${esc(cpl.kode)}"
                       title="Klik untuk melihat detail CPL ${esc(cpl.kode)}"
                     >
@@ -1548,20 +1544,14 @@ function renderMatrixCplPl() {
                     })
                     .join("")}
 
-                  <td class="matrix-cell-summary">
-                    ${
-                      plCount > 0
-                        ? `<span class="matrix-count-badge ok" title="${plCount} dari ${allPl.length} Profil Lulusan">${plCount} PL</span>`
-                        : `<span class="matrix-count-badge warn" title="Peringatan OBE: CPL wajib diturunkan dari minimal 1 PL">⚠️ 0 PL</span>`
-                    }
-                  </td>
+
                 </tr>
               `;
                     })
                     .join("")
                 : `
               <tr>
-                <td colspan="${allPl.length + 4}" style="text-align:center;padding:48px 16px">
+                <td colspan="${allPl.length + 2}" style="text-align:center;padding:48px 16px">
                   <div class="empty">
                     <b>Tidak ada data CPL yang sesuai</b><br>
                     Coba sesuaikan kata kunci pencarian atau filter status yang Anda pilih.
@@ -1579,22 +1569,24 @@ function renderMatrixCplPl() {
         <div class="matrix-legend-items">
           <span style="font-weight:600;color:var(--text);font-size:12px">Keterangan Matriks:</span>
           <div class="matrix-legend-item">
-            <span class="matrix-legend-chip linked">✓ Terhubung</span>
-            <span>CPL berkontribusi langsung membentuk Profil Lulusan</span>
+            <span class="matrix-legend-chip linked">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+            </span>
+            <span>Mendukung Profil Lulusan</span>
           </div>
           <div class="matrix-legend-item">
             <span class="matrix-legend-chip unlinked">&mdash;</span>
-            <span>Tidak ada relasi langsung</span>
+            <span>Tidak Berkaitan Langsung</span>
+          </div>
+          <div class="matrix-legend-item">
+            <span class="tag hard" style="font-size:11px;height:20px;line-height:18px">Hard skill</span>
+            <span class="tag softs" style="font-size:11px;height:20px;line-height:18px">Soft skill</span>
+            <span>Klasifikasi CPL</span>
           </div>
         </div>
-
-        <div class="matrix-guide-note">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
-          <span><b>Tips Pengoperasian:</b> ${matrixInteractive ? "Mode Edit aktif: Klik langsung pada sel untuk menghubungkan atau melepas relasi CPL dengan Profil Lulusan (PL)." : "Aktifkan Mode Edit di kanan atas untuk dapat mengubah relasi sel pemetaan CPL–PL."} Data master CPL dikelola secara terpusat melalui Data Master CPL. Perubahan relasi otomatis dicatat dalam audit log.</span>
+        <div style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          Klik kode CPL atau PL untuk melihat detail kompetensi. Gunakan mode edit untuk mengubah relasi.
         </div>
       </div>
     </div>
@@ -2333,6 +2325,9 @@ document.addEventListener("click", (ev) => {
     }
     tab = b.dataset.t;
     $("q").value = "";
+    if ($("flt")) {
+      $("flt").value = "";
+    }
     render();
     if (isMobile()) {
       closeMobileSidebar();

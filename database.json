@@ -2,169 +2,333 @@
   "pl": [
     {
       "kode": "PL01",
-      "nama": "Pengembang Perangkat Lunak",
-      "deskripsi": "Merancang, membangun, dan memelihara aplikasi desktop, web, dan mobile enterprise.",
-      "cpl": [
-        "CPL02",
-        "CPL03",
-        "CPL11"
-      ],
-      "by": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.15"
-    },
-    {
-      "kode": "PL02",
-      "nama": "Analis Sistem Informasi",
-      "deskripsi": "Menganalisis proses bisnis, memodelkan kebutuhan sistem, dan menyusun spesifikasi teknis software.",
+      "nama": "Software Engineer / Fullstack Developer",
+      "deskripsi": "Merancang, membangun, menguji, dan memelihara aplikasi web dan enterprise modern dengan prinsip rekayasa perangkat lunak dan clean code.",
       "cpl": [
         "CPL01",
         "CPL02",
-        "CPL11"
+        "CPL03",
+        "CPL04",
+        "CPL05",
+        "CPL06",
+        "CPL08",
+        "CPL09",
+        "CPL10"
       ],
       "by": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.15"
+      "at": "20 Okt 2026, 09.00"
+    },
+    {
+      "kode": "PL02",
+      "nama": "System Analyst & Solution Architect",
+      "deskripsi": "Menganalisis proses bisnis, merumuskan kebutuhan sistem, dan merancang arsitektur perangkat lunak skala enterprise berbasis standar industri.",
+      "cpl": [
+        "CPL01",
+        "CPL03",
+        "CPL07",
+        "CPL08",
+        "CPL09",
+        "CPL10"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.05"
     },
     {
       "kode": "PL03",
-      "nama": "Penguji Mutu Perangkat Lunak (QA)",
-      "deskripsi": "Merancang skenario pengujian fungsional dan otomatisasi untuk menjamin kualitas perangkat lunak.",
+      "nama": "Database & Data Engineer",
+      "deskripsi": "Merancang skema basis data relasional/NoSQL, mengoptimasi query performa tinggi, dan membangun pipeline rekayasa data analitik.",
+      "cpl": [
+        "CPL02",
+        "CPL06",
+        "CPL08",
+        "CPL09",
+        "CPL10"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.10"
+    },
+    {
+      "kode": "PL04",
+      "nama": "Quality Assurance & Software Tester",
+      "deskripsi": "Merancang strategi pengujian, membuat skenario automated test, dan menjamin mutu perangkat lunak serta keandalan sistem produksi.",
       "cpl": [
         "CPL04",
-        "CPL11"
+        "CPL08",
+        "CPL09",
+        "CPL10"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 09.15"
     },
     {
-      "kode": "PL04",
-      "nama": "Teknopreneur Perangkat Lunak",
-      "deskripsi": "Mengidentifikasi peluang inovasi digital, mengelola produk teknologi, dan memimpin startup mandiri.",
+      "kode": "PL05",
+      "nama": "DevOps & Cloud Infrastructure Engineer",
+      "deskripsi": "Mengelola otomatisasi CI/CD, orkestrasi container, konfigurasi keamanan sistem, dan keandalan infrastruktur cloud computing.",
       "cpl": [
-        "CPL11"
+        "CPL05",
+        "CPL07",
+        "CPL08",
+        "CPL09",
+        "CPL10"
       ],
-      "by": "Tim kurikulum",
-      "at": "18 Okt 2026, 13.40"
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.20"
     }
   ],
   "cpl": [
     {
       "kode": "CPL01",
-      "nama": "Mampu menganalisis kebutuhan perangkat lunak dan proses bisnis",
+      "nama": "Mampu merumuskan analisis kebutuhan sistem dan memodelkan spesifikasi perangkat lunak berstandar industri (SRS IEEE 830)",
       "jenis": "Hard skill",
       "pl": [
+        "PL01",
         "PL02"
       ],
       "bk": [
-        "BK01"
+        "BK01",
+        "BK09"
       ],
       "mk": [
-        "krpl2503"
+        "krpl2504",
+        "krpl2509",
+        "krpl2514",
+        "krpl2518"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 09.30"
     },
     {
       "kode": "CPL02",
-      "nama": "Mampu merancang arsitektur basis data relasional dan optimasi query",
+      "nama": "Mampu merancang, mengimplementasikan, dan mengoptimasi arsitektur basis data relasional dan NoSQL berkinerja tinggi",
       "jenis": "Hard skill",
       "pl": [
         "PL01",
-        "PL02"
+        "PL03"
       ],
       "bk": [
-        "BK02"
+        "BK03",
+        "BK08"
       ],
       "mk": [
-        "krpl2501",
-        "krpl2504"
+        "krpl2503",
+        "krpl2507",
+        "krpl2510",
+        "krpl2516"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 09.32"
     },
     {
       "kode": "CPL03",
-      "nama": "Mampu membangun aplikasi web dan mobile enterprise berbasis standar industri",
+      "nama": "Mampu membangun aplikasi web, mobile, dan backend API enterprise menggunakan arsitektur bersih dan standar secure coding",
       "jenis": "Hard skill",
       "pl": [
-        "PL01"
+        "PL01",
+        "PL02"
       ],
       "bk": [
-        "BK03"
+        "BK02",
+        "BK04",
+        "BK05"
       ],
       "mk": [
+        "krpl2501",
         "krpl2502",
-        "krpl2505",
-        "krpl2507"
+        "krpl2506",
+        "krpl2508",
+        "krpl2510",
+        "krpl2511",
+        "krpl2514",
+        "krpl2518",
+        "krpl2524"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.35"
+    },
+    {
+      "kode": "CPL04",
+      "nama": "Mampu merancang skenario pengujian, menerapkan automated testing (unit, integration, E2E), dan menjamin mutu perangkat lunak",
+      "jenis": "Hard skill",
+      "pl": [
+        "PL01",
+        "PL04"
+      ],
+      "bk": [
+        "BK06"
+      ],
+      "mk": [
+        "krpl2512",
+        "krpl2514",
+        "krpl2518",
+        "krpl2524"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 09.40"
     },
     {
-      "kode": "CPL04",
-      "nama": "Mampu merancang dan melaksanakan pengujian serta penjaminan mutu perangkat lunak",
+      "kode": "CPL05",
+      "nama": "Mampu mengonfigurasi otomatisasi CI/CD, orkestrasi container, dan mengelola infrastruktur cloud computing secara andal",
       "jenis": "Hard skill",
       "pl": [
+        "PL01",
+        "PL05"
+      ],
+      "bk": [
+        "BK07"
+      ],
+      "mk": [
+        "krpl2513",
+        "krpl2515",
+        "krpl2518",
+        "krpl2519"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.42"
+    },
+    {
+      "kode": "CPL06",
+      "nama": "Mampu menerapkan algoritma komputasi cerdas, rekayasa data pipeline, dan integrasi model machine learning pada sistem aplikasi",
+      "jenis": "Hard skill",
+      "pl": [
+        "PL01",
         "PL03"
       ],
       "bk": [
-        "BK04"
+        "BK02",
+        "BK08"
       ],
       "mk": [
-        "krpl2506"
+        "krpl2505",
+        "krpl2516",
+        "krpl2521"
       ],
       "by": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.41"
+      "at": "20 Okt 2026, 09.45"
     },
     {
-      "kode": "CPL11",
-      "nama": "Mampu bekerja sama dalam tim lintas disiplin dan berkomunikasi secara profesional",
+      "kode": "CPL07",
+      "nama": "Mampu menerapkan arsitektur keamanan informasi, enkripsi, dan mitigasi kerentanan perangkat lunak sesuai panduan OWASP",
+      "jenis": "Hard skill",
+      "pl": [
+        "PL02",
+        "PL05"
+      ],
+      "bk": [
+        "BK07"
+      ],
+      "mk": [
+        "krpl2513",
+        "krpl2515",
+        "krpl2517",
+        "krpl2519"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.50"
+    },
+    {
+      "kode": "CPL08",
+      "nama": "Mampu bekerja sama secara efektif dalam tim lintas disiplin dengan metodologi Agile Scrum serta beradaptasi terhadap perubahan",
       "jenis": "Soft skill",
       "pl": [
         "PL01",
         "PL02",
         "PL03",
-        "PL04"
+        "PL04",
+        "PL05"
       ],
       "bk": [
-        "BK05"
+        "BK09",
+        "BK10"
+      ],
+      "mk": [
+        "krpl2514",
+        "krpl2518",
+        "krpl2522",
+        "krpl2524"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.55"
+    },
+    {
+      "kode": "CPL09",
+      "nama": "Mampu berkomunikasi profesional, menyusun dokumentasi teknis komprehensif, dan mempresentasikan hasil rancangan solusi sistem",
+      "jenis": "Soft skill",
+      "pl": [
+        "PL01",
+        "PL02",
+        "PL03",
+        "PL04",
+        "PL05"
+      ],
+      "bk": [
+        "BK01",
+        "BK10"
       ],
       "mk": [
         "urpl2501",
-        "krpl2507"
+        "krpl2504",
+        "krpl2509",
+        "urpl2504",
+        "krpl2523",
+        "krpl2524"
       ],
-      "by": "Tim kurikulum",
-      "at": "18 Okt 2026, 13.55"
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 10.00"
+    },
+    {
+      "kode": "CPL10",
+      "nama": "Menjunjung tinggi etika profesi rekayasa perangkat lunak, kepatuhan regulasi, serta budaya kerja mutu Astra (Catur Dharma)",
+      "jenis": "Soft skill",
+      "pl": [
+        "PL01",
+        "PL02",
+        "PL03",
+        "PL04",
+        "PL05"
+      ],
+      "bk": [
+        "BK10"
+      ],
+      "mk": [
+        "urpl2502",
+        "urpl2503",
+        "krpl2522",
+        "krpl2525"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 10.05"
     }
   ],
   "bk": [
     {
       "kode": "BK01",
-      "nama": "Rekayasa Kebutuhan Perangkat Lunak",
-      "deskripsi": "Teknik elisitasi, analisis kelayakan, pemodelan use case, dan dokumentasi SRS.",
+      "nama": "Rekayasa Kebutuhan & Analisis Sistem",
+      "deskripsi": "Elisitasi kebutuhan, pemodelan proses bisnis BPMN, analisis berorientasi objek UML, dan penyusunan spesifikasi SRS.",
       "mk": [
-        "krpl2503"
+        "krpl2504",
+        "krpl2509"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 09.15"
     },
     {
       "kode": "BK02",
-      "nama": "Basis Data & Manajemen Informasi",
-      "deskripsi": "Pemodelan data konseptual-logikal-fisikal, normalisasi, indexing, dan transaksi SQL.",
+      "nama": "Algoritma, Logika & Struktur Data",
+      "deskripsi": "Prinsip logika komputasi, algoritma dasar, struktur data rekursif, kompleksitas Big-O, dan paradigma OOP.",
       "mk": [
         "krpl2501",
-        "krpl2504"
+        "krpl2505",
+        "krpl2506"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 09.15"
     },
     {
       "kode": "BK03",
-      "nama": "Pemrograman & Rekayasa Web Enterprise",
-      "deskripsi": "Client-side modern, arsitektur microservices, REST API, dan full-stack framework.",
+      "nama": "Basis Data & Manajemen Informasi",
+      "deskripsi": "Pemodelan konseptual-logikal ERD, normalisasi data, transaksi ACID, indexing, dan optimasi query basis data relasional/NoSQL.",
       "mk": [
-        "krpl2502",
-        "krpl2505",
+        "krpl2503",
         "krpl2507"
       ],
       "by": "Pak Suhendra",
@@ -172,30 +336,120 @@
     },
     {
       "kode": "BK04",
-      "nama": "Penjaminan Mutu & Pengujian Software",
-      "deskripsi": "Prinsip QA/QC, unit testing, test-driven development (TDD), dan automasi test CI/CD.",
+      "nama": "Rekayasa Antarmuka & Web Enterprise",
+      "deskripsi": "Prinsip desain UI/UX, responsive front-end modern, perancangan RESTful API, dan arsitektur backend scalable.",
       "mk": [
-        "krpl2506"
+        "krpl2502",
+        "krpl2508",
+        "krpl2510"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 09.15"
     },
     {
       "kode": "BK05",
-      "nama": "Kolaborasi Profesional & Agile Scrum",
-      "deskripsi": "Metodologi Agile, Scrum sprint delivery, manajemen repositori git, dan komunikasi profesi.",
+      "nama": "Pengembangan Aplikasi Mobile Multiplatform",
+      "deskripsi": "Arsitektur aplikasi mobile, siklus hidup aplikasi, state management, integrasi API, dan deployment aplikasi Android/iOS.",
+      "mk": [
+        "krpl2511"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.15"
+    },
+    {
+      "kode": "BK06",
+      "nama": "Penjaminan Mutu & Pengujian Software",
+      "deskripsi": "Metodologi QA/QC, test planning, pembuatan test case, unit testing, integration testing, dan automated regression test.",
+      "mk": [
+        "krpl2512"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.15"
+    },
+    {
+      "kode": "BK07",
+      "nama": "DevOps, Cloud Computing & Keamanan",
+      "deskripsi": "Otomatisasi CI/CD, kontainerisasi Docker/Kubernetes, cloud hosting, mitigasi kerentanan OWASP, dan hardening sistem.",
+      "mk": [
+        "krpl2513",
+        "krpl2515",
+        "krpl2519"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.15"
+    },
+    {
+      "kode": "BK08",
+      "nama": "Rekayasa Data & Kecerdasan Terapan",
+      "deskripsi": "Data ingestion, ETL pipeline, analisis data eksploratif, model machine learning terapan, dan pemanfaatan AI API.",
+      "mk": [
+        "krpl2516",
+        "krpl2521"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.15"
+    },
+    {
+      "kode": "BK09",
+      "nama": "Manajemen Proyek Agile & Praktik Rekayasa",
+      "deskripsi": "Metodologi Scrum, sprint planning, git branching strategy, clean architecture, refactoring, dan kolaborasi proyek industri.",
+      "mk": [
+        "krpl2514",
+        "krpl2517",
+        "krpl2518",
+        "krpl2520",
+        "krpl2522",
+        "krpl2524"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.15"
+    },
+    {
+      "kode": "BK10",
+      "nama": "Komunikasi Profesional, Etika & Nilai Astra",
+      "deskripsi": "Bahasa Inggris komunikasi teknis, penulisan laporan ilmiah, etika profesi rekayasa, keselamatan kerja, dan Catur Dharma Astra.",
       "mk": [
         "urpl2501",
-        "krpl2507"
+        "urpl2502",
+        "urpl2503",
+        "urpl2504",
+        "krpl2523",
+        "krpl2525"
       ],
-      "by": "Tim kurikulum",
-      "at": "18 Okt 2026, 13.45"
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.15"
     }
   ],
   "mk": [
     {
+      "kode": "urpl2501",
+      "nama": "Bahasa Inggris Komunikasi Teknis",
+      "kat": "Umum",
+      "sks": 2,
+      "sksTeori": 2,
+      "sksPrak": 0,
+      "sem": 1,
+      "jenis": "Teori",
+      "prasyarat": [],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 10.00"
+    },
+    {
+      "kode": "urpl2502",
+      "nama": "Budaya Industri & Nilai Astra",
+      "kat": "Umum",
+      "sks": 2,
+      "sksTeori": 2,
+      "sksPrak": 0,
+      "sem": 1,
+      "jenis": "Teori",
+      "prasyarat": [],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 10.02"
+    },
+    {
       "kode": "krpl2501",
-      "nama": "Basis Data",
+      "nama": "Algoritma dan Pemrograman",
       "kat": "Inti RPL",
       "sks": 3,
       "sksTeori": 1,
@@ -208,7 +462,7 @@
     },
     {
       "kode": "krpl2502",
-      "nama": "Pemrograman Web Dasar",
+      "nama": "Desain Antarmuka & UI/UX",
       "kat": "Inti RPL",
       "sks": 3,
       "sksTeori": 1,
@@ -217,37 +471,63 @@
       "jenis": "Praktik",
       "prasyarat": [],
       "by": "Pak Suhendra",
-      "at": "20 Okt 2026, 10.06"
+      "at": "20 Okt 2026, 10.10"
     },
     {
       "kode": "krpl2503",
-      "nama": "Rekayasa Kebutuhan",
+      "nama": "Basis Data Relasional",
       "kat": "Inti RPL",
-      "sks": 2,
-      "sksTeori": 2,
-      "sksPrak": 0,
+      "sks": 3,
+      "sksTeori": 1,
+      "sksPrak": 2,
       "sem": 1,
-      "jenis": "Teori",
+      "jenis": "Praktik",
       "prasyarat": [],
-      "by": "Tim kurikulum",
-      "at": "18 Okt 2026, 14.10"
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 10.15"
     },
     {
-      "kode": "urpl2501",
-      "nama": "Bahasa Indonesia & Komunikasi Profesi",
+      "kode": "krpl2504",
+      "nama": "Rekayasa Kebutuhan Perangkat Lunak",
+      "kat": "Inti RPL",
+      "sks": 3,
+      "sksTeori": 2,
+      "sksPrak": 1,
+      "sem": 1,
+      "jenis": "Praktik",
+      "prasyarat": [],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 10.20"
+    },
+    {
+      "kode": "krpl2505",
+      "nama": "Struktur Data & Logika Lanjut",
+      "kat": "Inti RPL",
+      "sks": 4,
+      "sksTeori": 2,
+      "sksPrak": 2,
+      "sem": 1,
+      "jenis": "Praktik",
+      "prasyarat": [],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 10.25"
+    },
+    {
+      "kode": "urpl2503",
+      "nama": "Etika Profesi & Regulasi TI",
       "kat": "Umum",
       "sks": 2,
       "sksTeori": 2,
       "sksPrak": 0,
-      "sem": 1,
+      "sem": 2,
       "jenis": "Teori",
       "prasyarat": [],
-      "by": "Tim kurikulum",
-      "at": "18 Okt 2026, 14.12"
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 10.30"
     },
     {
-      "kode": "krpl2504",
-      "nama": "Basis Data Lanjut",
+      "kode": "krpl2506",
+      "nama": "Pemrograman Berorientasi Objek",
       "kat": "Inti RPL",
       "sks": 3,
       "sksTeori": 1,
@@ -258,26 +538,11 @@
         "krpl2501"
       ],
       "by": "Pak Suhendra",
-      "at": "20 Okt 2026, 10.15"
+      "at": "20 Okt 2026, 10.32"
     },
     {
-      "kode": "krpl2505",
-      "nama": "Pemrograman Web Lanjut",
-      "kat": "Inti RPL",
-      "sks": 4,
-      "sksTeori": 1,
-      "sksPrak": 3,
-      "sem": 2,
-      "jenis": "Praktik",
-      "prasyarat": [
-        "krpl2502"
-      ],
-      "by": "Pak Suhendra",
-      "at": "20 Okt 2026, 10.18"
-    },
-    {
-      "kode": "krpl2506",
-      "nama": "Pengujian Perangkat Lunak",
+      "kode": "krpl2507",
+      "nama": "Basis Data Lanjut & Optimasi Query",
       "kat": "Inti RPL",
       "sks": 3,
       "sksTeori": 1,
@@ -285,14 +550,102 @@
       "sem": 2,
       "jenis": "Praktik",
       "prasyarat": [
-        "krpl2502"
+        "krpl2503"
       ],
       "by": "Pak Suhendra",
-      "at": "20 Okt 2026, 10.20"
+      "at": "20 Okt 2026, 10.35"
     },
     {
-      "kode": "krpl2507",
-      "nama": "Proyek Pengembangan Agile",
+      "kode": "krpl2508",
+      "nama": "Pemrograman Web Dasar",
+      "kat": "Inti RPL",
+      "sks": 3,
+      "sksTeori": 1,
+      "sksPrak": 2,
+      "sem": 2,
+      "jenis": "Praktik",
+      "prasyarat": [
+        "krpl2501"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 10.38"
+    },
+    {
+      "kode": "krpl2509",
+      "nama": "Analisis & Perancangan Berorientasi Objek",
+      "kat": "Inti RPL",
+      "sks": 3,
+      "sksTeori": 2,
+      "sksPrak": 1,
+      "sem": 2,
+      "jenis": "Praktik",
+      "prasyarat": [
+        "krpl2504"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 10.40"
+    },
+    {
+      "kode": "krpl2511",
+      "nama": "Pengembangan Aplikasi Mobile Dasar",
+      "kat": "Inti RPL",
+      "sks": 3,
+      "sksTeori": 1,
+      "sksPrak": 2,
+      "sem": 2,
+      "jenis": "Praktik",
+      "prasyarat": [
+        "krpl2506"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 10.45"
+    },
+    {
+      "kode": "krpl2513",
+      "nama": "Jaringan Komputer & Keamanan Siber",
+      "kat": "Inti RPL",
+      "sks": 3,
+      "sksTeori": 1,
+      "sksPrak": 2,
+      "sem": 2,
+      "jenis": "Praktik",
+      "prasyarat": [],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 10.50"
+    },
+    {
+      "kode": "krpl2510",
+      "nama": "Rekayasa Web Enterprise & API",
+      "kat": "Inti RPL",
+      "sks": 4,
+      "sksTeori": 1,
+      "sksPrak": 3,
+      "sem": 3,
+      "jenis": "Praktik",
+      "prasyarat": [
+        "krpl2508"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.00"
+    },
+    {
+      "kode": "krpl2512",
+      "nama": "Penjaminan Mutu & Pengujian Software",
+      "kat": "Inti RPL",
+      "sks": 3,
+      "sksTeori": 1,
+      "sksPrak": 2,
+      "sem": 3,
+      "jenis": "Praktik",
+      "prasyarat": [
+        "krpl2506"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.05"
+    },
+    {
+      "kode": "krpl2514",
+      "nama": "Proyek Pengembangan Agile 1",
       "kat": "Inti RPL",
       "sks": 4,
       "sksTeori": 0,
@@ -300,611 +653,761 @@
       "sem": 3,
       "jenis": "Praktik",
       "prasyarat": [
-        "krpl2505",
-        "krpl2506"
-      ],
-      "by": "Pak Suhendra",
-      "at": "20 Okt 2026, 10.25"
-    }
-  ],
-  "cpmk": [
-    {
-      "kode": "CPMK01.01",
-      "nama": "Mampu menyusun dokumen Software Requirements Specification (SRS) sesuai standar industri IEEE 830",
-      "cpl": [
-        "CPL01"
-      ],
-      "mk": [
-        "krpl2503"
-      ],
-      "by": "Pak Suhendra",
-      "at": "20 Okt 2026, 11.00"
-    },
-    {
-      "kode": "CPMK02.01",
-      "nama": "Mampu merancang diagram ERD dan mengimplementasikan skema database relasional ternormalisasi",
-      "cpl": [
-        "CPL02"
-      ],
-      "mk": [
-        "krpl2501"
-      ],
-      "by": "Pak Suhendra",
-      "at": "20 Okt 2026, 11.05"
-    },
-    {
-      "kode": "CPMK02.02",
-      "nama": "Mampu melakukan optimasi query kompleks, indexing, dan transaksi multi-tabel ACID",
-      "cpl": [
-        "CPL02"
-      ],
-      "mk": [
-        "krpl2504"
+        "krpl2508",
+        "krpl2509"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 11.10"
     },
     {
-      "kode": "CPMK03.01",
-      "nama": "Mampu membangun antarmuka web responsif dan mengonsumsi REST API endpoints",
-      "cpl": [
-        "CPL03"
-      ],
-      "mk": [
-        "krpl2502"
-      ],
-      "by": "Pak Suhendra",
-      "at": "20 Okt 2026, 11.12"
-    },
-    {
-      "kode": "CPMK03.02",
-      "nama": "Mampu merancang arsitektur backend REST API berbasis MVC dengan otentikasi token JWT",
-      "cpl": [
-        "CPL03"
-      ],
-      "mk": [
-        "krpl2505"
+      "kode": "krpl2515",
+      "nama": "Cloud & DevOps Engineering",
+      "kat": "Inti RPL",
+      "sks": 3,
+      "sksTeori": 1,
+      "sksPrak": 2,
+      "sem": 3,
+      "jenis": "Praktik",
+      "prasyarat": [
+        "krpl2513"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 11.15"
     },
     {
-      "kode": "CPMK04.01",
-      "nama": "Mampu merancang test suite, membuat skenario pengujian unit & integration test secara otomatis",
-      "cpl": [
-        "CPL04"
-      ],
-      "mk": [
-        "krpl2506"
+      "kode": "krpl2516",
+      "nama": "Rekayasa Data & Machine Learning Terapan",
+      "kat": "Inti RPL",
+      "sks": 3,
+      "sksTeori": 1,
+      "sksPrak": 2,
+      "sem": 3,
+      "jenis": "Praktik",
+      "prasyarat": [
+        "krpl2507"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 11.20"
     },
     {
-      "kode": "CPMK11.01",
-      "nama": "Mampu mempresentasikan hasil perancangan sistem dan proposal teknis secara lisan dan tulisan",
-      "cpl": [
-        "CPL11"
-      ],
-      "mk": [
-        "urpl2501"
+      "kode": "krpl2517",
+      "nama": "Arsitektur Software & Clean Code",
+      "kat": "Inti RPL",
+      "sks": 3,
+      "sksTeori": 2,
+      "sksPrak": 1,
+      "sem": 3,
+      "jenis": "Teori",
+      "prasyarat": [
+        "krpl2510"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 11.25"
     },
     {
-      "kode": "CPMK11.02",
-      "nama": "Mampu berkolaborasi aktif dalam tim pengembangan software dengan metodologi Agile Scrum",
-      "cpl": [
-        "CPL11"
-      ],
-      "mk": [
-        "krpl2507"
+      "kode": "krpl2518",
+      "nama": "Proyek Perangkat Lunak Industri 2",
+      "kat": "Inti RPL",
+      "sks": 6,
+      "sksTeori": 0,
+      "sksPrak": 6,
+      "sem": 4,
+      "jenis": "Praktik",
+      "prasyarat": [
+        "krpl2514"
       ],
       "by": "Pak Suhendra",
       "at": "20 Okt 2026, 11.30"
+    },
+    {
+      "kode": "krpl2519",
+      "nama": "Keamanan Aplikasi & DevSecOps",
+      "kat": "Inti RPL",
+      "sks": 3,
+      "sksTeori": 1,
+      "sksPrak": 2,
+      "sem": 4,
+      "jenis": "Praktik",
+      "prasyarat": [
+        "krpl2515"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.35"
+    },
+    {
+      "kode": "krpl2520",
+      "nama": "Solusi Perangkat Lunak Skala Besar",
+      "kat": "Inti RPL",
+      "sks": 3,
+      "sksTeori": 2,
+      "sksPrak": 1,
+      "sem": 4,
+      "jenis": "Teori",
+      "prasyarat": [
+        "krpl2517"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.40"
+    },
+    {
+      "kode": "krpl2521",
+      "nama": "Sistem Cerdas & AI Automation",
+      "kat": "Inti RPL",
+      "sks": 3,
+      "sksTeori": 1,
+      "sksPrak": 2,
+      "sem": 4,
+      "jenis": "Praktik",
+      "prasyarat": [
+        "krpl2516"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.45"
+    },
+    {
+      "kode": "urpl2504",
+      "nama": "Metodologi Penelitian Terapan & Presentasi",
+      "kat": "Umum",
+      "sks": 3,
+      "sksTeori": 3,
+      "sksPrak": 0,
+      "sem": 4,
+      "jenis": "Teori",
+      "prasyarat": [],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.50"
+    },
+    {
+      "kode": "krpl2522",
+      "nama": "Magang Industri Terstruktur (Co-op)",
+      "kat": "Inti RPL",
+      "sks": 16,
+      "sksTeori": 0,
+      "sksPrak": 16,
+      "sem": 5,
+      "jenis": "Praktik",
+      "prasyarat": [
+        "krpl2518"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 12.00"
+    },
+    {
+      "kode": "krpl2523",
+      "nama": "Seminar Magang Industri",
+      "kat": "Inti RPL",
+      "sks": 4,
+      "sksTeori": 0,
+      "sksPrak": 4,
+      "sem": 5,
+      "jenis": "Praktik",
+      "prasyarat": [],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 12.05"
+    },
+    {
+      "kode": "krpl2524",
+      "nama": "Proyek Akhir Rekayasa Perangkat Lunak",
+      "kat": "Inti RPL",
+      "sks": 10,
+      "sksTeori": 0,
+      "sksPrak": 10,
+      "sem": 6,
+      "jenis": "Praktik",
+      "prasyarat": [
+        "krpl2522"
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 12.10"
+    },
+    {
+      "kode": "krpl2525",
+      "nama": "Sertifikasi Kompetensi & Profesi",
+      "kat": "Inti RPL",
+      "sks": 4,
+      "sksTeori": 0,
+      "sksPrak": 4,
+      "sem": 6,
+      "jenis": "Praktik",
+      "prasyarat": [],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 12.15"
+    }
+  ],
+  "cpmk": [
+    {
+      "kode": "CPMK01.01",
+      "nama": "Mampu menyusun dokumen Software Requirements Specification (SRS) sesuai standar IEEE 830",
+      "cpl": [
+        "CPL01"
+      ],
+      "mk": [
+        "krpl2504",
+        "krpl2509"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK01.01.01",
+          "nama": "Melakukan elisitasi kebutuhan pengguna menggunakan teknik wawancara dan observasi proses bisnis"
+        },
+        {
+          "kode": "SubCPMK01.01.02",
+          "nama": "Membuat spesifikasi use case naratif dan diagram konteks berstandar industri"
+        },
+        {
+          "kode": "SubCPMK01.01.03",
+          "nama": "Menyusun dokumen SRS lengkap beserta matriks keterlacakan kebutuhan (RTM)"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.00"
+    },
+    {
+      "kode": "CPMK01.02",
+      "nama": "Mampu merancang diagram analisis sistem berorientasi objek (UML & BPMN)",
+      "cpl": [
+        "CPL01"
+      ],
+      "mk": [
+        "krpl2509",
+        "krpl2514"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK01.02.01",
+          "nama": "Memodelkan diagram aktivitas dan alur proses bisnis dengan notasi BPMN 2.0"
+        },
+        {
+          "kode": "SubCPMK01.02.02",
+          "nama": "Merancang class diagram dan sequence diagram untuk sistem berbasis event-driven"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.05"
+    },
+    {
+      "kode": "CPMK02.01",
+      "nama": "Mampu merancang diagram ERD ternormalisasi dan mengimplementasikan skema database relasional",
+      "cpl": [
+        "CPL02"
+      ],
+      "mk": [
+        "krpl2503",
+        "krpl2507"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK02.01.01",
+          "nama": "Merancang ERD konseptual dan menerjemahkannya ke Physical Data Model (PDM)"
+        },
+        {
+          "kode": "SubCPMK02.01.02",
+          "nama": "Menerapkan normalisasi data relasional hingga bentuk 3NF/BCNF"
+        },
+        {
+          "kode": "SubCPMK02.01.03",
+          "nama": "Mengimplementasikan skema tabel dengan DDL, constraint relasi, dan cascading"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.10"
+    },
+    {
+      "kode": "CPMK02.02",
+      "nama": "Mampu melakukan optimasi query kompleks, indexing, dan manajemen transaksi ACID",
+      "cpl": [
+        "CPL02"
+      ],
+      "mk": [
+        "krpl2507",
+        "krpl2510"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK02.02.01",
+          "nama": "Menganalisis query execution plan dan menerapkan composite index yang optimal"
+        },
+        {
+          "kode": "SubCPMK02.02.02",
+          "nama": "Mengelola transaksi multi-tabel dengan locking mechanism dan isolation level ACID"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.15"
+    },
+    {
+      "kode": "CPMK03.01",
+      "nama": "Mampu membangun antarmuka web responsif dan berinteraksi dengan API RESTful",
+      "cpl": [
+        "CPL03"
+      ],
+      "mk": [
+        "krpl2502",
+        "krpl2508"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK03.01.01",
+          "nama": "Menerapkan prinsip desain UI/UX ke dalam layout responsif mobile-first"
+        },
+        {
+          "kode": "SubCPMK03.01.02",
+          "nama": "Mengintegrasikan antarmuka dengan asynchronous data fetching REST API"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.20"
+    },
+    {
+      "kode": "CPMK03.02",
+      "nama": "Mampu merancang backend service berskala enterprise berbasis MVC dan microservices",
+      "cpl": [
+        "CPL03"
+      ],
+      "mk": [
+        "krpl2510",
+        "krpl2517"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK03.02.01",
+          "nama": "Membangun REST API aman dengan validasi input, sanitasi, dan autentikasi JWT"
+        },
+        {
+          "kode": "SubCPMK03.02.02",
+          "nama": "Menerapkan pola arsitektur controller-service-repository (clean architecture)"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.25"
+    },
+    {
+      "kode": "CPMK03.03",
+      "nama": "Mampu membangun aplikasi mobile multiplatform dengan arsitektur terstruktur dan offline persistence",
+      "cpl": [
+        "CPL03"
+      ],
+      "mk": [
+        "krpl2511"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK03.03.01",
+          "nama": "Mengimplementasikan antarmuka mobile interaktif dengan state management terstandar"
+        },
+        {
+          "kode": "SubCPMK03.03.02",
+          "nama": "Mengelola cache lokal SQLite/Hive untuk fungsionalitas aplikasi offline-first"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.30"
+    },
+    {
+      "kode": "CPMK04.01",
+      "nama": "Mampu merancang test plan, skenario test case, dan melaksanakan unit testing terotomasi",
+      "cpl": [
+        "CPL04"
+      ],
+      "mk": [
+        "krpl2512",
+        "krpl2514"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK04.01.01",
+          "nama": "Menyusun dokumen test specification dan kriteria penerimaan (acceptance criteria)"
+        },
+        {
+          "kode": "SubCPMK04.01.02",
+          "nama": "Menulis unit test dan mock dependencies dengan code coverage minimal 80%"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.35"
+    },
+    {
+      "kode": "CPMK04.02",
+      "nama": "Mampu mengimplementasikan automated end-to-end testing dan performance benchmark",
+      "cpl": [
+        "CPL04"
+      ],
+      "mk": [
+        "krpl2512",
+        "krpl2518"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK04.02.01",
+          "nama": "Membuat script automated UI testing untuk skenario regresi alur transaksi utama"
+        },
+        {
+          "kode": "SubCPMK04.02.02",
+          "nama": "Melakukan stress testing dan menganalisis metrik throughput response time"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.40"
+    },
+    {
+      "kode": "CPMK05.01",
+      "nama": "Mampu membangun automated CI/CD pipeline untuk automated build, linting, dan test",
+      "cpl": [
+        "CPL05"
+      ],
+      "mk": [
+        "krpl2515",
+        "krpl2518"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK05.01.01",
+          "nama": "Mengonfigurasi workflow pipeline otomatis pada GitHub Actions / GitLab CI"
+        },
+        {
+          "kode": "SubCPMK05.01.02",
+          "nama": "Mengintegrasikan automated security scanning (SAST) dalam tahapan pipeline"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.45"
+    },
+    {
+      "kode": "CPMK05.02",
+      "nama": "Mampu mengemas aplikasi ke dalam container Docker dan melakukan deployment cloud",
+      "cpl": [
+        "CPL05"
+      ],
+      "mk": [
+        "krpl2515",
+        "krpl2519"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK05.02.01",
+          "nama": "Menulis multi-stage Dockerfile yang aman dan berukuran efisien"
+        },
+        {
+          "kode": "SubCPMK05.02.02",
+          "nama": "Melakukan orkestrasi container dan mengonfigurasi reverse proxy SSL di cloud"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.50"
+    },
+    {
+      "kode": "CPMK06.01",
+      "nama": "Mampu memproses data pipeline dan menerapkan algoritma Machine Learning terapan",
+      "cpl": [
+        "CPL06"
+      ],
+      "mk": [
+        "krpl2505",
+        "krpl2516",
+        "krpl2521"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK06.01.01",
+          "nama": "Melakukan pembersihan data, feature engineering, dan normalisasi dataset industri"
+        },
+        {
+          "kode": "SubCPMK06.01.02",
+          "nama": "Melatih model prediksi supervised learning dan mengevaluasi metrik F1-Score/RMSE"
+        },
+        {
+          "kode": "SubCPMK06.01.03",
+          "nama": "Mengintegrasikan inferensi model machine learning ke dalam REST API backend"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.55"
+    },
+    {
+      "kode": "CPMK07.01",
+      "nama": "Mampu menganalisis kerentanan aplikasi web & mobile serta menerapkan mitigasi OWASP Top 10",
+      "cpl": [
+        "CPL07"
+      ],
+      "mk": [
+        "krpl2513",
+        "krpl2519"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK07.01.01",
+          "nama": "Melakukan vulnerability scanning dan audit celah keamanan SQL Injection dan XSS"
+        },
+        {
+          "kode": "SubCPMK07.01.02",
+          "nama": "Mengimplementasikan enkripsi data at-rest dan in-transit dengan TLS/AES-256"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 12.00"
+    },
+    {
+      "kode": "CPMK08.01",
+      "nama": "Mampu berkolaborasi aktif dalam tim Scrum, memimpin sprint ritual, dan mengelola issue tracking",
+      "cpl": [
+        "CPL08"
+      ],
+      "mk": [
+        "krpl2514",
+        "krpl2518",
+        "krpl2522"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK08.01.01",
+          "nama": "Menjalankan peran Scrum (Developer/Scrum Master) dalam daily standup & sprint review"
+        },
+        {
+          "kode": "SubCPMK08.01.02",
+          "nama": "Mengelola product backlog dan git branch integration berbasis pull request"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 12.05"
+    },
+    {
+      "kode": "CPMK09.01",
+      "nama": "Mampu mempresentasikan arsitektur teknis dan menyusun dokumentasi proyek berstandar industri",
+      "cpl": [
+        "CPL09"
+      ],
+      "mk": [
+        "urpl2501",
+        "krpl2504",
+        "urpl2504",
+        "krpl2523",
+        "krpl2524"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK09.01.01",
+          "nama": "Menyusun laporan teknis proyek dan manual instalasi sistem secara sistematis"
+        },
+        {
+          "kode": "SubCPMK09.01.02",
+          "nama": "Mempresentasikan hasil demo produk di hadapan penguji dan mitra industri"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 12.10"
+    },
+    {
+      "kode": "CPMK10.01",
+      "nama": "Mampu mematuhi etika profesi rekayasa perangkat lunak, integritas data, dan nilai Catur Dharma Astra",
+      "cpl": [
+        "CPL10"
+      ],
+      "mk": [
+        "urpl2502",
+        "urpl2503",
+        "krpl2522",
+        "krpl2525"
+      ],
+      "sub_cpmk": [
+        {
+          "kode": "SubCPMK10.01.01",
+          "nama": "Menerapkan regulasi perlindungan data pribadi dan hak kekayaan intelektual (HAKI)"
+        },
+        {
+          "kode": "SubCPMK10.01.02",
+          "nama": "Menunjukkan komitmen terhadap keselamatan kerja, etika rekayasa, dan budaya mutu Astra"
+        }
+      ],
+      "by": "Pak Suhendra",
+      "at": "20 Okt 2026, 12.15"
     }
   ],
   "logs": [
-    {
-      "id": "LOG-028",
-      "master": "cpmk",
-      "masterLabel": "Capaian MK (CPMK)",
-      "aksi": "tambah",
-      "kode": "CPMK11.02",
-      "nama": "Mampu berkolaborasi aktif dalam tim pengembangan software dengan metodologi Agile Scrum",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 11.30",
-      "keterangan": "Perumusan CPMK11.02 diturunkan dari CPL11 untuk pengampu MK Proyek Pengembangan Agile (krpl2507)",
-      "changes": [
-        { "field": "kode", "label": "Kode CPMK", "old": null, "new": "CPMK11.02" },
-        { "field": "cpl", "label": "CPL Induk", "old": null, "new": ["CPL11"] },
-        { "field": "mk", "label": "Mata Kuliah Pengampu", "old": null, "new": ["krpl2507"] }
-      ],
-      "detail": {
-        "kode": "CPMK11.02",
-        "nama": "Mampu berkolaborasi aktif dalam tim pengembangan software dengan metodologi Agile Scrum",
-        "cpl": ["CPL11"],
-        "mk": ["krpl2507"]
-      }
-    },
-    {
-      "id": "LOG-027",
-      "master": "cpmk",
-      "masterLabel": "Capaian MK (CPMK)",
-      "aksi": "tambah",
-      "kode": "CPMK11.01",
-      "nama": "Mampu mempresentasikan hasil perancangan sistem dan proposal teknis secara lisan dan tulisan",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 11.25",
-      "keterangan": "Perumusan CPMK11.01 diturunkan dari CPL11 untuk MK Bahasa Indonesia & Komunikasi Profesi (urpl2501)",
-      "changes": [
-        { "field": "kode", "label": "Kode CPMK", "old": null, "new": "CPMK11.01" },
-        { "field": "cpl", "label": "CPL Induk", "old": null, "new": ["CPL11"] },
-        { "field": "mk", "label": "Mata Kuliah Pengampu", "old": null, "new": ["urpl2501"] }
-      ],
-      "detail": {
-        "kode": "CPMK11.01",
-        "nama": "Mampu mempresentasikan hasil perancangan sistem dan proposal teknis secara lisan dan tulisan",
-        "cpl": ["CPL11"],
-        "mk": ["urpl2501"]
-      }
-    },
-    {
-      "id": "LOG-026",
-      "master": "cpmk",
-      "masterLabel": "Capaian MK (CPMK)",
-      "aksi": "tambah",
-      "kode": "CPMK04.01",
-      "nama": "Mampu merancang test suite, membuat skenario pengujian unit & integration test secara otomatis",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 11.20",
-      "keterangan": "Perumusan CPMK04.01 diturunkan dari CPL04 untuk MK Pengujian Perangkat Lunak (krpl2506)",
-      "changes": [
-        { "field": "kode", "label": "Kode CPMK", "old": null, "new": "CPMK04.01" },
-        { "field": "cpl", "label": "CPL Induk", "old": null, "new": ["CPL04"] },
-        { "field": "mk", "label": "Mata Kuliah Pengampu", "old": null, "new": ["krpl2506"] }
-      ],
-      "detail": {
-        "kode": "CPMK04.01",
-        "nama": "Mampu merancang test suite, membuat skenario pengujian unit & integration test secara otomatis",
-        "cpl": ["CPL04"],
-        "mk": ["krpl2506"]
-      }
-    },
-    {
-      "id": "LOG-025",
-      "master": "cpmk",
-      "masterLabel": "Capaian MK (CPMK)",
-      "aksi": "tambah",
-      "kode": "CPMK03.02",
-      "nama": "Mampu merancang arsitektur backend REST API berbasis MVC dengan otentikasi token JWT",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 11.15",
-      "keterangan": "Perumusan CPMK03.02 diturunkan dari CPL03 untuk MK Pemrograman Web Lanjut (krpl2505)",
-      "changes": [
-        { "field": "kode", "label": "Kode CPMK", "old": null, "new": "CPMK03.02" },
-        { "field": "cpl", "label": "CPL Induk", "old": null, "new": ["CPL03"] },
-        { "field": "mk", "label": "Mata Kuliah Pengampu", "old": null, "new": ["krpl2505"] }
-      ],
-      "detail": {
-        "kode": "CPMK03.02",
-        "nama": "Mampu merancang arsitektur backend REST API berbasis MVC dengan otentikasi token JWT",
-        "cpl": ["CPL03"],
-        "mk": ["krpl2505"]
-      }
-    },
-    {
-      "id": "LOG-024",
-      "master": "cpmk",
-      "masterLabel": "Capaian MK (CPMK)",
-      "aksi": "tambah",
-      "kode": "CPMK03.01",
-      "nama": "Mampu membangun antarmuka web responsif dan mengonsumsi REST API endpoints",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 11.12",
-      "keterangan": "Perumusan CPMK03.01 diturunkan dari CPL03 untuk MK Pemrograman Web Dasar (krpl2502)",
-      "changes": [
-        { "field": "kode", "label": "Kode CPMK", "old": null, "new": "CPMK03.01" },
-        { "field": "cpl", "label": "CPL Induk", "old": null, "new": ["CPL03"] },
-        { "field": "mk", "label": "Mata Kuliah Pengampu", "old": null, "new": ["krpl2502"] }
-      ],
-      "detail": {
-        "kode": "CPMK03.01",
-        "nama": "Mampu membangun antarmuka web responsif dan mengonsumsi REST API endpoints",
-        "cpl": ["CPL03"],
-        "mk": ["krpl2502"]
-      }
-    },
-    {
-      "id": "LOG-023",
-      "master": "cpmk",
-      "masterLabel": "Capaian MK (CPMK)",
-      "aksi": "tambah",
-      "kode": "CPMK02.02",
-      "nama": "Mampu melakukan optimasi query kompleks, indexing, dan transaksi multi-tabel ACID",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 11.10",
-      "keterangan": "Perumusan CPMK02.02 diturunkan dari CPL02 untuk MK Basis Data Lanjut (krpl2504)",
-      "changes": [
-        { "field": "kode", "label": "Kode CPMK", "old": null, "new": "CPMK02.02" },
-        { "field": "cpl", "label": "CPL Induk", "old": null, "new": ["CPL02"] },
-        { "field": "mk", "label": "Mata Kuliah Pengampu", "old": null, "new": ["krpl2504"] }
-      ],
-      "detail": {
-        "kode": "CPMK02.02",
-        "nama": "Mampu melakukan optimasi query kompleks, indexing, dan transaksi multi-tabel ACID",
-        "cpl": ["CPL02"],
-        "mk": ["krpl2504"]
-      }
-    },
-    {
-      "id": "LOG-022",
-      "master": "cpmk",
-      "masterLabel": "Capaian MK (CPMK)",
-      "aksi": "tambah",
-      "kode": "CPMK02.01",
-      "nama": "Mampu merancang diagram ERD dan mengimplementasikan skema database relasional ternormalisasi",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 11.05",
-      "keterangan": "Perumusan CPMK02.01 diturunkan dari CPL02 untuk MK Basis Data (krpl2501)",
-      "changes": [
-        { "field": "kode", "label": "Kode CPMK", "old": null, "new": "CPMK02.01" },
-        { "field": "cpl", "label": "CPL Induk", "old": null, "new": ["CPL02"] },
-        { "field": "mk", "label": "Mata Kuliah Pengampu", "old": null, "new": ["krpl2501"] }
-      ],
-      "detail": {
-        "kode": "CPMK02.01",
-        "nama": "Mampu merancang diagram ERD dan mengimplementasikan skema database relasional ternormalisasi",
-        "cpl": ["CPL02"],
-        "mk": ["krpl2501"]
-      }
-    },
-    {
-      "id": "LOG-021",
-      "master": "cpmk",
-      "masterLabel": "Capaian MK (CPMK)",
-      "aksi": "tambah",
-      "kode": "CPMK01.01",
-      "nama": "Mampu menyusun dokumen Software Requirements Specification (SRS) sesuai standar industri IEEE 830",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 11.00",
-      "keterangan": "Perumusan CPMK01.01 diturunkan dari CPL01 untuk MK Rekayasa Kebutuhan (krpl2503)",
-      "changes": [
-        { "field": "kode", "label": "Kode CPMK", "old": null, "new": "CPMK01.01" },
-        { "field": "cpl", "label": "CPL Induk", "old": null, "new": ["CPL01"] },
-        { "field": "mk", "label": "Mata Kuliah Pengampu", "old": null, "new": ["krpl2503"] }
-      ],
-      "detail": {
-        "kode": "CPMK01.01",
-        "nama": "Mampu menyusun dokumen Software Requirements Specification (SRS) sesuai standar industri IEEE 830",
-        "cpl": ["CPL01"],
-        "mk": ["krpl2503"]
-      }
-    },
-    {
-      "id": "LOG-020",
-      "master": "mk",
-      "masterLabel": "Mata Kuliah (MK)",
-      "aksi": "ubah",
-      "kode": "krpl2507",
-      "nama": "Proyek Pengembangan Agile",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 10.45",
-      "keterangan": "Penyesuaian distribusi SKS Praktik (3 -> 4) dan prasyarat kelulusan",
-      "changes": [
-        { "field": "sksPrak", "label": "SKS Praktik", "old": 3, "new": 4 },
-        { "field": "sks", "label": "Total SKS", "old": 3, "new": 4 },
-        { "field": "prasyarat", "label": "Prasyarat", "old": ["krpl2505"], "new": ["krpl2505", "krpl2506"] }
-      ],
-      "detail": {
-        "kode": "krpl2507",
-        "nama": "Proyek Pengembangan Agile",
-        "sks": 4,
-        "sksPrak": 4,
-        "prasyarat": ["krpl2505", "krpl2506"]
-      }
-    },
-    {
-      "id": "LOG-019",
-      "master": "mk",
-      "masterLabel": "Mata Kuliah (MK)",
-      "aksi": "tambah",
-      "kode": "krpl2507",
-      "nama": "Proyek Pengembangan Agile",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 10.25",
-      "keterangan": "Penetapan MK Proyek Pengembangan Agile pada Semester 3 Kategori Inti RPL",
-      "changes": [
-        { "field": "kode", "label": "Kode MK", "old": null, "new": "krpl2507" },
-        { "field": "kat", "label": "Kategori", "old": null, "new": "Inti RPL" },
-        { "field": "sem", "label": "Semester", "old": null, "new": 3 }
-      ],
-      "detail": { "kode": "krpl2507", "nama": "Proyek Pengembangan Agile", "sem": 3 }
-    },
-    {
-      "id": "LOG-018",
-      "master": "mk",
-      "masterLabel": "Mata Kuliah (MK)",
-      "aksi": "tambah",
-      "kode": "krpl2506",
-      "nama": "Pengujian Perangkat Lunak",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 10.20",
-      "keterangan": "Penetapan MK Pengujian Perangkat Lunak Sem 2 dengan prasyarat krpl2502",
-      "changes": [
-        { "field": "kode", "label": "Kode MK", "old": null, "new": "krpl2506" },
-        { "field": "prasyarat", "label": "Prasyarat", "old": null, "new": ["krpl2502"] }
-      ],
-      "detail": { "kode": "krpl2506", "nama": "Pengujian Perangkat Lunak", "sem": 2 }
-    },
-    {
-      "id": "LOG-017",
-      "master": "mk",
-      "masterLabel": "Mata Kuliah (MK)",
-      "aksi": "tambah",
-      "kode": "krpl2505",
-      "nama": "Pemrograman Web Lanjut",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 10.18",
-      "keterangan": "Penetapan MK Pemrograman Web Lanjut Sem 2 (4 SKS: 1T/3P) dengan prasyarat krpl2502",
-      "changes": [
-        { "field": "kode", "label": "Kode MK", "old": null, "new": "krpl2505" }
-      ],
-      "detail": { "kode": "krpl2505", "nama": "Pemrograman Web Lanjut", "sem": 2 }
-    },
-    {
-      "id": "LOG-016",
-      "master": "mk",
-      "masterLabel": "Mata Kuliah (MK)",
-      "aksi": "tambah",
-      "kode": "krpl2504",
-      "nama": "Basis Data Lanjut",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 10.15",
-      "keterangan": "Penetapan MK Basis Data Lanjut Sem 2 (3 SKS: 1T/2P) dengan prasyarat krpl2501",
-      "changes": [
-        { "field": "kode", "label": "Kode MK", "old": null, "new": "krpl2504" }
-      ],
-      "detail": { "kode": "krpl2504", "nama": "Basis Data Lanjut", "sem": 2 }
-    },
-    {
-      "id": "LOG-015",
-      "master": "mk",
-      "masterLabel": "Mata Kuliah (MK)",
-      "aksi": "tambah",
-      "kode": "urpl2501",
-      "nama": "Bahasa Indonesia & Komunikasi Profesi",
-      "user": "Tim kurikulum",
-      "at": "18 Okt 2026, 14.12",
-      "keterangan": "Penetapan MK Wajib Umum Bahasa Indonesia & Komunikasi Profesi Sem 1 (2 SKS: 2T/0P)",
-      "changes": [
-        { "field": "kode", "label": "Kode MK", "old": null, "new": "urpl2501" }
-      ],
-      "detail": { "kode": "urpl2501", "nama": "Bahasa Indonesia & Komunikasi Profesi", "kat": "Umum" }
-    },
-    {
-      "id": "LOG-014",
-      "master": "mk",
-      "masterLabel": "Mata Kuliah (MK)",
-      "aksi": "tambah",
-      "kode": "krpl2503",
-      "nama": "Rekayasa Kebutuhan",
-      "user": "Tim kurikulum",
-      "at": "18 Okt 2026, 14.10",
-      "keterangan": "Penetapan MK Rekayasa Kebutuhan Sem 1 (2 SKS: 2T/0P)",
-      "changes": [
-        { "field": "kode", "label": "Kode MK", "old": null, "new": "krpl2503" }
-      ],
-      "detail": { "kode": "krpl2503", "nama": "Rekayasa Kebutuhan", "kat": "Inti RPL" }
-    },
-    {
-      "id": "LOG-013",
-      "master": "mk",
-      "masterLabel": "Mata Kuliah (MK)",
-      "aksi": "tambah",
-      "kode": "krpl2502",
-      "nama": "Pemrograman Web Dasar",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 10.06",
-      "keterangan": "Penetapan MK Pemrograman Web Dasar Sem 1 (3 SKS: 1T/2P)",
-      "changes": [
-        { "field": "kode", "label": "Kode MK", "old": null, "new": "krpl2502" }
-      ],
-      "detail": { "kode": "krpl2502", "nama": "Pemrograman Web Dasar" }
-    },
-    {
-      "id": "LOG-012",
-      "master": "mk",
-      "masterLabel": "Mata Kuliah (MK)",
-      "aksi": "tambah",
-      "kode": "krpl2501",
-      "nama": "Basis Data",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 10.05",
-      "keterangan": "Penetapan MK Basis Data Sem 1 (3 SKS: 1T/2P)",
-      "changes": [
-        { "field": "kode", "label": "Kode MK", "old": null, "new": "krpl2501" }
-      ],
-      "detail": { "kode": "krpl2501", "nama": "Basis Data" }
-    },
-    {
-      "id": "LOG-011",
-      "master": "cpl",
-      "masterLabel": "Capaian Pembelajaran (CPL)",
-      "aksi": "ubah",
-      "kode": "CPL03",
-      "nama": "Mampu membangun aplikasi web dan mobile enterprise berbasis standar industri",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.50",
-      "keterangan": "Penyelarasan redaksi capaian dan penambahan relasi MK krpl2507",
-      "changes": [
-        { "field": "nama", "label": "Pernyataan CPL", "old": "Mampu membangun aplikasi web enterprise", "new": "Mampu membangun aplikasi web dan mobile enterprise berbasis standar industri" },
-        { "field": "mk", "label": "Mata Kuliah Terkait", "old": ["krpl2502", "krpl2505"], "new": ["krpl2502", "krpl2505", "krpl2507"] }
-      ],
-      "detail": {
-        "kode": "CPL03",
-        "nama": "Mampu membangun aplikasi web dan mobile enterprise berbasis standar industri"
-      }
-    },
-    {
-      "id": "LOG-010",
-      "master": "cpl",
-      "masterLabel": "Capaian Pembelajaran (CPL)",
-      "aksi": "tambah",
-      "kode": "CPL04",
-      "nama": "Mampu merancang dan melaksanakan pengujian serta penjaminan mutu perangkat lunak",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.41",
-      "keterangan": "Perumusan CPL04 diturunkan dari PL03 (QA) dan diwadahi BK04",
-      "changes": [
-        { "field": "kode", "label": "Kode CPL", "old": null, "new": "CPL04" },
-        { "field": "pl", "label": "Profil Lulusan", "old": null, "new": ["PL03"] }
-      ],
-      "detail": { "kode": "CPL04", "jenis": "Hard skill" }
-    },
-    {
-      "id": "LOG-009",
-      "master": "cpl",
-      "masterLabel": "Capaian Pembelajaran (CPL)",
-      "aksi": "tambah",
-      "kode": "CPL03",
-      "nama": "Mampu membangun aplikasi web enterprise",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.40",
-      "keterangan": "Perumusan CPL03 diturunkan dari PL01 dan diwadahi BK03",
-      "changes": [
-        { "field": "kode", "label": "Kode CPL", "old": null, "new": "CPL03" },
-        { "field": "pl", "label": "Profil Lulusan", "old": null, "new": ["PL01"] }
-      ],
-      "detail": { "kode": "CPL03", "jenis": "Hard skill" }
-    },
-    {
-      "id": "LOG-008",
-      "master": "cpl",
-      "masterLabel": "Capaian Pembelajaran (CPL)",
-      "aksi": "tambah",
-      "kode": "CPL02",
-      "nama": "Mampu merancang arsitektur basis data relasional dan optimasi query",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.32",
-      "keterangan": "Perumusan CPL02 diturunkan dari PL01 & PL02 dan diwadahi BK02",
-      "changes": [
-        { "field": "kode", "label": "Kode CPL", "old": null, "new": "CPL02" },
-        { "field": "pl", "label": "Profil Lulusan", "old": null, "new": ["PL01", "PL02"] }
-      ],
-      "detail": { "kode": "CPL02", "jenis": "Hard skill" }
-    },
-    {
-      "id": "LOG-007",
-      "master": "cpl",
-      "masterLabel": "Capaian Pembelajaran (CPL)",
-      "aksi": "tambah",
-      "kode": "CPL01",
-      "nama": "Mampu menganalisis kebutuhan perangkat lunak dan proses bisnis",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.30",
-      "keterangan": "Perumusan CPL01 diturunkan dari PL02 dan diwadahi BK01",
-      "changes": [
-        { "field": "kode", "label": "Kode CPL", "old": null, "new": "CPL01" },
-        { "field": "pl", "label": "Profil Lulusan", "old": null, "new": ["PL02"] }
-      ],
-      "detail": { "kode": "CPL01", "jenis": "Hard skill" }
-    },
-    {
-      "id": "LOG-006",
-      "master": "bk",
-      "masterLabel": "Bahan Kajian (BK)",
-      "aksi": "tambah",
-      "kode": "BK05",
-      "nama": "Kolaborasi Profesional & Agile Scrum",
-      "user": "Tim kurikulum",
-      "at": "18 Okt 2026, 13.45",
-      "keterangan": "Penyusunan Bahan Kajian Kolaborasi Profesional & Agile Scrum untuk MK urpl2501 dan krpl2507",
-      "changes": [
-        { "field": "kode", "label": "Kode BK", "old": null, "new": "BK05" },
-        { "field": "mk", "label": "Mata Kuliah Pengampu", "old": null, "new": ["urpl2501", "krpl2507"] }
-      ],
-      "detail": { "kode": "BK05", "nama": "Kolaborasi Profesional & Agile Scrum" }
-    },
-    {
-      "id": "LOG-005",
-      "master": "bk",
-      "masterLabel": "Bahan Kajian (BK)",
-      "aksi": "tambah",
-      "kode": "BK04",
-      "nama": "Penjaminan Mutu & Pengujian Software",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.15",
-      "keterangan": "Penyusunan Bahan Kajian Penjaminan Mutu & Pengujian Software untuk MK krpl2506",
-      "changes": [
-        { "field": "kode", "label": "Kode BK", "old": null, "new": "BK04" }
-      ],
-      "detail": { "kode": "BK04", "nama": "Penjaminan Mutu & Pengujian Software" }
-    },
-    {
-      "id": "LOG-004",
-      "master": "bk",
-      "masterLabel": "Bahan Kajian (BK)",
-      "aksi": "tambah",
-      "kode": "BK03",
-      "nama": "Pemrograman & Rekayasa Web Enterprise",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.15",
-      "keterangan": "Penyusunan Bahan Kajian Pemrograman & Rekayasa Web Enterprise untuk MK krpl2502, krpl2505, krpl2507",
-      "changes": [
-        { "field": "kode", "label": "Kode BK", "old": null, "new": "BK03" }
-      ],
-      "detail": { "kode": "BK03", "nama": "Pemrograman & Rekayasa Web Enterprise" }
-    },
-    {
-      "id": "LOG-003",
-      "master": "bk",
-      "masterLabel": "Bahan Kajian (BK)",
-      "aksi": "tambah",
-      "kode": "BK02",
-      "nama": "Basis Data & Manajemen Informasi",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.15",
-      "keterangan": "Penyusunan Bahan Kajian Basis Data & Manajemen Informasi untuk MK krpl2501, krpl2504",
-      "changes": [
-        { "field": "kode", "label": "Kode BK", "old": null, "new": "BK02" }
-      ],
-      "detail": { "kode": "BK02", "nama": "Basis Data & Manajemen Informasi" }
-    },
-    {
-      "id": "LOG-002",
-      "master": "bk",
-      "masterLabel": "Bahan Kajian (BK)",
-      "aksi": "tambah",
-      "kode": "BK01",
-      "nama": "Rekayasa Kebutuhan Perangkat Lunak",
-      "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.15",
-      "keterangan": "Penyusunan Bahan Kajian Rekayasa Kebutuhan Perangkat Lunak untuk MK krpl2503",
-      "changes": [
-        { "field": "kode", "label": "Kode BK", "old": null, "new": "BK01" }
-      ],
-      "detail": { "kode": "BK01", "nama": "Rekayasa Kebutuhan Perangkat Lunak" }
-    },
     {
       "id": "LOG-001",
       "master": "pl",
       "masterLabel": "Profil Lulusan (PL)",
       "aksi": "tambah",
       "kode": "PL01",
-      "nama": "Pengembang Perangkat Lunak",
+      "nama": "Software Engineer / Fullstack Developer",
       "user": "Pak Suhendra",
-      "at": "20 Okt 2026, 09.15",
-      "keterangan": "Inisialisasi Profil Lulusan Pengembang Perangkat Lunak untuk kurikulum TRPL 2026",
+      "at": "20 Okt 2026, 09.00",
+      "keterangan": "Perumusan profil lulusan utama TRPL berorientasi industri digital",
       "changes": [
-        { "field": "kode", "label": "Kode PL", "old": null, "new": "PL01" },
-        { "field": "cpl", "label": "CPL Terkait", "old": null, "new": ["CPL02", "CPL03", "CPL11"] }
+        {
+          "field": "kode",
+          "label": "Kode PL",
+          "old": null,
+          "new": "PL01"
+        }
       ],
       "detail": {
         "kode": "PL01",
-        "nama": "Pengembang Perangkat Lunak",
-        "cpl": ["CPL02", "CPL03", "CPL11"]
+        "nama": "Software Engineer / Fullstack Developer",
+        "deskripsi": "Merancang, membangun, menguji, dan memelihara aplikasi web dan enterprise modern dengan prinsip rekayasa perangkat lunak dan clean code.",
+        "cpl": [
+          "CPL01",
+          "CPL02",
+          "CPL03",
+          "CPL04",
+          "CPL05",
+          "CPL06",
+          "CPL08",
+          "CPL09",
+          "CPL10"
+        ],
+        "by": "Pak Suhendra",
+        "at": "20 Okt 2026, 09.00"
+      }
+    },
+    {
+      "id": "LOG-002",
+      "master": "cpl",
+      "masterLabel": "Capaian Pembelajaran (CPL)",
+      "aksi": "tambah",
+      "kode": "CPL01",
+      "nama": "Mampu merumuskan analisis kebutuhan sistem dan memodelkan spesifikasi perangkat lunak berstandar industri (SRS IEEE 830)",
+      "user": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.30",
+      "keterangan": "Penetapan CPL01 turunan dari PL01 dan PL02",
+      "changes": [
+        {
+          "field": "kode",
+          "label": "Kode CPL",
+          "old": null,
+          "new": "CPL01"
+        }
+      ],
+      "detail": {
+        "kode": "CPL01",
+        "nama": "Mampu merumuskan analisis kebutuhan sistem dan memodelkan spesifikasi perangkat lunak berstandar industri (SRS IEEE 830)",
+        "jenis": "Hard skill",
+        "pl": [
+          "PL01",
+          "PL02"
+        ],
+        "bk": [
+          "BK01",
+          "BK09"
+        ],
+        "mk": [
+          "krpl2504",
+          "krpl2509",
+          "krpl2514",
+          "krpl2518"
+        ],
+        "by": "Pak Suhendra",
+        "at": "20 Okt 2026, 09.30"
+      }
+    },
+    {
+      "id": "LOG-003",
+      "master": "bk",
+      "masterLabel": "Bahan Kajian (BK)",
+      "aksi": "tambah",
+      "kode": "BK01",
+      "nama": "Rekayasa Kebutuhan & Analisis Sistem",
+      "user": "Pak Suhendra",
+      "at": "20 Okt 2026, 09.15",
+      "keterangan": "Pemetaan bahan kajian analisis sistem berstandar OBE Dikti",
+      "changes": [
+        {
+          "field": "kode",
+          "label": "Kode BK",
+          "old": null,
+          "new": "BK01"
+        }
+      ],
+      "detail": {
+        "kode": "BK01",
+        "nama": "Rekayasa Kebutuhan & Analisis Sistem",
+        "deskripsi": "Elisitasi kebutuhan, pemodelan proses bisnis BPMN, analisis berorientasi objek UML, dan penyusunan spesifikasi SRS.",
+        "mk": [
+          "krpl2504",
+          "krpl2509"
+        ],
+        "by": "Pak Suhendra",
+        "at": "20 Okt 2026, 09.15"
+      }
+    },
+    {
+      "id": "LOG-004",
+      "master": "mk",
+      "masterLabel": "Mata Kuliah (MK)",
+      "aksi": "tambah",
+      "kode": "krpl2518",
+      "nama": "Proyek Perangkat Lunak Industri 2",
+      "user": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.30",
+      "keterangan": "Penetapan MK Inti RPL semester 4 bobot 6 SKS Praktik",
+      "changes": [
+        {
+          "field": "kode",
+          "label": "Kode MK",
+          "old": null,
+          "new": "krpl2518"
+        }
+      ],
+      "detail": {
+        "kode": "krpl2518",
+        "nama": "Proyek Perangkat Lunak Industri 2",
+        "kat": "Inti RPL",
+        "sks": 6,
+        "sksTeori": 0,
+        "sksPrak": 6,
+        "sem": 4,
+        "jenis": "Praktik",
+        "prasyarat": [
+          "krpl2514"
+        ],
+        "by": "Pak Suhendra",
+        "at": "20 Okt 2026, 11.30"
+      }
+    },
+    {
+      "id": "LOG-005",
+      "master": "cpmk",
+      "masterLabel": "Capaian MK (CPMK)",
+      "aksi": "tambah",
+      "kode": "CPMK01.01",
+      "nama": "Mampu menyusun dokumen Software Requirements Specification (SRS) sesuai standar IEEE 830",
+      "user": "Pak Suhendra",
+      "at": "20 Okt 2026, 11.00",
+      "keterangan": "Perumusan CPMK01.01 beserta 3 Sub-CPMK terstandar",
+      "changes": [
+        {
+          "field": "kode",
+          "label": "Kode CPMK",
+          "old": null,
+          "new": "CPMK01.01"
+        }
+      ],
+      "detail": {
+        "kode": "CPMK01.01",
+        "nama": "Mampu menyusun dokumen Software Requirements Specification (SRS) sesuai standar IEEE 830",
+        "cpl": [
+          "CPL01"
+        ],
+        "mk": [
+          "krpl2504",
+          "krpl2509"
+        ],
+        "sub_cpmk": [
+          {
+            "kode": "SubCPMK01.01.01",
+            "nama": "Melakukan elisitasi kebutuhan pengguna menggunakan teknik wawancara dan observasi proses bisnis"
+          },
+          {
+            "kode": "SubCPMK01.01.02",
+            "nama": "Membuat spesifikasi use case naratif dan diagram konteks berstandar industri"
+          },
+          {
+            "kode": "SubCPMK01.01.03",
+            "nama": "Menyusun dokumen SRS lengkap beserta matriks keterlacakan kebutuhan (RTM)"
+          }
+        ],
+        "by": "Pak Suhendra",
+        "at": "20 Okt 2026, 11.00"
       }
     }
   ]
