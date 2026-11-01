@@ -1105,13 +1105,6 @@ tbody tr:hover {
   .log-date-input {
     width: 100% !important;
   }
-  .matrix-guide-card {
-    margin: 14px 12px 20px 12px;
-    padding: 12px 16px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
 }
 
 /* ==========================================================================
@@ -1663,7 +1656,6 @@ tbody tr:hover {
 .matrix-view-wrap {
   display: flex;
   flex-direction: column;
-  padding-bottom: 8px;
 }
 
 /* Top Stat Cards */
@@ -1893,11 +1885,10 @@ tbody tr:hover {
 /* Interactive Matrix Table Scroll Area */
 .matrix-scroll-wrap {
   overflow: auto;
-  max-height: calc(100vh - 310px);
+  max-height: calc(100vh - 290px);
   min-height: 400px;
   position: relative;
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
 }
 
 .matrix-table {
@@ -2288,18 +2279,15 @@ tbody tr:hover {
 
 /* Bottom Guidance & Legend Card */
 .matrix-guide-card {
-  margin: 20px 20px 28px 20px;
   padding: 16px 20px;
   background: #f8fafc;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
   font-size: 13px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .matrix-legend-items {
@@ -2675,7 +2663,6 @@ tbody tr:hover {
 /* 4. Organisasi Mata Kuliah (Peta Alur / Flowchart Board) */
 .organisasi-board {
   display: flex;
-  margin: 0 20px;
   gap: 16px;
   overflow-x: auto;
   padding: 8px 4px 20px;
