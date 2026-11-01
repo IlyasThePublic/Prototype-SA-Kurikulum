@@ -2947,7 +2947,7 @@ function renderMatrixBkCplMk() {
         </div>
       </div>
 
-      <div class="scroll" style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:auto">
+      <div class="scroll" style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:auto;margin:0 20px">
         ${tripartitView === "bk" ? renderTripartitBkView(allBk, allCpl, allMk) : renderTripartitMkView(allMk, allBk, allCpl)}
       </div>
 
