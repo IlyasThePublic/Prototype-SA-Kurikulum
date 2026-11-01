@@ -1884,9 +1884,7 @@ tbody tr:hover {
 
 /* Interactive Matrix Table Scroll Area */
 .matrix-scroll-wrap {
-  overflow: auto;
-  max-height: calc(100vh - 290px);
-  min-height: 400px;
+  overflow-x: auto;
   position: relative;
   background: var(--surface);
 }
