@@ -71,7 +71,7 @@ textarea {
 .appbar {
   position: sticky;
   top: 0;
-  z-index: 15;
+  z-index: 100;
   background: var(--surface);
   color: var(--text);
   border-bottom: 1px solid var(--border);
@@ -334,7 +334,7 @@ h1 {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  overflow: hidden;
+  overflow: clip;
 }
 
 /* Filter / Action Bar */
@@ -345,6 +345,10 @@ h1 {
   align-items: center;
   padding: 16px;
   border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 64px;
+  z-index: 25;
+  background: var(--surface);
 }
 
 .search {
@@ -444,6 +448,7 @@ select.f:focus {
 /* Table */
 .scroll {
   overflow-x: auto;
+  overflow-y: clip;
 }
 
 table {
@@ -461,6 +466,9 @@ th {
   padding: 12px 16px;
   white-space: nowrap;
   border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 136px;
+  z-index: 20;
 }
 
 td {
@@ -624,7 +632,7 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   padding: 16px;
-  z-index: 20;
+  z-index: 1000;
 }
 
 .ov.on {
@@ -639,6 +647,9 @@ tbody tr:hover {
   max-height: calc(100vh - 32px);
   overflow: auto;
   padding: 24px;
+  position: relative;
+  z-index: 1001;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
 }
 
 .modal h2 {
@@ -1009,7 +1020,7 @@ tbody tr:hover {
     width: 270px;
     max-width: 82vw;
     height: calc(100vh - 64px);
-    z-index: 14;
+    z-index: 95;
     background: var(--sidebar);
     border-right: 1px solid var(--border);
     overflow-y: auto;
@@ -1033,7 +1044,7 @@ tbody tr:hover {
     inset: 64px 0 0 0;
     background: rgba(15, 23, 42, 0.45);
     backdrop-filter: blur(2px);
-    z-index: 13;
+    z-index: 90;
   }
   main {
     padding: 16px;
@@ -1705,7 +1716,6 @@ tbody tr:hover {
   border-bottom: 1px solid var(--border);
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
-  overflow: hidden;
 }
 
 .matrix-stat-icon {
@@ -1779,6 +1789,10 @@ tbody tr:hover {
   padding: 14px 20px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 64px;
+  z-index: 30;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .matrix-toolbar-left {
@@ -1915,6 +1929,7 @@ tbody tr:hover {
 /* Interactive Matrix Table Scroll Area */
 .matrix-scroll-wrap {
   overflow-x: auto;
+  overflow-y: clip;
   position: relative;
   background: var(--surface);
 }
@@ -1937,8 +1952,8 @@ tbody tr:hover {
   border-bottom: 1px solid var(--border);
   border-right: 1px solid var(--border);
   position: sticky;
-  top: 0;
-  z-index: 10;
+  top: 130px;
+  z-index: 20;
   white-space: normal;
   vertical-align: top;
 }
@@ -1946,9 +1961,9 @@ tbody tr:hover {
 /* Sticky Corners (Top-Left) */
 .matrix-table th.th-cpl-code {
   position: sticky;
-  top: 0;
+  top: 130px;
   left: 0;
-  z-index: 15;
+  z-index: 25;
   background: #f1f5f9;
   width: 1%;
   white-space: nowrap;
@@ -1958,9 +1973,9 @@ tbody tr:hover {
 
 .matrix-table th.th-cpl-name {
   position: sticky;
-  top: 0;
+  top: 130px;
   left: 64px;
-  z-index: 15;
+  z-index: 25;
   background: #f1f5f9;
   min-width: 260px;
   max-width: 320px;
