@@ -1381,71 +1381,166 @@ function getMenuModule(id) {
 let matrixSearch = "";
 let matrixJenisFilter = "all";
 let matrixStatusFilter = "all";
-let matrixInteractive = false;
+// ==========================================================
+// UNIFIED 2D RELATION MATRIX TEMPLATE ENGINE (OBE)
+// ==========================================================
+const matrixState = {
+  search: { cpl_pl: "", cpl_bk: "", bk_mk: "", cpl_mk: "" },
+  interactive: { cpl_pl: false, cpl_bk: false, bk_mk: false, cpl_mk: false }
+};
+
 let matrixHoverCol = null;
 
-function renderMatrixCplPl() {
+
+
+const MATRIX_CONFIGS = {
+  cpl_pl: {
+    id: "cpl_pl",
+    crumb: "Matriks Relasi OBE / Matriks CPL–PL",
+    title: "Matriks Relasi CPL – Profil Lulusan (2D)",
+    lead: "Pemetaan dua dimensi antara Capaian Pembelajaran Lulusan (CPL) dan Profil Lulusan (PL) TRPL. Memastikan setiap profil lulusan didukung oleh kompetensi yang tepat sesuai standar OBE.",
+    rowEntity: "cpl",
+    colEntity: "pl",
+    relationField: "pl",
+    rowCodeLabel: "Kode CPL",
+    rowNameLabel: "Pernyataan Capaian Pembelajaran Lulusan (CPL)",
+    colLabel: "PL",
+    searchPlaceholder: "Cari CPL (kode / kata kunci)...",
+    rowFilter: (c) => true,
+    colFilter: (p) => !String(p.kode).includes("ALT"),
+    colBtnClass: "pl-head-btn",
+    colDataAttr: "data-matrix-pl-info",
+    legendTitle: "Keterangan Matriks:",
+    legendLinked: "Mendukung Profil Lulusan",
+    legendUnlinked: "Tidak Berkaitan Langsung",
+    obePassMsg: "Semua CPL & PL memiliki relasi",
+    obeGuideModalId: "cpl_pl"
+  },
+  cpl_bk: {
+    id: "cpl_bk",
+    crumb: "Matriks Relasi OBE / Matriks CPL–BK",
+    title: "Matriks Relasi CPL – Bahan Kajian (CPL–BK)",
+    lead: "Pemetaan dua dimensi antara Capaian Pembelajaran Lulusan (CPL) dan Bahan Kajian (BK / Body of Knowledge). Menentukan bidang keilmuan yang esensial untuk membentuk setiap kompetensi lulusan.",
+    rowEntity: "cpl",
+    colEntity: "bk",
+    relationField: "bk",
+    rowCodeLabel: "Kode CPL",
+    rowNameLabel: "Capaian Pembelajaran Lulusan (CPL)",
+    colLabel: "BK",
+    searchPlaceholder: "Cari CPL (kode / kata kunci)...",
+    colBtnClass: "bk-head-btn",
+    colDataAttr: "data-matrix-bk-info",
+    legendTitle: "Keterangan Matriks:",
+    legendLinked: "Bahan Kajian Mendukung CPL",
+    legendUnlinked: "Tidak Terhubung Langsung",
+    obePassMsg: "Semua CPL & BK saling terhubung",
+    obeGuideModalId: "cpl_bk"
+  },
+  bk_mk: {
+    id: "bk_mk",
+    crumb: "Matriks Relasi OBE / Matriks BK–MK",
+    title: "Matriks Pengemasan Bahan Kajian ke Mata Kuliah (BK–MK)",
+    lead: "Pemetaan pengemasan materi Bahan Kajian (BK) ke dalam unit pembelajaran Mata Kuliah (MK). Aturan OBE: Tidak boleh ada Bahan Kajian yang berdiri tanpa Mata Kuliah (Orphan BK = 0, minimal 1 MK).",
+    rowEntity: "bk",
+    colEntity: "mk",
+    relationField: "mk",
+    rowCodeLabel: "Kode BK",
+    rowNameLabel: "Bahan Kajian (Materi & Pokok Bahasan)",
+    colLabel: "MK",
+    searchPlaceholder: "Cari BK (kode / kata kunci)...",
+    colBtnClass: "mk-head-btn",
+    colDataAttr: "data-matrix-mk-info",
+    legendTitle: "Keterangan Matriks:",
+    legendLinked: "Bahan Kajian Dikemas ke Mata Kuliah",
+    legendUnlinked: "Tidak Dikemas",
+    obePassMsg: "0 BK kosong (Semua BK memiliki MK)",
+    obeGuideModalId: "bk_mk"
+  },
+  cpl_mk: {
+    id: "cpl_mk",
+    crumb: "Matriks Relasi OBE / Matriks CPL–MK",
+    title: "Matriks Beban CPL pada Mata Kuliah (CPL–MK)",
+    lead: "Pemetaan beban Capaian Pembelajaran Lulusan (CPL) pada setiap Mata Kuliah kurikulum TRPL. Mengidentifikasi kontribusi mata kuliah terhadap capaian profil lulusan.",
+    rowEntity: "cpl",
+    colEntity: "mk",
+    relationField: "mk",
+    rowCodeLabel: "Kode CPL",
+    rowNameLabel: "Capaian Pembelajaran Lulusan (CPL)",
+    colLabel: "MK",
+    searchPlaceholder: "Cari CPL (kode / kata kunci)...",
+    colBtnClass: "mk-head-btn",
+    colDataAttr: "data-matrix-mk-info",
+    legendTitle: "Keterangan Matriks:",
+    legendLinked: "CPL Dibebankan pada Mata Kuliah",
+    legendUnlinked: "Tidak Dibebankan",
+    obePassMsg: "Semua CPL & MK memiliki keterkaitan",
+    obeGuideModalId: "cpl_mk"
+  }
+};
+
+function renderMatrix2D(cfgKey) {
+  const cfg = MATRIX_CONFIGS[cfgKey];
+  if (!cfg) return;
+
   if ($("log-header-container")) $("log-header-container").innerHTML = "";
   if ($("btn-master-log")) $("btn-master-log").style.display = "none";
 
-  $("crumb").textContent = "Matriks Relasi OBE / Matriks CPL–PL";
-  $("title").textContent = "Matriks Relasi CPL – Profil Lulusan (2D)";
-  $("lead").textContent =
-    "Pemetaan dua dimensi antara Capaian Pembelajaran Lulusan (CPL) dan Profil Lulusan (PL) TRPL. Memastikan setiap profil lulusan didukung oleh kompetensi yang tepat sesuai standar OBE.";
+  $("crumb").textContent = cfg.crumb;
+  $("title").textContent = cfg.title;
+  $("lead").textContent = cfg.lead;
   $("bar").style.display = "none";
 
-  const allCpl = db.cpl || [];
-  const allPl = (db.pl || []).filter(p => !String(p.kode).includes("ALT"));
+  const allRows = (db[cfg.rowEntity] || []).filter(cfg.rowFilter || (() => true));
+  const allCols = (db[cfg.colEntity] || []).filter(cfg.colFilter || (() => true));
 
-  // Overall metrics calculation
   let totalActiveLinks = 0;
-  let cplWithoutPlCount = 0;
-  let plWithoutCplCount = 0;
+  let orphanRowCount = 0;
+  let orphanColCount = 0;
 
-  allCpl.forEach((c) => {
-    const links = (c.pl || []).length;
+  allRows.forEach((r) => {
+    const links = (r[cfg.relationField] || []).length;
     totalActiveLinks += links;
-    if (links === 0) cplWithoutPlCount++;
+    if (links === 0) orphanRowCount++;
   });
 
-  allPl.forEach((p) => {
-    const supportingCpl = allCpl.filter((c) =>
-      (c.pl || []).includes(p.kode),
-    ).length;
-    if (supportingCpl === 0) plWithoutCplCount++;
+  allCols.forEach((col) => {
+    const sup = allRows.filter((r) => (r[cfg.relationField] || []).includes(col.kode)).length;
+    if (sup === 0) orphanColCount++;
   });
 
-  const isObeCompliant =
-    cplWithoutPlCount === 0 && plWithoutCplCount === 0;
+  const isObeCompliant = orphanRowCount === 0 && orphanColCount === 0;
+  const isInteractive = Boolean(matrixState.interactive[cfgKey]);
+  const searchQuery = (matrixState.search[cfgKey] || "").toLowerCase();
 
-  // Filter CPL rows according to search & filter criteria
-  const filteredCpl = allCpl.filter((c) => {
-    if (matrixSearch) {
-      const term = (
-        c.kode +
-        " " +
-        (c.nama || "") +
-        " " +
-        (c.jenis || "")
-      ).toLowerCase();
-      if (!term.includes(matrixSearch)) return false;
-    }
-    if (matrixJenisFilter !== "all" && c.jenis !== matrixJenisFilter) {
-      return false;
-    }
-    const links = (c.pl || []).length;
-    if (matrixStatusFilter === "mapped" && links === 0) return false;
-    if (matrixStatusFilter === "unmapped" && links > 0) return false;
-    return true;
+  const filteredRows = allRows.filter((r) => {
+    if (!searchQuery) return true;
+    const term = (r.kode + " " + (r.nama || "") + " " + (r.deskripsi || "") + " " + (r.jenis || "") + " " + (r.kategori || "")).toLowerCase();
+    return term.includes(searchQuery);
   });
 
-  const hasFilter = Boolean(
-    matrixSearch ||
-      matrixJenisFilter !== "all" ||
-      matrixStatusFilter !== "all",
-  );
+  // Calculate stats cards values
+  let stat1Sub = "";
+  if (cfg.rowEntity === "cpl") {
+    const hardCount = allRows.filter((c) => c.jenis === "Hard skill").length;
+    const softCount = allRows.filter((c) => c.jenis === "Soft skill").length;
+    stat1Sub = hardCount + " Hard skill &bull; " + softCount + " Soft skill";
+  } else if (cfg.rowEntity === "bk") {
+    stat1Sub = "Rumpun keilmuan wajib";
+  }
 
-  $("view-container").innerHTML = `
+  let stat2Sub = "";
+  if (cfg.colEntity === "pl") {
+    stat2Sub = "Seluruh profil aktif kurikulum";
+  } else if (cfg.colEntity === "bk") {
+    stat2Sub = "Rumpun keilmuan aktif kurikulum";
+  } else if (cfg.colEntity === "mk") {
+    const totalSks = allCols.reduce((acc, m) => acc + (parseInt(m.sks, 10) || 0), 0);
+    stat2Sub = totalSks + " Total SKS &bull; 8 Semester";
+  }
+
+  const avgLinks = allCols.length ? (totalActiveLinks / allCols.length).toFixed(1) : "0";
+
+  const renderedHtml = `
     <div class="matrix-view-wrap">
       <!-- 1. Top Stat Cards -->
       <div class="matrix-stats-grid">
@@ -1460,9 +1555,9 @@ function renderMatrixCplPl() {
             </svg>
           </div>
           <div class="matrix-stat-info">
-            <span class="matrix-stat-val">${allCpl.length} CPL</span>
-            <span class="matrix-stat-label">Capaian Pembelajaran</span>
-            <span class="matrix-stat-sub">${allCpl.filter((c) => c.jenis === "Hard skill").length} Hard skill &bull; ${allCpl.filter((c) => c.jenis === "Soft skill").length} Soft skill</span>
+            <span class="matrix-stat-val">${allRows.length} ${cfg.rowEntity.toUpperCase()}</span>
+            <span class="matrix-stat-label">Total ${cfg.rowCodeLabel}</span>
+            <span class="matrix-stat-sub">${stat1Sub}</span>
           </div>
         </div>
 
@@ -1474,9 +1569,9 @@ function renderMatrixCplPl() {
             </svg>
           </div>
           <div class="matrix-stat-info">
-            <span class="matrix-stat-val">${allPl.length} PL</span>
-            <span class="matrix-stat-label">Profil Lulusan TRPL</span>
-            <span class="matrix-stat-sub">Seluruh profil aktif kurikulum</span>
+            <span class="matrix-stat-val">${allCols.length} ${cfg.colEntity.toUpperCase()}</span>
+            <span class="matrix-stat-label">Total ${cfg.colLabel}</span>
+            <span class="matrix-stat-sub">${stat2Sub}</span>
           </div>
         </div>
 
@@ -1490,22 +1585,21 @@ function renderMatrixCplPl() {
           <div class="matrix-stat-info">
             <span class="matrix-stat-val">${totalActiveLinks} Tautan</span>
             <span class="matrix-stat-label">Relasi Aktif Terpetakan</span>
-            <span class="matrix-stat-sub">Rata-rata ${allPl.length ? (totalActiveLinks / allPl.length).toFixed(1) : 0} CPL per profil</span>
+            <span class="matrix-stat-sub">Rata-rata ${avgLinks} ${cfg.rowEntity.toUpperCase()} per ${cfg.colEntity.toUpperCase()}</span>
           </div>
         </div>
 
         <div class="matrix-stat-card">
           <div class="matrix-stat-icon obe ${isObeCompliant ? "pass" : ""}">
-            ${
-              isObeCompliant
-                ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
-                : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`
+            ${isObeCompliant
+              ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
+              : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`
             }
           </div>
           <div class="matrix-stat-info">
             <span class="matrix-stat-val" style="${isObeCompliant ? "color:var(--success)" : "color:var(--warning)"}">${isObeCompliant ? "100% Terpenuhi" : "Perlu Evaluasi"}</span>
             <span class="matrix-stat-label">Standar Validasi OBE</span>
-            <span class="matrix-stat-sub">${isObeCompliant ? "Semua CPL &amp; PL memiliki relasi" : `${cplWithoutPlCount} CPL kosong, ${plWithoutCplCount} PL kosong`}</span>
+            <span class="matrix-stat-sub">${isObeCompliant ? cfg.obePassMsg : (orphanRowCount + " " + cfg.rowEntity.toUpperCase() + " kosong, " + orphanColCount + " " + cfg.colEntity.toUpperCase() + " kosong")}</span>
           </div>
         </div>
       </div>
@@ -1519,31 +1613,38 @@ function renderMatrixCplPl() {
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             <input
-              id="matrix-q"
+              class="matrix-search-input"
+              data-matrix-id="${cfg.id}"
+              id="matrix-${cfg.id}-q"
               type="search"
-              placeholder="Cari CPL (kode / kata kunci)..."
-              value="${esc(matrixSearch)}"
-              aria-label="Cari CPL"
+              placeholder="${cfg.searchPlaceholder}"
+              value="${esc(searchQuery)}"
+              aria-label="${cfg.searchPlaceholder}"
             />
           </div>
-
-
         </div>
 
         <div class="matrix-toolbar-right">
           <button
             type="button"
-            id="matrix-toggle-mode"
-            class="matrix-mode-badge ${matrixInteractive ? "active" : ""}"
-            title="${matrixInteractive ? "Mode Edit Aktif (Klik untuk mematikan)" : "Mode Edit Mati (Klik untuk mengaktifkan)"}"
+            class="matrix-mode-badge ${isInteractive ? "active" : ""}"
+            data-matrix-mode-toggle="${cfg.id}"
+            id="matrix-${cfg.id}-toggle-mode"
+            title="${isInteractive ? "Mode Edit Aktif (Klik untuk mematikan)" : "Mode Edit Mati (Klik untuk mengaktifkan)"}"
             role="switch"
-            aria-checked="${matrixInteractive}"
+            aria-checked="${isInteractive}"
           >
             <span class="matrix-mode-dot"></span>
             <span>Mode Edit</span>
           </button>
 
-          <button type="button" class="matrix-btn-tool" id="matrix-btn-guide" title="Lihat Panduan Standar OBE Matriks CPL-PL">
+          <button
+            type="button"
+            class="matrix-btn-tool"
+            data-matrix-guide="${cfg.id}"
+            id="matrix-${cfg.id}-btn-guide"
+            title="Lihat Panduan Standar OBE ${cfg.title}"
+          >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
@@ -1556,111 +1657,103 @@ function renderMatrixCplPl() {
 
       <!-- 3. Scrollable 2D Table Grid -->
       <div class="matrix-scroll-wrap" id="matrix-scroll-container">
-        <table class="matrix-table ${matrixInteractive ? "" : "view-only"}">
+        <table class="matrix-table ${isInteractive ? "" : "view-only"}">
           <thead>
             <tr>
-              <th class="th-cpl-code" scope="col">Kode CPL</th>
-              <th class="th-cpl-name" scope="col">Pernyataan Capaian Pembelajaran Lulusan (CPL)</th>
-              ${allPl
-                .map((pl) => {
-                  const cplCount = allCpl.filter((c) =>
-                    (c.pl || []).includes(pl.kode),
-                  ).length;
-                  return `
-                  <th class="th-pl" data-col-pl="${esc(pl.kode)}" scope="col">
+              <th class="th-cpl-code" scope="col">${cfg.rowCodeLabel}</th>
+              <th class="th-cpl-name" scope="col">${cfg.rowNameLabel}</th>
+              ${allCols.map((col) => {
+                const rowCount = allRows.filter((r) => (r[cfg.relationField] || []).includes(col.kode)).length;
+                const semBadge = col.sem ? `<span class="tag neutral" style="font-size:10px;height:18px;line-height:16px;padding:0 4px;margin-right:2px">S${col.sem}</span>` : "";
+                const sksSub = col.sks ? `<span style="font-size:10px;color:var(--text-muted);display:block;margin-top:2px">${col.sks} SKS</span>` : "";
+                return `
+                  <th class="th-col th-${cfg.colEntity}" data-col="${esc(col.kode)}" scope="col">
                     <button
                       type="button"
-                      class="pl-head-btn"
-                      data-matrix-pl-info="${esc(pl.kode)}"
-                      title="Klik untuk melihat detail: ${esc(pl.kode)} &bull; ${esc(pl.nama)}"
-                      aria-label="Detail ${esc(pl.kode)}: ${esc(pl.nama)}"
+                      class="${cfg.colBtnClass}"
+                      ${cfg.colDataAttr}="${esc(col.kode)}"
+                      title="Klik untuk melihat detail: ${esc(col.kode)} &bull; ${esc(col.nama || col.profesi || col.deskripsi || '')}"
                     >
-                      <span class="pl-head-code">${esc(pl.kode)}</span>
-                      <span class="matrix-tf-pill ${cplCount > 0 ? "" : "empty"}">${cplCount} CPL</span>
+                      ${semBadge}
+                      <span class="pl-head-code bk-head-code mk-head-code">${esc(col.kode)}</span>
+                      ${sksSub}
+                      <span class="matrix-tf-pill ${rowCount > 0 ? "" : "empty"}">${rowCount} ${cfg.rowEntity.toUpperCase()}</span>
                     </button>
                   </th>
                 `;
-                })
-                .join("")}
-
+              }).join("")}
             </tr>
           </thead>
 
           <tbody>
-            ${
-              filteredCpl.length
-                ? filteredCpl
-                    .map((cpl) => {
-                      const assignedPl = cpl.pl || [];
-                      const plCount = assignedPl.length;
-                      const isHard = cpl.jenis === "Hard skill";
+            ${filteredRows.length
+              ? filteredRows.map((r) => {
+                  const assignedCols = r[cfg.relationField] || [];
+                  const isHard = r.jenis === "Hard skill";
+                  const rowDetailAttr = cfg.rowEntity === "bk"
+                    ? `data-matrix-bk-info="${esc(r.kode)}"`
+                    : `data-matrix-cpl-info="${esc(r.kode)}"`;
+                  
+                  const rowBadge = cfg.rowEntity === "bk"
+                    ? `<span class="tag neutral" style="font-size:11px;height:20px;line-height:18px;background:#f3f4f6">${esc(r.kategori || "Inti Keilmuan")} &bull; ${r.bobot || 0}%</span>`
+                    : `<span class="tag ${isHard ? "hard" : "softs"}" style="font-size:11px;height:20px;line-height:18px">${esc(r.jenis || "Hard skill")}</span>`;
 
-                      return `
-                <tr data-row-cpl="${esc(cpl.kode)}">
-                  <td class="td-cpl-code">
-                    <button
-                      type="button"
-                      class="matrix-cpl-btn ${isHard ? "hard" : "softs"}"
-                      data-matrix-cpl-info="${esc(cpl.kode)}"
-                      title="Klik untuk melihat detail CPL ${esc(cpl.kode)}"
-                    >
-                      ${esc(cpl.kode)}
-                    </button>
-                  </td>
-
-                  <td class="td-cpl-name">
-                    <div style="font-weight:500;color:var(--text);line-height:1.45">${esc(cpl.nama)}</div>
-                    <div style="margin-top:4px">
-                      <span class="tag ${isHard ? "hard" : "softs"}" style="font-size:11px;height:20px;line-height:18px">${esc(cpl.jenis || "Hard skill")}</span>
-                    </div>
-                  </td>
-
-                  ${allPl
-                    .map((pl) => {
-                      const isLinked = assignedPl.includes(pl.kode);
-                      return `
-                      <td
-                        class="matrix-cell"
-                        data-cell-cpl="${esc(cpl.kode)}"
-                        data-cell-pl="${esc(pl.kode)}"
-                      >
+                  return `
+                    <tr data-row="${esc(r.kode)}">
+                      <td class="td-cpl-code">
                         <button
                           type="button"
-                          class="matrix-btn ${isLinked ? "linked" : "unlinked"}"
-                          data-matrix-toggle-cpl="${esc(cpl.kode)}"
-                          data-matrix-toggle-pl="${esc(pl.kode)}"
-                          title="${esc(cpl.kode)} &bull; ${esc(pl.kode)}: ${isLinked ? "Terhubung (Klik untuk melepas)" : "Belum terhubung (Klik untuk menghubungkan)"}"
-                          aria-label="${esc(cpl.kode)} ke ${esc(pl.kode)}: ${isLinked ? "Terhubung" : "Tidak Terhubung"}"
+                          class="matrix-cpl-btn ${cfg.rowEntity === "bk" ? "neutral" : (isHard ? "hard" : "softs")}"
+                          ${rowDetailAttr}
+                          title="Klik untuk melihat detail ${esc(r.kode)}"
+                          style="${cfg.rowEntity === "bk" ? "background:#fef3c7;color:#b45309;border-color:#fde68a" : ""}"
                         >
-                          ${
-                            isLinked
-                              ? `<span class="matrix-icon"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span>`
-                              : `<span class="matrix-dash">&mdash;</span>
-                               <span class="matrix-btn-hover-label" title="Hubungkan">
-                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                               </span>`
-                          }
+                          ${esc(r.kode)}
                         </button>
                       </td>
-                    `;
-                    })
-                    .join("")}
 
+                      <td class="td-cpl-name">
+                        <div style="font-weight:500;color:var(--text);line-height:1.45">${esc(r.nama || r.deskripsi || "")}</div>
+                        <div style="margin-top:4px">${rowBadge}</div>
+                      </td>
 
+                      ${allCols.map((col) => {
+                        const isLinked = assignedCols.includes(col.kode);
+                        return `
+                          <td class="matrix-cell" data-col="${esc(col.kode)}" data-cell-row="${esc(r.kode)}" data-cell-col="${esc(col.kode)}">
+                            <button
+                              type="button"
+                              class="matrix-btn ${isLinked ? "linked" : "unlinked"}"
+                              data-matrix-id="${cfg.id}"
+                              data-matrix-toggle-row="${esc(r.kode)}"
+                              data-matrix-toggle-col="${esc(col.kode)}"
+                              title="${esc(r.kode)} &bull; ${esc(col.kode)}: ${isLinked ? "Terhubung (Klik untuk melepas)" : "Belum terhubung (Klik untuk menghubungkan)"}"
+                              aria-label="${esc(r.kode)} ke ${esc(col.kode)}: ${isLinked ? "Terhubung" : "Tidak Terhubung"}"
+                            >
+                              ${isLinked
+                                ? '<span class="matrix-icon"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span>'
+                                : `<span class="matrix-dash">&mdash;</span>
+                                   <span class="matrix-btn-hover-label" title="Hubungkan">
+                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                   </span>`
+                              }
+                            </button>
+                          </td>
+                        `;
+                      }).join("")}
+                    </tr>
+                  `;
+                }).join("")
+              : `
+                <tr>
+                  <td colspan="${allCols.length + 2}" style="text-align:center;padding:48px 16px">
+                    <div class="empty">
+                      <b>Tidak ada data yang sesuai</b><br>
+                      Coba sesuaikan kata kunci pencarian Anda.
+                    </div>
+                  </td>
                 </tr>
-              `;
-                    })
-                    .join("")
-                : `
-              <tr>
-                <td colspan="${allPl.length + 2}" style="text-align:center;padding:48px 16px">
-                  <div class="empty">
-                    <b>Tidak ada data CPL yang sesuai</b><br>
-                    Coba sesuaikan kata kunci pencarian atau filter status yang Anda pilih.
-                  </div>
-                </td>
-              </tr>
-            `
+              `
             }
           </tbody>
         </table>
@@ -1669,108 +1762,85 @@ function renderMatrixCplPl() {
       <!-- 4. Guidance & Legend Footer Card -->
       <div class="matrix-guide-card">
         <div class="matrix-legend-items">
-          <span style="font-weight:600;color:var(--text);font-size:12px">Keterangan Matriks:</span>
+          <span style="font-weight:600;color:var(--text);font-size:12px">${cfg.legendTitle}</span>
           <div class="matrix-legend-item">
             <span class="matrix-legend-chip linked">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
             </span>
-            <span>Mendukung Profil Lulusan</span>
+            <span>${cfg.legendLinked}</span>
           </div>
           <div class="matrix-legend-item">
             <span class="matrix-legend-chip unlinked">&mdash;</span>
-            <span>Tidak Berkaitan Langsung</span>
-          </div>
-          <div class="matrix-legend-item">
-            <span class="tag hard" style="font-size:11px;height:20px;line-height:18px">Hard skill</span>
-            <span class="tag softs" style="font-size:11px;height:20px;line-height:18px">Soft skill</span>
-            <span>Klasifikasi CPL</span>
+            <span>${cfg.legendUnlinked}</span>
           </div>
         </div>
         <div style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          Klik kode CPL atau PL untuk melihat detail kompetensi. Gunakan mode edit untuk mengubah relasi.
+          Klik kode untuk melihat detail rincian materi. Aktifkan Mode Edit untuk mengubah relasi.
         </div>
       </div>
     </div>
   `;
+
+  $("view-container").innerHTML = renderedHtml;
 }
 
-function toggleMatrixRelation(cplKode, plKode) {
-  if (!matrixInteractive) {
-    return;
+// Generic Relation Toggle Handler with Automatic Audit Logging
+function toggleMatrixRelation(cfgKey, rowKode, colKode) {
+  const cfg = MATRIX_CONFIGS[cfgKey];
+  if (!cfg) return;
+  if (!matrixState.interactive[cfgKey]) return;
+
+  const rows = db[cfg.rowEntity] || [];
+  const rowObj = rows.find((r) => r.kode === rowKode);
+  if (!rowObj) return;
+
+  if (!Array.isArray(rowObj[cfg.relationField])) {
+    rowObj[cfg.relationField] = [];
   }
 
-  const cplObj = (db.cpl || []).find((c) => c.kode === cplKode);
-  const plObj = (db.pl || []).find((p) => p.kode === plKode);
-  if (!cplObj || !plObj) return;
-
-  if (!Array.isArray(cplObj.pl)) cplObj.pl = [];
-  if (!Array.isArray(plObj.cpl)) plObj.cpl = [];
-
-  const isCurrentlyLinked = cplObj.pl.includes(plKode);
-  const prevCplPl = [...cplObj.pl];
-  const prevPlCpl = [...plObj.cpl];
-
-  if (isCurrentlyLinked) {
-    // Disconnect
-    cplObj.pl = cplObj.pl.filter((k) => k !== plKode);
-    plObj.cpl = plObj.cpl.filter((k) => k !== cplKode);
-
-    cplObj.by = USER;
-    cplObj.at = stamp();
-    plObj.by = USER;
-    plObj.at = stamp();
-
-    addAuditLog({
-      master: "cpl",
-      aksi: "ubah",
-      kode: cplKode,
-      nama: cplObj.nama,
-      keterangan: `Memutus relasi ${cplKode} dengan Profil Lulusan ${plKode} (${plObj.nama}) via Matriks 2D`,
-      changes: [
-        {
-          field: "pl",
-          label: "Profil Lulusan Terkait",
-          old: prevCplPl,
-          new: [...cplObj.pl],
-        },
-      ],
-      detail: { cpl: cplKode, pl: plKode, statusRelasi: "Dilepas" },
-    });
-
-    renderMatrixCplPl();
+  const arr = rowObj[cfg.relationField];
+  const idx = arr.indexOf(colKode);
+  const isAdd = idx === -1;
+  if (isAdd) {
+    arr.push(colKode);
   } else {
-    // Connect
-    cplObj.pl.push(plKode);
-    if (!plObj.cpl.includes(cplKode)) {
-      plObj.cpl.push(cplKode);
-    }
-
-    cplObj.by = USER;
-    cplObj.at = stamp();
-    plObj.by = USER;
-    plObj.at = stamp();
-
-    addAuditLog({
-      master: "cpl",
-      aksi: "ubah",
-      kode: cplKode,
-      nama: cplObj.nama,
-      keterangan: `Menghubungkan ${cplKode} ke Profil Lulusan ${plKode} (${plObj.nama}) via Matriks 2D`,
-      changes: [
-        {
-          field: "pl",
-          label: "Profil Lulusan Terkait",
-          old: prevCplPl,
-          new: [...cplObj.pl],
-        },
-      ],
-      detail: { cpl: cplKode, pl: plKode, statusRelasi: "Terhubung" },
-    });
-
-    renderMatrixCplPl();
+    arr.splice(idx, 1);
   }
+
+  rowObj.by = USER;
+  rowObj.at = stamp();
+
+  const relLabel = cfg.colLabel || cfg.colEntity.toUpperCase();
+  addAuditLog({
+    master: cfg.rowEntity,
+    aksi: "ubah",
+    kode: rowObj.kode,
+    nama: rowObj.nama || rowObj.deskripsi || rowObj.kode,
+    keterangan: `${isAdd ? "Menghubungkan" : "Memutuskan"} relasi ${rowObj.kode} dengan ${relLabel} ${colKode}`,
+    changes: [
+      {
+        field: cfg.relationField,
+        label: `Relasi ${relLabel}`,
+        old: isAdd ? "Tidak Terhubung" : "Terhubung",
+        new: isAdd ? "Terhubung" : "Tidak Terhubung"
+      }
+    ],
+    detail: { ...rowObj }
+  });
+
+  saveDb();
+  renderMatrix2D(cfgKey);
 }
+
+// Backward compatible wrappers
+function renderMatrixCplPl() { renderMatrix2D("cpl_pl"); }
+function renderMatrixCplBk() { renderMatrix2D("cpl_bk"); }
+function renderMatrixBkMk() { renderMatrix2D("bk_mk"); }
+function renderMatrixCplMk() { renderMatrix2D("cpl_mk"); }
+
+function toggleMatrixRelationCplBk(c, b) { toggleMatrixRelation("cpl_bk", c, b); }
+function toggleMatrixRelationBkMk(b, m) { toggleMatrixRelation("bk_mk", b, m); }
+function toggleMatrixRelationCplMk(c, m) { toggleMatrixRelation("cpl_mk", c, m); }
 
 function openMatrixPlDetail(plKode) {
   const pl = (db.pl || []).find((p) => p.kode === plKode);
@@ -2227,675 +2297,6 @@ function openMatrixCpmkDetail(cpmkKode) {
 }
 
 // Relation Toggle Handlers
-function toggleMatrixRelationCplBk(cplKode, bkKode) {
-  if (!matrixCplBkInteractive) return;
-  const cpl = (db.cpl || []).find((c) => c.kode === cplKode);
-  if (!cpl) return;
-  if (!Array.isArray(cpl.bk)) cpl.bk = [];
-  const idx = cpl.bk.indexOf(bkKode);
-  const isAdd = idx === -1;
-  if (isAdd) {
-    cpl.bk.push(bkKode);
-  } else {
-    cpl.bk.splice(idx, 1);
-  }
-  cpl.by = USER;
-  cpl.at = stamp();
-  addAuditLog({
-    master: "cpl",
-    aksi: "ubah",
-    kode: cpl.kode,
-    nama: cpl.nama,
-    keterangan: `${isAdd ? "Menghubungkan" : "Memutuskan"} relasi ${cpl.kode} dengan Bahan Kajian ${bkKode}`,
-    changes: [{ field: "bk", label: "Bahan Kajian Terkait", old: isAdd ? "Tidak Terhubung" : "Terhubung", new: isAdd ? "Terhubung" : "Tidak Terhubung" }],
-    detail: { ...cpl },
-  });
-  saveDb();
-  renderMatrixCplBk();
-}
-
-function toggleMatrixRelationBkMk(bkKode, mkKode) {
-  if (!matrixBkMkInteractive) return;
-  const bk = (db.bk || []).find((b) => b.kode === bkKode);
-  if (!bk) return;
-  if (!Array.isArray(bk.mk)) bk.mk = [];
-  const idx = bk.mk.indexOf(mkKode);
-  const isAdd = idx === -1;
-  if (isAdd) {
-    bk.mk.push(mkKode);
-  } else {
-    bk.mk.splice(idx, 1);
-  }
-  bk.by = USER;
-  bk.at = stamp();
-  addAuditLog({
-    master: "bk",
-    aksi: "ubah",
-    kode: bk.kode,
-    nama: bk.nama,
-    keterangan: `${isAdd ? "Mengemas" : "Mengeluarkan"} Bahan Kajian ${bk.kode} ${isAdd ? "ke" : "dari"} Mata Kuliah ${mkKode}`,
-    changes: [{ field: "mk", label: "Mata Kuliah Terkait", old: isAdd ? "Tidak Terhubung" : "Terhubung", new: isAdd ? "Terhubung" : "Tidak Terhubung" }],
-    detail: { ...bk },
-  });
-  saveDb();
-  renderMatrixBkMk();
-}
-
-function toggleMatrixRelationCplMk(cplKode, mkKode) {
-  if (!matrixCplMkInteractive) return;
-  const cpl = (db.cpl || []).find((c) => c.kode === cplKode);
-  if (!cpl) return;
-  if (!Array.isArray(cpl.mk)) cpl.mk = [];
-  const idx = cpl.mk.indexOf(mkKode);
-  const isAdd = idx === -1;
-  if (isAdd) {
-    cpl.mk.push(mkKode);
-  } else {
-    cpl.mk.splice(idx, 1);
-  }
-  cpl.by = USER;
-  cpl.at = stamp();
-  addAuditLog({
-    master: "cpl",
-    aksi: "ubah",
-    kode: cpl.kode,
-    nama: cpl.nama,
-    keterangan: `${isAdd ? "Membebankan" : "Menghapus beban"} CPL ${cpl.kode} pada Mata Kuliah ${mkKode}`,
-    changes: [{ field: "mk", label: "Mata Kuliah Terkait", old: isAdd ? "Tidak Terhubung" : "Terhubung", new: isAdd ? "Terhubung" : "Tidak Terhubung" }],
-    detail: { ...cpl },
-  });
-  saveDb();
-  renderMatrixCplMk();
-}
-
-// ==========================================================
-// 1. MATRIKS CPL-BK
-// ==========================================================
-function renderMatrixCplBk() {
-  if ($("log-header-container")) $("log-header-container").innerHTML = "";
-  if ($("btn-master-log")) $("btn-master-log").style.display = "none";
-
-  $("crumb").textContent = "Matriks Relasi OBE / Matriks CPL–BK";
-  $("title").textContent = "Matriks Relasi CPL – Bahan Kajian (CPL–BK)";
-  $("lead").textContent =
-    "Pemetaan dua dimensi antara Capaian Pembelajaran Lulusan (CPL) dan Bahan Kajian (BK / Body of Knowledge). Menentukan bidang keilmuan yang esensial untuk membentuk setiap kompetensi lulusan.";
-  $("bar").style.display = "none";
-
-  const allCpl = db.cpl || [];
-  const allBk = db.bk || [];
-
-  let totalActiveLinks = 0;
-  let cplWithoutBkCount = 0;
-  let bkWithoutCplCount = 0;
-
-  allCpl.forEach((c) => {
-    const links = (c.bk || []).length;
-    totalActiveLinks += links;
-    if (links === 0) cplWithoutBkCount++;
-  });
-
-  allBk.forEach((b) => {
-    const sup = allCpl.filter((c) => (c.bk || []).includes(b.kode)).length;
-    if (sup === 0) bkWithoutCplCount++;
-  });
-
-  const isObeCompliant = cplWithoutBkCount === 0 && bkWithoutCplCount === 0;
-
-  const filteredCpl = allCpl.filter((c) => {
-    if (matrixCplBkSearch) {
-      const term = (c.kode + " " + (c.nama || "") + " " + (c.jenis || "")).toLowerCase();
-      if (!term.includes(matrixCplBkSearch)) return false;
-    }
-    if (matrixCplBkJenisFilter !== "all" && c.jenis !== matrixCplBkJenisFilter) return false;
-    const links = (c.bk || []).length;
-    if (matrixCplBkStatusFilter === "mapped" && links === 0) return false;
-    if (matrixCplBkStatusFilter === "unmapped" && links > 0) return false;
-    return true;
-  });
-
-  $("view-container").innerHTML = `
-    <div class="matrix-view-wrap">
-      <div class="matrix-stats-grid">
-        <div class="matrix-stat-card">
-          <div class="matrix-stat-icon cpl">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-          </div>
-          <div class="matrix-stat-info">
-            <span class="matrix-stat-val">${allCpl.length} CPL</span>
-            <span class="matrix-stat-label">Capaian Pembelajaran</span>
-            <span class="matrix-stat-sub">${allCpl.filter(c => c.jenis === "Hard skill").length} Hard skill &bull; ${allCpl.filter(c => c.jenis === "Soft skill").length} Soft skill</span>
-          </div>
-        </div>
-
-        <div class="matrix-stat-card">
-          <div class="matrix-stat-icon pl" style="background:#fef3c7;color:#b45309">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-          </div>
-          <div class="matrix-stat-info">
-            <span class="matrix-stat-val">${allBk.length} BK</span>
-            <span class="matrix-stat-label">Bahan Kajian (Body of Knowledge)</span>
-            <span class="matrix-stat-sub">Rumpun keilmuan aktif kurikulum</span>
-          </div>
-        </div>
-
-        <div class="matrix-stat-card">
-          <div class="matrix-stat-icon relation">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-          </div>
-          <div class="matrix-stat-info">
-            <span class="matrix-stat-val">${totalActiveLinks} Tautan</span>
-            <span class="matrix-stat-label">Relasi Aktif Terpetakan</span>
-            <span class="matrix-stat-sub">Rata-rata ${allBk.length ? (totalActiveLinks / allBk.length).toFixed(1) : 0} CPL per bahan kajian</span>
-          </div>
-        </div>
-
-        <div class="matrix-stat-card">
-          <div class="matrix-stat-icon obe ${isObeCompliant ? "pass" : ""}">
-            ${isObeCompliant 
-              ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'
-              : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
-            }
-          </div>
-          <div class="matrix-stat-info">
-            <span class="matrix-stat-val" style="${isObeCompliant ? "color:var(--success)" : "color:var(--warning)"}">${isObeCompliant ? "100% Terpenuhi" : "Perlu Evaluasi"}</span>
-            <span class="matrix-stat-label">Standar Validasi OBE</span>
-            <span class="matrix-stat-sub">${isObeCompliant ? "Semua CPL & BK saling terhubung" : `${cplWithoutBkCount} CPL kosong, ${bkWithoutCplCount} BK kosong`}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="matrix-toolbar">
-        <div class="matrix-toolbar-left">
-          <div class="matrix-search">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input id="matrix-cpl-bk-q" type="search" placeholder="Cari CPL..." value="${esc(matrixCplBkSearch)}" aria-label="Cari CPL" />
-          </div>
-
-        </div>
-        <div class="matrix-toolbar-right">
-          <button type="button" id="matrix-cpl-bk-toggle-mode" class="matrix-mode-badge ${matrixCplBkInteractive ? "active" : ""}">
-            <span class="matrix-mode-dot"></span>
-            <span>Mode Edit</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="matrix-scroll-wrap">
-        <table class="matrix-table ${matrixCplBkInteractive ? "" : "view-only"}">
-          <thead>
-            <tr>
-              <th class="th-cpl-code" scope="col">Kode CPL</th>
-              <th class="th-cpl-name" scope="col">Capaian Pembelajaran Lulusan (CPL)</th>
-              ${allBk.map(bk => {
-                const cplCount = allCpl.filter(c => (c.bk || []).includes(bk.kode)).length;
-                return `
-                  <th class="th-bk" scope="col">
-                    <button type="button" class="bk-head-btn" data-matrix-bk-info="${esc(bk.kode)}" title="${esc(bk.kode)}: ${esc(bk.nama)}">
-                      <span class="bk-head-code">${esc(bk.kode)}</span>
-                      <span class="matrix-tf-pill ${cplCount > 0 ? "" : "empty"}">${cplCount} CPL</span>
-                    </button>
-                  </th>
-                `;
-              }).join("")}
-            </tr>
-          </thead>
-          <tbody>
-            ${filteredCpl.length ? filteredCpl.map(cpl => {
-              const assignedBk = cpl.bk || [];
-              const isHard = cpl.jenis === "Hard skill";
-              return `
-                <tr>
-                  <td class="td-cpl-code">
-                    <button type="button" class="matrix-cpl-btn ${isHard ? "hard" : "softs"}" data-matrix-cpl-info="${esc(cpl.kode)}">
-                      ${esc(cpl.kode)}
-                    </button>
-                  </td>
-                  <td class="td-cpl-name">
-                    <div style="font-weight:500;color:var(--text);line-height:1.45">${esc(cpl.nama)}</div>
-                    <div style="margin-top:4px">
-                      <span class="tag ${isHard ? "hard" : "softs"}" style="font-size:11px;height:20px;line-height:18px">${esc(cpl.jenis || "Hard skill")}</span>
-                    </div>
-                  </td>
-                  ${allBk.map(bk => {
-                    const isLinked = assignedBk.includes(bk.kode);
-                    return `
-                      <td class="matrix-cell">
-                        <button type="button" class="matrix-btn ${isLinked ? "linked" : "unlinked"}"
-                          data-matrix-toggle-cpl-bk="${esc(cpl.kode)}" data-bk="${esc(bk.kode)}"
-                          title="${esc(cpl.kode)} &bull; ${esc(bk.kode)}: ${isLinked ? "Terhubung" : "Tidak Terhubung"}">
-                          ${isLinked 
-                            ? '<span class="matrix-icon"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span>'
-                            : '<span class="matrix-dash">&mdash;</span>'
-                          }
-                        </button>
-                      </td>
-                    `;
-                  }).join("")}
-                </tr>
-              `;
-            }).join("") : `
-              <tr>
-                <td colspan="${allBk.length + 2}" style="text-align:center;padding:48px 16px">
-                  <div class="empty"><b>Tidak ada data CPL yang cocok</b></div>
-                </td>
-              </tr>
-            `}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="matrix-guide-card">
-        <div class="matrix-legend-items">
-          <span style="font-weight:600;color:var(--text);font-size:12px">Keterangan Matriks:</span>
-          <div class="matrix-legend-item">
-            <span class="matrix-legend-chip linked">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
-            </span>
-            <span>Bahan Kajian Mendukung CPL</span>
-          </div>
-          <div class="matrix-legend-item"><span class="matrix-legend-chip unlinked">&mdash;</span><span>Tidak Terhubung Langsung</span></div>
-        </div>
-        <div style="font-size:12px;color:var(--text-muted)">
-          Klik kode CPL atau BK untuk melihat rincian materi. Aktifkan Mode Edit untuk menambah/mengurangi relasi.
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// ==========================================================
-// 2. MATRIKS BK-MK (Pengemasan Bahan Kajian ke Mata Kuliah)
-// ==========================================================
-function renderMatrixBkMk() {
-  if ($("log-header-container")) $("log-header-container").innerHTML = "";
-  if ($("btn-master-log")) $("btn-master-log").style.display = "none";
-
-  $("crumb").textContent = "Matriks Relasi OBE / Matriks BK–MK";
-  $("title").textContent = "Matriks Pengemasan Bahan Kajian ke Mata Kuliah (BK–MK)";
-  $("lead").textContent =
-    "Pemetaan pengemasan materi Bahan Kajian (BK) ke dalam unit pembelajaran Mata Kuliah (MK). Aturan OBE: Tidak boleh ada Bahan Kajian yang berdiri tanpa Mata Kuliah (Orphan BK = 0, minimal 1 MK).";
-  $("bar").style.display = "none";
-
-  const allBk = db.bk || [];
-  const allMk = db.mk || [];
-
-  let totalActiveLinks = 0;
-  let orphanBkCount = 0;
-
-  allBk.forEach((b) => {
-    const links = (b.mk || []).length;
-    totalActiveLinks += links;
-    if (links === 0) orphanBkCount++;
-  });
-
-  const isOrphanZero = orphanBkCount === 0;
-
-  const filteredBk = allBk.filter((b) => {
-    if (matrixBkMkSearch) {
-      const term = (b.kode + " " + (b.nama || "")).toLowerCase();
-      if (!term.includes(matrixBkMkSearch)) return false;
-    }
-    const links = (b.mk || []).length;
-    if (matrixBkMkStatusFilter === "mapped" && links === 0) return false;
-    if (matrixBkMkStatusFilter === "orphan" && links > 0) return false;
-    return true;
-  });
-
-  const filteredMkCols = allMk.filter((m) => {
-    // Filter dropdowns removed
-    return true;
-  });
-
-  $("view-container").innerHTML = `
-    <div class="matrix-view-wrap">
-      <div class="matrix-stats-grid">
-        <div class="matrix-stat-card">
-          <div class="matrix-stat-icon pl" style="background:#fef3c7;color:#b45309">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-          </div>
-          <div class="matrix-stat-info">
-            <span class="matrix-stat-val">${allBk.length} BK</span>
-            <span class="matrix-stat-label">Total Bahan Kajian</span>
-            <span class="matrix-stat-sub">Rumpun keilmuan wajib</span>
-          </div>
-        </div>
-
-        <div class="matrix-stat-card">
-          <div class="matrix-stat-icon cpl" style="background:#e0e7ff;color:#3730a3">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-          </div>
-          <div class="matrix-stat-info">
-            <span class="matrix-stat-val">${allMk.length} MK</span>
-            <span class="matrix-stat-label">Mata Kuliah Pengampu</span>
-            <span class="matrix-stat-sub">Distribusi Semester 1 s.d 6</span>
-          </div>
-        </div>
-
-        <div class="matrix-stat-card">
-          <div class="matrix-stat-icon relation">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-          </div>
-          <div class="matrix-stat-info">
-            <span class="matrix-stat-val">${totalActiveLinks} Kemasan</span>
-            <span class="matrix-stat-label">Tautan Pengemasan BK-MK</span>
-            <span class="matrix-stat-sub">Rata-rata ${allBk.length ? (totalActiveLinks / allBk.length).toFixed(1) : 0} MK per BK</span>
-          </div>
-        </div>
-
-        <div class="matrix-stat-card">
-          <div class="matrix-stat-icon obe ${isOrphanZero ? "pass" : ""}">
-            ${isOrphanZero
-              ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'
-              : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
-            }
-          </div>
-          <div class="matrix-stat-info">
-            <span class="matrix-stat-val" style="${isOrphanZero ? "color:var(--success)" : "color:var(--danger)"}">${isOrphanZero ? "100% Lolos Validasi" : "Peringatan Null MK"}</span>
-            <span class="matrix-stat-label">Validasi Orphan BK</span>
-            <span class="matrix-stat-sub">${isOrphanZero ? "0 BK kosong (Semua BK memiliki MK)" : `${orphanBkCount} BK belum dikemas ke MK!`}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="matrix-toolbar">
-        <div class="matrix-toolbar-left">
-          <div class="matrix-search">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input id="matrix-bk-mk-q" type="search" placeholder="Cari BK..." value="${esc(matrixBkMkSearch)}" aria-label="Cari BK" />
-          </div>
-
-        </div>
-        <div class="matrix-toolbar-right">
-          <button type="button" id="matrix-bk-mk-toggle-mode" class="matrix-mode-badge ${matrixBkMkInteractive ? "active" : ""}">
-            <span class="matrix-mode-dot"></span>
-            <span>Mode Edit</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="matrix-scroll-wrap">
-        <table class="matrix-table ${matrixBkMkInteractive ? "" : "view-only"}">
-          <thead>
-            <tr>
-              <th class="th-cpl-code" scope="col">Kode BK</th>
-              <th class="th-cpl-name" scope="col">Bahan Kajian (Materi & Pokok Bahasan)</th>
-              ${filteredMkCols.map(mk => {
-                const bkCount = allBk.filter(b => (b.mk || []).includes(mk.kode)).length;
-                return `
-                  <th class="th-mk" scope="col">
-                    <button type="button" class="mk-head-btn" data-matrix-mk-info="${esc(mk.kode)}" title="${esc(mk.kode)}: ${esc(mk.nama)} (Sem ${esc(mk.sem)})">
-                      <span class="mk-head-code">${esc(mk.kode)}</span>
-                      <span class="mk-sem-tag">S${esc(mk.sem)}</span>
-                      <span class="matrix-tf-pill ${bkCount > 0 ? "" : "empty"}">${bkCount} BK</span>
-                    </button>
-                  </th>
-                `;
-              }).join("")}
-            </tr>
-          </thead>
-          <tbody>
-            ${filteredBk.length ? filteredBk.map(bk => {
-              const assignedMk = bk.mk || [];
-              const isOrphan = assignedMk.length === 0;
-              return `
-                <tr>
-                  <td class="td-cpl-code">
-                    <button type="button" class="bk-head-code" style="cursor:pointer;border:none" data-matrix-bk-info="${esc(bk.kode)}">
-                      ${esc(bk.kode)}
-                    </button>
-                  </td>
-                  <td class="td-cpl-name">
-                    <div style="font-weight:600;color:var(--text);line-height:1.4">${esc(bk.nama)}</div>
-                    <div style="margin-top:4px">
-                      <span class="status-pill ${isOrphan ? "danger" : "valid"}">${isOrphan ? "Orphan BK (0 MK)" : `Dikemas ke ${assignedMk.length} MK`}</span>
-                    </div>
-                  </td>
-                  ${filteredMkCols.map(mk => {
-                    const isLinked = assignedMk.includes(mk.kode);
-                    return `
-                      <td class="matrix-cell">
-                        <button type="button" class="matrix-btn ${isLinked ? "linked" : "unlinked"}"
-                          data-matrix-toggle-bk-mk="${esc(bk.kode)}" data-mk="${esc(mk.kode)}"
-                          title="${esc(bk.kode)} &bull; ${esc(mk.kode)}: ${isLinked ? "Dikemas" : "Tidak Dikemas"}">
-                          ${isLinked 
-                            ? '<span class="matrix-icon"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span>'
-                            : '<span class="matrix-dash">&mdash;</span>'
-                          }
-                        </button>
-                      </td>
-                    `;
-                  }).join("")}
-                </tr>
-              `;
-            }).join("") : `
-              <tr>
-                <td colspan="${filteredMkCols.length + 2}" style="text-align:center;padding:48px 16px">
-                  <div class="empty"><b>Tidak ada data Bahan Kajian yang cocok</b></div>
-                </td>
-              </tr>
-            `}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="matrix-guide-card">
-        <div class="matrix-legend-items">
-          <span style="font-weight:600;color:var(--text);font-size:12px">Validasi Integritas:</span>
-          <div class="matrix-legend-item">
-            <span class="status-pill valid">Dikemas (>= 1 MK)</span>
-            <span>Bahan Kajian valid diajarkan pada MK</span>
-          </div>
-          <div class="matrix-legend-item">
-            <span class="status-pill danger">Orphan BK (0 MK)</span>
-            <span>Pelanggaran OBE: Bahan Kajian tidak memiliki mata kuliah pengampu</span>
-          </div>
-        </div>
-        <div style="font-size:12px;color:var(--text-muted)">
-          Gunakan Mode Edit untuk mengemas bahan kajian ke dalam mata kuliah yang sesuai.
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// ==========================================================
-// 3. MATRIKS CPL-MK (Pembebanan CPL ke Mata Kuliah)
-// ==========================================================
-function renderMatrixCplMk() {
-  if ($("log-header-container")) $("log-header-container").innerHTML = "";
-  if ($("btn-master-log")) $("btn-master-log").style.display = "none";
-
-  $("crumb").textContent = "Matriks Relasi OBE / Matriks CPL–MK";
-  $("title").textContent = "Matriks Beban CPL pada Mata Kuliah (CPL–MK)";
-  $("lead").textContent =
-    "Pemetaan beban Capaian Pembelajaran Lulusan (CPL) pada setiap Mata Kuliah kurikulum TRPL. Mengidentifikasi kontribusi mata kuliah terhadap capaian profil lulusan.";
-  $("bar").style.display = "none";
-
-  const allCpl = db.cpl || [];
-  const allMk = db.mk || [];
-
-  let totalActiveLinks = 0;
-  let cplWithoutMkCount = 0;
-  let mkWithoutCplCount = 0;
-
-  allCpl.forEach((c) => {
-    const links = (c.mk || []).length;
-    totalActiveLinks += links;
-    if (links === 0) cplWithoutMkCount++;
-  });
-
-  allMk.forEach((m) => {
-    const sup = allCpl.filter((c) => (c.mk || []).includes(m.kode)).length;
-    if (sup === 0) mkWithoutCplCount++;
-  });
-
-  const isCompliant = cplWithoutMkCount === 0 && mkWithoutCplCount === 0;
-
-  const filteredCpl = allCpl.filter((c) => {
-    if (matrixCplMkSearch) {
-      const term = (c.kode + " " + (c.nama || "")).toLowerCase();
-      if (!term.includes(matrixCplMkSearch)) return false;
-    }
-    // Filter dropdowns removed
-    return true;
-  });
-
-  const filteredMkCols = allMk.filter((m) => {
-    // Filter dropdowns removed
-    return true;
-  });
-
-  $("view-container").innerHTML = `
-    <div class="matrix-view-wrap">
-      <div class="matrix-stats-grid">
-        <div class="matrix-stat-card">
-          <div class="matrix-stat-icon cpl">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-          </div>
-          <div class="matrix-stat-info">
-            <span class="matrix-stat-val">${allCpl.length} CPL</span>
-            <span class="matrix-stat-label">Total Capaian Lulusan</span>
-            <span class="matrix-stat-sub">Seluruh capaian aktif</span>
-          </div>
-        </div>
-
-        <div class="matrix-stat-card">
-          <div class="matrix-stat-icon pl" style="background:#e0e7ff;color:#3730a3">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-          </div>
-          <div class="matrix-stat-info">
-            <span class="matrix-stat-val">${allMk.length} MK</span>
-            <span class="matrix-stat-label">Mata Kuliah Pengusung</span>
-            <span class="matrix-stat-sub">Semester 1 s.d 6</span>
-          </div>
-        </div>
-
-        <div class="matrix-stat-card">
-          <div class="matrix-stat-icon relation">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-          </div>
-          <div class="matrix-stat-info">
-            <span class="matrix-stat-val">${totalActiveLinks} Pembebanan</span>
-            <span class="matrix-stat-label">Tautan CPL-MK</span>
-            <span class="matrix-stat-sub">Rata-rata ${allMk.length ? (totalActiveLinks / allMk.length).toFixed(1) : 0} CPL per mata kuliah</span>
-          </div>
-        </div>
-
-        <div class="matrix-stat-card">
-          <div class="matrix-stat-icon obe ${isCompliant ? "pass" : ""}">
-            ${isCompliant 
-              ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'
-              : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
-            }
-          </div>
-          <div class="matrix-stat-info">
-            <span class="matrix-stat-val" style="${isCompliant ? "color:var(--success)" : "color:var(--warning)"}">${isCompliant ? "100% Terpenuhi" : "Perlu Evaluasi"}</span>
-            <span class="matrix-stat-label">Konsistensi Pembebanan</span>
-            <span class="matrix-stat-sub">${isCompliant ? "Semua MK mendukung minimal 1 CPL" : `${mkWithoutCplCount} MK belum mendukung CPL`}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="matrix-toolbar">
-        <div class="matrix-toolbar-left">
-          <div class="matrix-search">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input id="matrix-cpl-mk-q" type="search" placeholder="Cari CPL..." value="${esc(matrixCplMkSearch)}" aria-label="Cari CPL" />
-          </div>
-
-        </div>
-        <div class="matrix-toolbar-right">
-          <button type="button" id="matrix-cpl-mk-toggle-mode" class="matrix-mode-badge ${matrixCplMkInteractive ? "active" : ""}">
-            <span class="matrix-mode-dot"></span>
-            <span>Mode Edit</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="matrix-scroll-wrap">
-        <table class="matrix-table ${matrixCplMkInteractive ? "" : "view-only"}">
-          <thead>
-            <tr>
-              <th class="th-cpl-code" scope="col">Kode CPL</th>
-              <th class="th-cpl-name" scope="col">Pernyataan Capaian Lulusan (CPL)</th>
-              ${filteredMkCols.map(mk => {
-                const cplCount = allCpl.filter(c => (c.mk || []).includes(mk.kode)).length;
-                return `
-                  <th class="th-mk" scope="col">
-                    <button type="button" class="mk-head-btn" data-matrix-mk-info="${esc(mk.kode)}" title="${esc(mk.kode)}: ${esc(mk.nama)} (Sem ${esc(mk.sem)})">
-                      <span class="mk-head-code">${esc(mk.kode)}</span>
-                      <span class="mk-sem-tag">S${esc(mk.sem)}</span>
-                      <span class="matrix-tf-pill ${cplCount > 0 ? "" : "empty"}">${cplCount} CPL</span>
-                    </button>
-                  </th>
-                `;
-              }).join("")}
-            </tr>
-          </thead>
-          <tbody>
-            ${filteredCpl.length ? filteredCpl.map(cpl => {
-              const assignedMk = cpl.mk || [];
-              const isHard = cpl.jenis === "Hard skill";
-              return `
-                <tr>
-                  <td class="td-cpl-code">
-                    <button type="button" class="matrix-cpl-btn ${isHard ? "hard" : "softs"}" data-matrix-cpl-info="${esc(cpl.kode)}">
-                      ${esc(cpl.kode)}
-                    </button>
-                  </td>
-                  <td class="td-cpl-name">
-                    <div style="font-weight:500;color:var(--text);line-height:1.45">${esc(cpl.nama)}</div>
-                    <div style="margin-top:4px">
-                      <span class="tag ${isHard ? "hard" : "softs"}" style="font-size:11px;height:20px;line-height:18px">${esc(cpl.jenis || "Hard skill")}</span>
-                    </div>
-                  </td>
-                  ${filteredMkCols.map(mk => {
-                    const isLinked = assignedMk.includes(mk.kode);
-                    return `
-                      <td class="matrix-cell">
-                        <button type="button" class="matrix-btn ${isLinked ? "linked" : "unlinked"}"
-                          data-matrix-toggle-cpl-mk="${esc(cpl.kode)}" data-mk="${esc(mk.kode)}"
-                          title="${esc(cpl.kode)} &bull; ${esc(mk.kode)}: ${isLinked ? "Mendukung" : "Tidak Mendukung"}">
-                          ${isLinked 
-                            ? '<span class="matrix-icon"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span>'
-                            : '<span class="matrix-dash">&mdash;</span>'
-                          }
-                        </button>
-                      </td>
-                    `;
-                  }).join("")}
-                </tr>
-              `;
-            }).join("") : `
-              <tr>
-                <td colspan="${filteredMkCols.length + 2}" style="text-align:center;padding:48px 16px">
-                  <div class="empty"><b>Tidak ada data CPL yang cocok</b></div>
-                </td>
-              </tr>
-            `}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="matrix-guide-card">
-        <div class="matrix-legend-items">
-          <span style="font-weight:600;color:var(--text);font-size:12px">Keterangan:</span>
-          <div class="matrix-legend-item">
-            <span class="matrix-legend-chip linked">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
-            </span>
-            <span>Mata Kuliah Mendukung Pemenuhan CPL</span>
-          </div>
-          <div class="matrix-legend-item"><span class="matrix-legend-chip unlinked">&mdash;</span><span>Tidak Dibebankan</span></div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// ==========================================================
-// 4. MATRIKS INTEGRASI TRIPARTIT BK-CPL-MK (Gabungan 5-6-7)
-// ==========================================================
 function renderMatrixBkCplMk() {
   if ($("log-header-container")) $("log-header-container").innerHTML = "";
   if ($("btn-master-log")) $("btn-master-log").style.display = "none";
@@ -4360,18 +3761,17 @@ document.addEventListener("click", (ev) => {
     if (eInp) eInp.value = "";
     renderLogTable();
     updateLogResetBtn();
-  } else if (b.id === "matrix-toggle-mode" || b.closest("#matrix-toggle-mode")) {
-    matrixInteractive = !matrixInteractive;
-    renderMatrixCplPl();
-  } else if (b.id === "matrix-btn-reset" || b.closest("#matrix-btn-reset")) {
-    matrixSearch = "";
-    matrixJenisFilter = "all";
-    matrixStatusFilter = "all";
-    renderMatrixCplPl();
-  } else if (b.id === "matrix-btn-guide" || b.closest("#matrix-btn-guide")) {
-    openMatrixGuideModal();
-  } else if (b.dataset.matrixToggleCpl && b.dataset.matrixTogglePl) {
-    toggleMatrixRelation(b.dataset.matrixToggleCpl, b.dataset.matrixTogglePl);
+  } else if (b.closest("[data-matrix-mode-toggle]")) {
+    const btn = b.closest("[data-matrix-mode-toggle]");
+    const mId = btn.dataset.matrixModeToggle;
+    matrixState.interactive[mId] = !matrixState.interactive[mId];
+    renderMatrix2D(mId);
+  } else if (b.closest("[data-matrix-guide]")) {
+    const btn = b.closest("[data-matrix-guide]");
+    openMatrixGuideModal(btn.dataset.matrixGuide);
+  } else if (b.closest("[data-matrix-toggle-row]")) {
+    const btn = b.closest("[data-matrix-toggle-row]");
+    toggleMatrixRelation(btn.dataset.matrixId, btn.dataset.matrixToggleRow, btn.dataset.matrixToggleCol);
   } else if (b.dataset.matrixPlInfo) {
     openMatrixPlDetail(b.dataset.matrixPlInfo);
   } else if (b.dataset.matrixCplInfo) {
@@ -4382,36 +3782,6 @@ document.addEventListener("click", (ev) => {
     openMatrixMkDetail(b.dataset.matrixMkInfo);
   } else if (b.dataset.matrixCpmkInfo) {
     openMatrixCpmkDetail(b.dataset.matrixCpmkInfo);
-  } else if (b.id === "matrix-cpl-bk-toggle-mode" || b.closest("#matrix-cpl-bk-toggle-mode")) {
-    matrixCplBkInteractive = !matrixCplBkInteractive;
-    renderMatrixCplBk();
-  } else if (b.id === "matrix-cpl-bk-btn-reset" || b.closest("#matrix-cpl-bk-btn-reset")) {
-    matrixCplBkSearch = "";
-    matrixCplBkJenisFilter = "all";
-    matrixCplBkStatusFilter = "all";
-    renderMatrixCplBk();
-  } else if (b.dataset.matrixToggleCplBk && b.dataset.bk) {
-    toggleMatrixRelationCplBk(b.dataset.matrixToggleCplBk, b.dataset.bk);
-  } else if (b.id === "matrix-bk-mk-toggle-mode" || b.closest("#matrix-bk-mk-toggle-mode")) {
-    matrixBkMkInteractive = !matrixBkMkInteractive;
-    renderMatrixBkMk();
-  } else if (b.id === "matrix-bk-mk-btn-reset" || b.closest("#matrix-bk-mk-btn-reset")) {
-    matrixBkMkSearch = "";
-    matrixBkMkSemFilter = "all";
-    matrixBkMkStatusFilter = "all";
-    renderMatrixBkMk();
-  } else if (b.dataset.matrixToggleBkMk && b.dataset.mk) {
-    toggleMatrixRelationBkMk(b.dataset.matrixToggleBkMk, b.dataset.mk);
-  } else if (b.id === "matrix-cpl-mk-toggle-mode" || b.closest("#matrix-cpl-mk-toggle-mode")) {
-    matrixCplMkInteractive = !matrixCplMkInteractive;
-    renderMatrixCplMk();
-  } else if (b.id === "matrix-cpl-mk-btn-reset" || b.closest("#matrix-cpl-mk-btn-reset")) {
-    matrixCplMkSearch = "";
-    matrixCplMkSemFilter = "all";
-    matrixCplMkJenisFilter = "all";
-    renderMatrixCplMk();
-  } else if (b.dataset.matrixToggleCplMk && b.dataset.mk) {
-    toggleMatrixRelationCplMk(b.dataset.matrixToggleCplMk, b.dataset.mk);
   } else if (b.dataset.tripartitTab) {
     tripartitView = b.dataset.tripartitTab;
     renderMatrixBkCplMk();
@@ -4483,9 +3853,11 @@ document.addEventListener("keydown", (ev) => {
 });
 
 document.addEventListener("input", (ev) => {
-  if (ev.target.id === "matrix-q") {
-    matrixSearch = ev.target.value.trim().toLowerCase();
-    renderMatrixCplPl();
+  const matrixInput = ev.target.closest(".matrix-search-input");
+  if (matrixInput) {
+    const mId = matrixInput.dataset.matrixId;
+    matrixState.search[mId] = matrixInput.value.trim().toLowerCase();
+    renderMatrix2D(mId);
     return;
   }
   if (ev.target.id === "log-q") {
@@ -4579,39 +3951,28 @@ document.addEventListener("change", (ev) => {
   }
 });
 
-// Matrix Crosshair Column Hover
+// Matrix Crosshair Column Hover (All 4 OBE Matrices)
 document.addEventListener("mouseover", (ev) => {
-  if (tab !== "cpl_pl") return;
-  const cell = ev.target.closest(".matrix-cell, th.th-pl");
+  if (!(tab in MATRIX_CONFIGS)) return;
+  const cell = ev.target.closest(".matrix-cell, th[data-col]");
   if (cell) {
-    const pl = cell.dataset.cellPl || cell.dataset.colPl;
-    if (pl && pl !== matrixHoverCol) {
-      matrixHoverCol = pl;
-      document
-        .querySelectorAll(`[data-col-pl="${pl}"]`)
-        .forEach((el) => el.classList.add("col-hover"));
-      document
-        .querySelectorAll(`[data-cell-pl="${pl}"]`)
-        .forEach((el) => el.classList.add("col-hover"));
+    const col = cell.dataset.col;
+    if (col && col !== matrixHoverCol) {
+      matrixHoverCol = col;
+      document.querySelectorAll(`[data-col="${col}"]`).forEach((el) => el.classList.add("col-hover"));
     }
   }
 });
 
 document.addEventListener("mouseout", (ev) => {
-  if (tab !== "cpl_pl") return;
-  const cell = ev.target.closest(".matrix-cell, th.th-pl");
+  if (!(tab in MATRIX_CONFIGS)) return;
+  const cell = ev.target.closest(".matrix-cell, th[data-col]");
   if (cell) {
     const relTarget = ev.relatedTarget;
-    const nextCell = relTarget
-      ? relTarget.closest(".matrix-cell, th.th-pl")
-      : null;
-    const nextPl = nextCell
-      ? nextCell.dataset.cellPl || nextCell.dataset.colPl
-      : null;
-    if (nextPl !== matrixHoverCol) {
-      document
-        .querySelectorAll(".col-hover")
-        .forEach((el) => el.classList.remove("col-hover"));
+    const nextCell = relTarget ? relTarget.closest(".matrix-cell, th[data-col]") : null;
+    const nextCol = nextCell ? nextCell.dataset.col : null;
+    if (nextCol !== matrixHoverCol) {
+      document.querySelectorAll(".col-hover").forEach((el) => el.classList.remove("col-hover"));
       matrixHoverCol = null;
     }
   }
