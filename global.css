@@ -1658,14 +1658,23 @@ tbody tr:hover {
   flex-direction: column;
 }
 
-/* Top Stat Cards */
+/* Detach Top Stat Cards from Table Container */
+.paper:has(.matrix-stats-grid) {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+}
+
 .matrix-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
-  padding: 18px 20px;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  padding: 0;
+  background: transparent;
+  border-bottom: none;
+  margin-bottom: 20px;
 }
 
 .matrix-stat-card {
@@ -1676,6 +1685,27 @@ tbody tr:hover {
   display: flex;
   align-items: center;
   gap: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* The table container elements below the stats grid */
+.matrix-view-wrap > :not(.matrix-stats-grid) {
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.matrix-view-wrap > .matrix-stats-grid + * {
+  border-top: 1px solid var(--border);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.matrix-view-wrap > :last-child {
+  border-bottom: 1px solid var(--border);
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  overflow: hidden;
 }
 
 .matrix-stat-icon {
