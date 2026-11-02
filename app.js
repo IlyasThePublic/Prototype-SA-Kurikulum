@@ -16,9 +16,9 @@ const S = (k, n, d, by, at) => ({
 });
 
 // Relational Database State
-let db = { pl: [], cpl: [], bk: [], mk: [], cpmk: [], logs: [] };
+let db = { pl: [], cpl: [], bk: [], mk: [], cpmk: [], sub_cpmk: [], logs: [] };
 
-const STORAGE_KEY = "SA_KURIKULUM_DB_V2";
+const STORAGE_KEY = "SA_KURIKULUM_DB_V6";
 
 function saveDb() {
   try {
@@ -28,13 +28,134 @@ function saveDb() {
   }
 }
 
+function hydrateDb(data) {
+  const rel = data.relasi || {};
+  const cplPl = rel.cpl_pl || [];
+  const cplBk = rel.cpl_bk || [];
+  const bkMk = rel.bk_mk || [];
+  const cplMk = rel.cpl_mk || [];
+  const mkCpmk = rel.mk_cpmk || [];
+  const subCpmkList = (data.sub_cpmk || []).map((s) => ({
+    ...s,
+    nama: s.deskripsi || s.nama || s.kode,
+  }));
+
+  // Profil Lulusan (4 Profil Utama D4 TRPL)
+  const pl = (data.profil_lulusan || []).map((p) => ({
+    ...p,
+    deskripsi: p.deskripsi || p.profil_lulusan || "",
+    profesi: p.profesi || "",
+    profesi_detail: p.profesi_detail || p.detail_profesi || "",
+    nama: p.profesi || (p.kode === "PL4" ? "Budaya a-STAR" : p.kode),
+    cpl: cplPl.filter((r) => r.pl === p.kode).map((r => r.cpl)),
+  }));
+
+  // CPL (12 butir: 8 Hard skill, 4 Soft skill)
+  const softCpls = ["CPL09", "CPL10", "CPL11", "CPL12"];
+  const cpl = (data.cpl || []).map((c) => ({
+    ...c,
+    nama: c.uraian || c.nama || c.kode,
+    uraian: c.uraian || c.nama || "",
+    jenis: c.jenis || (softCpls.includes(c.kode) ? "Soft skill" : "Hard skill"),
+    pl: c.pl && c.pl.length ? c.pl : cplPl.filter((r) => r.cpl === c.kode).map((r => r.pl)),
+    bk: c.bk && c.bk.length ? c.bk : cplBk.filter((r) => r.cpl === c.kode).map((r => r.bk)),
+    mk: c.mk && c.mk.length ? c.mk : cplMk.filter((r) => r.cpl === c.kode).map((r => r.mk)),
+  }));
+
+  // BK (19 butir: BK-01 s.d. BK-19)
+  const bk = (data.bahan_kajian || data.bk || []).map((b) => ({
+    ...b,
+    nama: b.nama || b.kode,
+    deskripsi: b.deskripsi || `${b.kategori || ""}${b.referensi ? ` (${b.referensi})` : ""}`,
+    mk: b.mk && b.mk.length ? b.mk : bkMk.filter((r) => r.bk === b.kode).map((r => r.mk)),
+    cpl: b.cpl && b.cpl.length ? b.cpl : cplBk.filter((r) => r.bk === b.kode).map((r => r.cpl)),
+  }));
+
+  // MK (46 mata kuliah, 8 semester, 144 SKS total)
+  const mk = (data.mata_kuliah || data.mk || []).map((m) => {
+    const sem = m.sem ?? m.semester ?? 1;
+    const sksTeori = m.sksTeori ?? m.sks_teori ?? 0;
+    const sksPrak = m.sksPrak ?? ((m.sks_praktik ?? 0) + (m.sks_praktikum ?? 0));
+    const sksTotal = m.sks ?? m.sks_total ?? (sksTeori + sksPrak);
+    const kat = m.kat || (m.kategori && m.kategori.includes("Umum") ? "Umum" : "Inti RPL");
+    const jenis = m.jenis || (m.tipe && m.tipe.includes("Praktek") ? "Praktik" : "Teori");
+    return {
+      ...m,
+      sem,
+      semester: sem,
+      sksTeori,
+      sks_teori: sksTeori,
+      sksPrak,
+      sks_praktik: m.sks_praktik ?? sksPrak,
+      sks_praktikum: m.sks_praktikum ?? 0,
+      sks: sksTotal,
+      sks_total: sksTotal,
+      kat,
+      kategori: m.kategori || (kat === "Umum" ? "Mata Kuliah Umum" : "Mata Kuliah Inti RPL"),
+      jenis,
+      tipe: m.tipe || (jenis === "Praktik" ? "Mata Kuliah Praktek" : "Mata Kuliah Teori"),
+      bk: m.bk && m.bk.length ? m.bk : bkMk.filter((r) => r.mk === m.kode).map((r => r.bk)),
+      cpl: m.cpl && m.cpl.length ? m.cpl : cplMk.filter((r) => r.mk === m.kode).map((r => r.cpl)),
+      cpmk: m.cpmk && m.cpmk.length ? m.cpmk : [...new Set(mkCpmk.filter((r) => r.mk === m.kode).map((r => r.cpmk)))],
+      prasyarat: m.prasyarat || [],
+    };
+  });
+
+  // CPMK (42 butir)
+  const cpmk = (data.cpmk || []).map((c) => ({
+    ...c,
+    nama: c.nama || c.deskripsi || c.kode,
+    deskripsi: c.deskripsi || c.nama || "",
+    mk: c.mk && c.mk.length ? c.mk : [...new Set(mkCpmk.filter((r) => r.cpmk === c.kode).map((r => r.mk)))],
+    sub_cpmk: subCpmkList.filter((s) => s.cpmk === c.kode),
+  }));
+
+  // Initial audit logs dari 17 riwayat perbaikan
+  let logs = data.logs;
+  if (!logs || !logs.length) {
+    logs = (data.riwayat_perbaikan || []).map((note, idx) => {
+      let master = "all";
+      const nLower = note.toLowerCase();
+      if (nLower.includes("mk") || nLower.includes("semester") || note.includes("KRPL") || note.includes("URPL")) master = "mk";
+      else if (nLower.includes("cpl")) master = "cpl";
+      else if (nLower.includes("cpmk")) master = "cpmk";
+      else if (nLower.includes("bk")) master = "bk";
+      else if (nLower.includes("pl")) master = "pl";
+      return {
+        id: `LOG-OBE-${String(idx + 1).padStart(2, "0")}`,
+        timestamp: "02 Nov 2026, 08.08",
+        isoTimestamp: "2026-11-02T08:08:00.000Z",
+        user: "Tim Pengembang Kurikulum",
+        master,
+        aksi: "ubah",
+        kode: `REV-${String(idx + 1).padStart(2, "0")}`,
+        nama: "Penyelarasan Data Kurikulum V1",
+        keterangan: note,
+        changes: [{ field: "kurikulum", label: "Perbaikan Sumber Data", old: "Tabel Excel Kur_OBE.V1", new: "Standardisasi database.json" }],
+        detail: { catatan: note },
+      };
+    });
+  }
+
+  return {
+    ...data,
+    pl,
+    cpl,
+    bk,
+    mk,
+    cpmk,
+    sub_cpmk: subCpmkList,
+    logs,
+  };
+}
+
 async function initDb() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const saved = JSON.parse(raw);
-      if (saved && typeof saved === "object") {
-        Object.assign(db, saved);
+      if (saved && typeof saved === "object" && (saved.mata_kuliah || saved.mk)) {
+        Object.assign(db, hydrateDb(saved));
         render();
         return;
       }
@@ -42,7 +163,7 @@ async function initDb() {
     const res = await fetch("database.json");
     if (res.ok) {
       const data = await res.json();
-      Object.assign(db, data);
+      Object.assign(db, hydrateDb(data));
       saveDb();
     }
   } catch (e) {
@@ -69,6 +190,10 @@ const MENU_GROUPS = [
       {
         id: "cpmk",
         label: "Capaian MK (CPMK)",
+      },
+      {
+        id: "sub_cpmk",
+        label: "Sub-CPMK (170)",
       },
     ],
   },
@@ -146,31 +271,36 @@ const E = {
     group: "Data Master",
     label: "Profil Lulusan (PL)",
     add: "Tambah PL",
-    lead: "Gambaran peran profesional yang akan dijalani lulusan TRPL di dunia kerja. PL merupakan fondasi utama perumusan seluruh CPL.",
+    lead: "Gambaran peran profesional yang akan dijalani lulusan TRPL di dunia kerja (4 Profil Lulusan D4 TRPL). PL merupakan fondasi utama perumusan seluruh CPL.",
     pre: "PL",
     fields: [
-      { k: "kode", l: "Kode PL", h: "Format standar: PL01, PL02, dst." },
-      { k: "nama", l: "Nama Profil Lulusan" },
-      { k: "deskripsi", l: "Deskripsi Profil", t: "area", opt: 1 },
+      { k: "kode", l: "Kode PL", h: "Format standar: PL1, PL2, PL3, PL4." },
+      { k: "deskripsi", l: "Profil Lulusan (PL) Prodi", t: "area" },
+      { k: "profesi", l: "Profesi", opt: 1, h: "Contoh: Associate Software Engineer, Associate AI engineer" },
+      { k: "profesi_detail", l: "Detail Profesi", opt: 1, h: "Contoh: Web developer, back end developer, front end developer, mobile programmer, sistem analis" },
     ],
     cols: [
       "Kode",
-      "Profil Lulusan & Deskripsi",
+      "Profil Lulusan (PL) Prodi",
+      "Profesi",
+      "Detail Profesi",
       "CPL Terkait",
     ],
     row: (r) => {
       const assigned =
         r.cpl ||
-        db.cpl
+        (db.cpl || [])
           .filter((c) => c.pl && c.pl.includes(r.kode))
           .map((c) => c.kode);
       return [
         `<span class="kode">${esc(r.kode)}</span>`,
-        `<b>${esc(r.nama)}</b><br><span class="by">${esc(r.deskripsi)}</span>`,
+        `<span style="line-height:1.5">${esc(r.deskripsi || r.profil_lulusan || "")}</span>`,
+        r.profesi ? `<b>${esc(r.profesi)}</b>` : `<span style="color:var(--text-secondary)">-</span>`,
+        r.profesi_detail ? `<span style="color:var(--text-secondary);font-size:13px;line-height:1.4">${esc(r.profesi_detail)}</span>` : `<span style="color:var(--text-secondary)">-</span>`,
         assigned.length
           ? `<div class="pl-list">${assigned
               .map((c) => {
-                const cpl = db.cpl.find((x) => x.kode === c);
+                const cpl = (db.cpl || []).find((x) => x.kode === c);
                 return `<div class="pl-row"><span class="tag neutral" title="${cpl ? esc(cpl.nama) : ""}">${esc(c)}</span>${cpl ? `<span class="pl-name">${esc(cpl.nama)}</span>` : ""}</div>`;
               })
               .join("")}</div>`
@@ -206,19 +336,18 @@ const E = {
     ],
     cols: [
       "Kode",
-      "Capaian Pembelajaran",
+      "Capaian Pembelajaran Lulusan (CPL)",
       "Jenis",
       "Profil Lulusan (PL)",
     ],
-    filter: ["Jenis", "Hard skill", "Soft skill"],
     row: (r) => [
       `<span class="kode">${esc(r.kode)}</span>`,
-      `<b>${esc(r.nama)}</b>`,
+      `<b>${esc(r.nama || r.uraian)}</b>${r.sumber ? `<br><small style="color:var(--text-secondary)"><b>Rujukan:</b> ${esc(r.sumber.split('\n')[0])}</small>` : ""}`,
       `<span class="tag ${r.jenis === "Hard skill" ? "hard" : "softs"}">${r.jenis}</span>`,
       r.pl && r.pl.length
         ? `<div class="pl-list">${r.pl
             .map((p) => {
-              const pl = db.pl.find((x) => x.kode === p);
+              const pl = (db.pl || []).find((x) => x.kode === p);
               return `<div class="pl-row"><span class="tag neutral">${esc(p)}</span>${pl ? `<span class="pl-name">${esc(pl.nama)}</span>` : ""}</div>`;
             })
             .join("")}</div>`
@@ -232,7 +361,7 @@ const E = {
     lead: "Materi kajian keilmuan yang dibutuhkan untuk mencapai CPL. Sesuai prinsip kurikulum OBE, setiap BK wajib diwadahi oleh minimal 1 Mata Kuliah.",
     pre: "BK",
     fields: [
-      { k: "kode", l: "Kode BK", h: "Format standar: BK01, BK02, dst." },
+      { k: "kode", l: "Kode BK", h: "Format standar: BK-01, BK-02, dst." },
       { k: "nama", l: "Nama Bahan Kajian" },
       { k: "deskripsi", l: "Cakupan Materi", t: "area", opt: 1 },
       {
@@ -251,11 +380,11 @@ const E = {
       const assigned = r.mk || [];
       return [
         `<span class="kode">${esc(r.kode)}</span>`,
-        `<b>${esc(r.nama)}</b><br><span class="by">${esc(r.deskripsi)}</span>`,
+        `<b>${esc(r.nama)}</b>${r.kategori ? ` <span class="tag neutral" style="font-size:10.5px">${esc(r.kategori)}</span>` : ""}<br><span class="by">${esc(r.deskripsi || r.referensi || "")}</span>`,
         assigned.length
           ? `<div class="pl-list">${assigned
               .map((m) => {
-                const mk = db.mk.find((x) => x.kode === m);
+                const mk = (db.mk || []).find((x) => x.kode === m);
                 return `<div class="pl-row"><span class="tag neutral" title="${mk ? esc(mk.nama) : ""}">${esc(m)}</span>${mk ? `<span class="pl-name">${esc(mk.nama)}</span>` : ""}</div>`;
               })
               .join("")}</div>`
@@ -267,7 +396,7 @@ const E = {
     group: "Data Master",
     label: "Mata Kuliah (MK)",
     add: "Tambah MK",
-    lead: "Daftar mata kuliah program studi TRPL lengkap dengan kategori, distribusi SKS (Teori & Praktik), penempatan semester, dan prasyarat.",
+    lead: "Daftar 46 mata kuliah program studi TRPL lengkap dengan kategori, distribusi SKS (Teori & Praktik), penempatan semester 1-8, dan prasyarat.",
     pre: "MK",
     fields: [
       {
@@ -275,9 +404,9 @@ const E = {
         l: "Kategori MK",
         t: "sel",
         o: ["Inti RPL", "Umum"],
-        h: "Awalan kode: krpl untuk Inti RPL, urpl untuk Umum.",
+        h: "Awalan kode: KRPL untuk Inti RPL, URPL untuk Umum, IRPL untuk Magang.",
       },
-      { k: "kode", l: "Kode MK", h: "Format: krpl25xx / urpl25xx." },
+      { k: "kode", l: "Kode MK", h: "Format: KRPL25xx / URPL25xx / IRPL25xx." },
       { k: "nama", l: "Nama Mata Kuliah" },
       { k: "sem", l: "Semester", t: "num", min: 1, max: 8, def: 1 },
       {
@@ -293,7 +422,7 @@ const E = {
         l: "SKS Praktik (P)",
         t: "num",
         min: 0,
-        max: 6,
+        max: 12,
         def: 2,
       },
       {
@@ -317,10 +446,9 @@ const E = {
       "Jenis",
       "Prasyarat",
     ],
-    filter: ["Kategori", "Inti RPL", "Umum"],
     row: (r) => [
       `<span class="kode">${esc(r.kode)}</span>`,
-      `<b>${esc(r.nama)}</b>`,
+      `<b>${esc(r.nama)}</b>${r.nama_en ? `<br><small style="color:var(--text-secondary);font-style:italic">${esc(r.nama_en)}</small>` : ""}`,
       `Sem ${r.sem || 1}`,
       `<span class="tag neutral">${r.kat}</span>`,
       `<b>${(r.sksTeori || 0) + (r.sksPrak || 0)} SKS</b> (${r.sksTeori || 0}T / ${r.sksPrak || 0}P)`,
@@ -336,7 +464,7 @@ const E = {
     group: "Data Master",
     label: "Capaian Pembelajaran Mata Kuliah (CPMK)",
     add: "Tambah CPMK",
-    lead: "Capaian pembelajaran spesifik yang diturunkan dari CPL dan diukur pada mata kuliah tertentu. Penomoran kode terstandarisasi CPMKxx.yy sesuai nomor CPL induk.",
+    lead: "Capaian pembelajaran spesifik yang diturunkan dari CPL dan diukur pada mata kuliah tertentu. Penomoran kode terstandarisasi CPMK.xx.y sesuai nomor CPL induk.",
     pre: "CPMK",
     fields: [
       {
@@ -354,7 +482,7 @@ const E = {
       {
         k: "kode",
         l: "Kode CPMK (Terstandarisasi)",
-        h: "Format standar otomatis: CPMK[NoCPL].[NomorUrut], contoh CPMK02.01",
+        h: "Format standar: CPMK.xx.y, contoh CPMK.01.1",
       },
       { k: "nama", l: "Pernyataan Capaian Mata Kuliah" },
     ],
@@ -363,6 +491,7 @@ const E = {
       "Pernyataan Capaian MK",
       "CPL Induk",
       "Mata Kuliah Pengampu",
+      "Sub-CPMK",
     ],
     row: (r) => {
       const assignedCpl = Array.isArray(r.cpl)
@@ -371,13 +500,14 @@ const E = {
           ? [r.cpl]
           : [];
       const assignedMk = Array.isArray(r.mk) ? r.mk : r.mk ? [r.mk] : [];
+      const subList = r.sub_cpmk || (db.sub_cpmk || []).filter(s => s.cpmk === r.kode);
       return [
         `<span class="kode">${esc(r.kode)}</span>`,
-        `<b>${esc(r.nama)}</b>`,
+        `<b>${esc(r.nama || r.deskripsi)}</b>`,
         assignedCpl.length
           ? `<div class="pl-list">${assignedCpl
               .map((c) => {
-                const cpl = db.cpl.find((x) => x.kode === c);
+                const cpl = (db.cpl || []).find((x) => x.kode === c);
                 return `<div class="pl-row"><span class="tag neutral" title="${cpl ? esc(cpl.nama) : ""}">${esc(c)}</span>${cpl ? `<span class="pl-name">${esc(cpl.nama)}</span>` : ""}</div>`;
               })
               .join("")}</div>`
@@ -385,13 +515,48 @@ const E = {
         assignedMk.length
           ? `<div class="pl-list">${assignedMk
               .map((m) => {
-                const mk = db.mk.find((x) => x.kode === m);
+                const mk = (db.mk || []).find((x) => x.kode === m);
                 return `<div class="pl-row"><span class="tag neutral" title="${mk ? esc(mk.nama) : ""}">${esc(m)}</span>${mk ? `<span class="pl-name">${esc(mk.nama)}</span>` : ""}</div>`;
               })
               .join("")}</div>`
           : `<span class="tag warn">Belum ada MK (Null)</span>`,
+        subList.length
+          ? `<span class="tag neutral" style="background:#eff6ff;color:#1e40af;font-weight:600">${subList.length} Sub-CPMK</span>`
+          : `<span style="color:var(--text-muted)">-</span>`,
       ];
     },
+  },
+  sub_cpmk: {
+    group: "Data Master",
+    label: "Sub-CPMK (Kemampuan Akhir)",
+    add: "Tambah Sub-CPMK",
+    lead: "Kemampuan akhir yang direncanakan pada tiap tahap pembelajaran (170 Sub-CPMK). Dirumuskan berdasarkan CPL dan CPMK, serta mengacu pada unit kompetensi SKKNI.",
+    pre: "Sub-CPMK",
+    fields: [
+      { k: "kode", l: "Kode Sub-CPMK", h: "Format standar: Sub-CPMK.xx.y.z" },
+      { k: "cpl", l: "CPL Induk", t: "sel-cpl" },
+      { k: "cpmk", l: "CPMK Induk" },
+      { k: "deskripsi", l: "Pernyataan Kemampuan Akhir", t: "area" },
+      { k: "unit_skkni", l: "Unit SKKNI Acuan", opt: 1 },
+    ],
+    cols: [
+      "Kode Sub-CPMK",
+      "Kemampuan Akhir (Sub-CPMK)",
+      "CPL & CPMK Induk",
+      "Acuan Unit SKKNI",
+    ],
+
+    row: (r) => [
+      `<span class="kode" style="font-size:12px">${esc(r.kode)}</span>`,
+      `<b>${esc(r.deskripsi || r.nama)}</b>`,
+      `<div class="pl-list">
+        <span class="tag neutral" title="CPL Induk">${esc(r.cpl)}</span>
+        <span class="tag neutral" style="background:#e0f2fe;color:#0369a1" title="CPMK Induk">${esc(r.cpmk)}</span>
+      </div>`,
+      r.unit_skkni
+        ? `<span class="tag hard" style="font-size:11px" title="Unit SKKNI">${esc(r.unit_skkni)}</span>`
+        : `<span style="color:var(--text-muted);font-size:11px">-</span>`,
+    ],
   },
 };
 
@@ -485,6 +650,12 @@ const MASTER_META = {
     short: "CPMK",
     badge: "CPMK",
     desc: "Capaian Pembelajaran Mata Kuliah (CPMK)",
+  },
+  sub_cpmk: {
+    name: "Sub-CPMK (Kemampuan Akhir)",
+    short: "Sub-CPMK",
+    badge: "Sub-CPMK",
+    desc: "Kemampuan akhir tahapan pembelajaran (Sub-CPMK)",
   },
 };
 
@@ -624,6 +795,9 @@ function getFieldLabel(t, k) {
     bk: "Bahan Kajian Terkait",
     mk: "Mata Kuliah Terkait",
     cpl: "CPL Terkait",
+    cpmk: "CPMK Induk",
+    unit_skkni: "Unit SKKNI",
+    profesi_detail: "Rincian Jabatan",
   };
   return labels[k] || k;
 }
@@ -738,32 +912,31 @@ function renderMaster(t, q) {
   }
 
   const f = $("flt");
-  if (e.filter) {
-    f.hidden = false;
-    if (f.dataset.t !== t) {
-      f.dataset.t = t;
-      f.innerHTML =
-        `<option value="">Semua ${e.filter[0].toLowerCase()}</option>` +
-        e.filter
-          .slice(1)
-          .map((o) => `<option>${o}</option>`)
-          .join("");
-    }
-  } else {
+  if (f) {
     f.hidden = true;
-    f.value = "";
-    f.dataset.t = "";
+    f.style.display = "none";
   }
 
-  const fv = f.hidden ? "" : f.value;
-  const key = t === "cpl" ? "jenis" : "kat";
-  const rows = db[t]
+  const rows = (db[t] || [])
     .map((r, i) => [r, i])
     .filter(
       ([r]) =>
-        (!q ||
-          (r.kode + " " + (r.nama || "")).toLowerCase().includes(q)) &&
-        (!fv || r[key] === fv),
+        !q ||
+        (
+          r.kode +
+          " " +
+          (r.nama || "") +
+          " " +
+          (r.deskripsi || "") +
+          " " +
+          (r.profesi || "") +
+          " " +
+          (r.profesi_detail || "") +
+          " " +
+          (r.unit_skkni || "")
+        )
+          .toLowerCase()
+          .includes(q),
     );
 
   $("view-container").innerHTML = `
@@ -783,7 +956,7 @@ function renderMaster(t, q) {
     .join("")}</tbody>
 </table>
 </div>
-<div id="empty">${rows.length ? "" : `<div class="empty"><b>${q || fv ? "Tidak ada data yang cocok" : "Belum ada data"}</b><br>${q || fv ? "Ubah kata kunci pencarian atau filter." : "Klik “" + e.add + "” untuk mulai mengisi."}</div>`}</div>
+<div id="empty">${rows.length ? "" : `<div class="empty"><b>${q ? "Tidak ada data yang cocok" : "Belum ada data"}</b><br>${q ? "Ubah kata kunci pencarian." : "Klik “" + e.add + "” untuk mulai mengisi."}</div>`}</div>
 <div class="foot" id="foot">Menampilkan ${rows.length} dari ${db[t].length} data</div>
 `;
 }
@@ -821,7 +994,7 @@ function renderLogPage(activeTab) {
   const editCount = scopedLogs.filter((l) => l.aksi === "ubah").length;
   const delCount = scopedLogs.filter((l) => l.aksi === "hapus").length;
 
-  const masterKeys = ["all", "pl", "cpl", "bk", "mk", "cpmk"];
+  const masterKeys = ["all", "pl", "cpl", "bk", "mk", "cpmk", "sub_cpmk"];
   const masterCounts = {
     all: allLogs.length,
     pl: allLogs.filter((l) => l.master === "pl").length,
@@ -829,6 +1002,7 @@ function renderLogPage(activeTab) {
     bk: allLogs.filter((l) => l.master === "bk").length,
     mk: allLogs.filter((l) => l.master === "mk").length,
     cpmk: allLogs.filter((l) => l.master === "cpmk").length,
+    sub_cpmk: allLogs.filter((l) => l.master === "sub_cpmk").length,
   };
 
   // Render Header: Stats Cards & Segmented Master Tabs
@@ -909,69 +1083,12 @@ function renderLogPage(activeTab) {
 
   $("view-container").innerHTML = `
     <div class="log-toolbar">
-      <div class="log-search-box">
+      <div class="log-search-box" style="flex:1">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/>
         </svg>
         <input id="log-q" type="search" placeholder="Cari kode, nama, user, atau keterangan..." value="${esc(logSearchQuery)}" aria-label="Cari Log">
       </div>
-
-      <select class="log-select" id="log-flt-action" aria-label="Filter Aksi">
-        <option value="">Semua Aksi</option>
-        <option value="tambah" ${logActionFilter === "tambah" ? "selected" : ""}>Tambah Data</option>
-        <option value="ubah" ${logActionFilter === "ubah" ? "selected" : ""}>Ubah Data</option>
-        <option value="hapus" ${logActionFilter === "hapus" ? "selected" : ""}>Hapus Data</option>
-      </select>
-
-      <select class="log-select" id="log-flt-user" aria-label="Filter Pengguna">
-        <option value="">Semua Pengguna</option>
-        ${[...new Set(allLogs.map((l) => l.user))]
-          .map(
-            (u) =>
-              `<option value="${esc(u)}" ${logUserFilter === u ? "selected" : ""}>${esc(u)}</option>`,
-          )
-          .join("")}
-      </select>
-
-      <div class="log-time-select-wrap">
-        <select class="log-select" id="log-flt-time" aria-label="Filter Waktu">
-          <option value="all" ${logTimeFilter === "all" ? "selected" : ""}>Semua Waktu</option>
-          <option value="today" ${logTimeFilter === "today" ? "selected" : ""}>Hari Ini</option>
-          <option value="yesterday" ${logTimeFilter === "yesterday" ? "selected" : ""}>Kemarin</option>
-          <option value="last7" ${logTimeFilter === "last7" ? "selected" : ""}>7 Hari Terakhir</option>
-          <option value="last30" ${logTimeFilter === "last30" ? "selected" : ""}>30 Hari Terakhir</option>
-          <option value="thisMonth" ${logTimeFilter === "thisMonth" ? "selected" : ""}>Bulan Ini</option>
-          <option value="custom" ${logTimeFilter === "custom" ? "selected" : ""}>Rentang Tanggal Kustom...</option>
-        </select>
-      </div>
-
-      <div class="log-date-range" id="log-date-range-wrap" style="${logTimeFilter === "custom" ? "display:inline-flex;" : "display:none;"}">
-        <div class="log-date-group">
-          <span class="log-date-label">Dari:</span>
-          <input type="date" id="log-date-start" class="log-date-input" value="${esc(logDateStart)}" aria-label="Dari Tanggal">
-        </div>
-        <span class="log-date-sep">&ndash;</span>
-        <div class="log-date-group">
-          <span class="log-date-label">Sampai:</span>
-          <input type="date" id="log-date-end" class="log-date-input" value="${esc(logDateEnd)}" aria-label="Sampai Tanggal">
-        </div>
-        <button type="button" class="log-date-clear-btn" id="log-btn-clear-date" title="Kosongkan tanggal" style="${logDateStart || logDateEnd ? "display:inline-flex;" : "display:none;"}">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-
-      <select class="log-select" id="log-flt-sort" aria-label="Urutan Waktu">
-        <option value="desc" ${logSortOrder === "desc" ? "selected" : ""}>Waktu: Terbaru &darr;</option>
-        <option value="asc" ${logSortOrder === "asc" ? "selected" : ""}>Waktu: Terlama &uarr;</option>
-      </select>
-
-      <button class="log-reset-btn" id="log-btn-reset" style="${hasFilter ? "display:inline-flex;" : "display:none;"}">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-        Reset Filter
-      </button>
     </div>
 
     <div id="log-table-area"></div>
@@ -990,8 +1107,6 @@ function renderLogTable() {
   const timeRange = getLogTimeFilterRange(logTimeFilter, logDateStart, logDateEnd);
 
   const filtered = scopedLogs.filter((l) => {
-    if (logActionFilter && l.aksi !== logActionFilter) return false;
-    if (logUserFilter && l.user !== logUserFilter) return false;
     if (logSearchQuery) {
       const qStr = (
         l.id +
@@ -1009,13 +1124,6 @@ function renderLogTable() {
         (l.at || "")
       ).toLowerCase();
       if (!qStr.includes(logSearchQuery)) return false;
-    }
-    if (timeRange) {
-      const logDate = parseLogDate(l.at);
-      if (logDate) {
-        if (timeRange.start && logDate < timeRange.start) return false;
-        if (timeRange.end && logDate > timeRange.end) return false;
-      }
     }
     return true;
   });
@@ -1287,7 +1395,7 @@ function renderMatrixCplPl() {
   $("bar").style.display = "none";
 
   const allCpl = db.cpl || [];
-  const allPl = db.pl || [];
+  const allPl = (db.pl || []).filter(p => !String(p.kode).includes("ALT"));
 
   // Overall metrics calculation
   let totalActiveLinks = 0;
@@ -1419,31 +1527,7 @@ function renderMatrixCplPl() {
             />
           </div>
 
-          <select id="matrix-flt-jenis" class="matrix-select" aria-label="Filter Jenis CPL">
-            <option value="all" ${matrixJenisFilter === "all" ? "selected" : ""}>Semua Jenis (${allCpl.length})</option>
-            <option value="Hard skill" ${matrixJenisFilter === "Hard skill" ? "selected" : ""}>Khusus Hard skill</option>
-            <option value="Soft skill" ${matrixJenisFilter === "Soft skill" ? "selected" : ""}>Khusus Soft skill</option>
-          </select>
 
-          <select id="matrix-flt-status" class="matrix-select" aria-label="Filter Status Relasi">
-            <option value="all" ${matrixStatusFilter === "all" ? "selected" : ""}>Semua Status Pemetaan</option>
-            <option value="mapped" ${matrixStatusFilter === "mapped" ? "selected" : ""}>Hanya Yang Terpetakan</option>
-            <option value="unmapped" ${matrixStatusFilter === "unmapped" ? "selected" : ""}>Belum Terpetakan (0 PL)</option>
-          </select>
-
-          ${
-            hasFilter
-              ? `
-            <button class="matrix-btn-tool" id="matrix-btn-reset" title="Reset filter dan pencarian">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                <path d="M3 3v5h5"></path>
-              </svg>
-              Reset Filter
-            </button>
-          `
-              : ""
-          }
         </div>
 
         <div class="matrix-toolbar-right">
@@ -2326,19 +2410,7 @@ function renderMatrixCplBk() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input id="matrix-cpl-bk-q" type="search" placeholder="Cari CPL..." value="${esc(matrixCplBkSearch)}" aria-label="Cari CPL" />
           </div>
-          <select id="matrix-cpl-bk-flt-jenis" class="matrix-select">
-            <option value="all" ${matrixCplBkJenisFilter === "all" ? "selected" : ""}>Semua Jenis (${allCpl.length})</option>
-            <option value="Hard skill" ${matrixCplBkJenisFilter === "Hard skill" ? "selected" : ""}>Khusus Hard skill</option>
-            <option value="Soft skill" ${matrixCplBkJenisFilter === "Soft skill" ? "selected" : ""}>Khusus Soft skill</option>
-          </select>
-          <select id="matrix-cpl-bk-flt-status" class="matrix-select">
-            <option value="all" ${matrixCplBkStatusFilter === "all" ? "selected" : ""}>Semua Status Pemetaan</option>
-            <option value="mapped" ${matrixCplBkStatusFilter === "mapped" ? "selected" : ""}>Hanya Yang Terpetakan</option>
-            <option value="unmapped" ${matrixCplBkStatusFilter === "unmapped" ? "selected" : ""}>Belum Terpetakan</option>
-          </select>
-          ${(matrixCplBkSearch || matrixCplBkJenisFilter !== "all" || matrixCplBkStatusFilter !== "all") ? `
-            <button class="matrix-btn-tool" id="matrix-cpl-bk-btn-reset">Reset Filter</button>
-          ` : ""}
+
         </div>
         <div class="matrix-toolbar-right">
           <button type="button" id="matrix-cpl-bk-toggle-mode" class="matrix-mode-badge ${matrixCplBkInteractive ? "active" : ""}">
@@ -2470,7 +2542,7 @@ function renderMatrixBkMk() {
   });
 
   const filteredMkCols = allMk.filter((m) => {
-    if (matrixBkMkSemFilter !== "all" && String(m.sem) !== matrixBkMkSemFilter) return false;
+    // Filter dropdowns removed
     return true;
   });
 
@@ -2531,23 +2603,7 @@ function renderMatrixBkMk() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input id="matrix-bk-mk-q" type="search" placeholder="Cari BK..." value="${esc(matrixBkMkSearch)}" aria-label="Cari BK" />
           </div>
-          <select id="matrix-bk-mk-flt-sem" class="matrix-select">
-            <option value="all" ${matrixBkMkSemFilter === "all" ? "selected" : ""}>Semua Kolom MK (${allMk.length})</option>
-            <option value="1" ${matrixBkMkSemFilter === "1" ? "selected" : ""}>Semester 1</option>
-            <option value="2" ${matrixBkMkSemFilter === "2" ? "selected" : ""}>Semester 2</option>
-            <option value="3" ${matrixBkMkSemFilter === "3" ? "selected" : ""}>Semester 3</option>
-            <option value="4" ${matrixBkMkSemFilter === "4" ? "selected" : ""}>Semester 4</option>
-            <option value="5" ${matrixBkMkSemFilter === "5" ? "selected" : ""}>Semester 5</option>
-            <option value="6" ${matrixBkMkSemFilter === "6" ? "selected" : ""}>Semester 6</option>
-          </select>
-          <select id="matrix-bk-mk-flt-status" class="matrix-select">
-            <option value="all" ${matrixBkMkStatusFilter === "all" ? "selected" : ""}>Semua Status Kemasan</option>
-            <option value="mapped" ${matrixBkMkStatusFilter === "mapped" ? "selected" : ""}>Sudah Dikemas (>= 1 MK)</option>
-            <option value="orphan" ${matrixBkMkStatusFilter === "orphan" ? "selected" : ""}>Orphan BK (0 MK)</option>
-          </select>
-          ${(matrixBkMkSearch || matrixBkMkSemFilter !== "all" || matrixBkMkStatusFilter !== "all") ? `
-            <button class="matrix-btn-tool" id="matrix-bk-mk-btn-reset">Reset Filter</button>
-          ` : ""}
+
         </div>
         <div class="matrix-toolbar-right">
           <button type="button" id="matrix-bk-mk-toggle-mode" class="matrix-mode-badge ${matrixBkMkInteractive ? "active" : ""}">
@@ -2680,12 +2736,12 @@ function renderMatrixCplMk() {
       const term = (c.kode + " " + (c.nama || "")).toLowerCase();
       if (!term.includes(matrixCplMkSearch)) return false;
     }
-    if (matrixCplMkJenisFilter !== "all" && c.jenis !== matrixCplMkJenisFilter) return false;
+    // Filter dropdowns removed
     return true;
   });
 
   const filteredMkCols = allMk.filter((m) => {
-    if (matrixCplMkSemFilter !== "all" && String(m.sem) !== matrixCplMkSemFilter) return false;
+    // Filter dropdowns removed
     return true;
   });
 
@@ -2746,23 +2802,7 @@ function renderMatrixCplMk() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input id="matrix-cpl-mk-q" type="search" placeholder="Cari CPL..." value="${esc(matrixCplMkSearch)}" aria-label="Cari CPL" />
           </div>
-          <select id="matrix-cpl-mk-flt-jenis" class="matrix-select">
-            <option value="all" ${matrixCplMkJenisFilter === "all" ? "selected" : ""}>Semua Jenis CPL (${allCpl.length})</option>
-            <option value="Hard skill" ${matrixCplMkJenisFilter === "Hard skill" ? "selected" : ""}>Hard skill</option>
-            <option value="Soft skill" ${matrixCplMkJenisFilter === "Soft skill" ? "selected" : ""}>Soft skill</option>
-          </select>
-          <select id="matrix-cpl-mk-flt-sem" class="matrix-select">
-            <option value="all" ${matrixCplMkSemFilter === "all" ? "selected" : ""}>Semua Semester MK (${allMk.length})</option>
-            <option value="1" ${matrixCplMkSemFilter === "1" ? "selected" : ""}>Semester 1</option>
-            <option value="2" ${matrixCplMkSemFilter === "2" ? "selected" : ""}>Semester 2</option>
-            <option value="3" ${matrixCplMkSemFilter === "3" ? "selected" : ""}>Semester 3</option>
-            <option value="4" ${matrixCplMkSemFilter === "4" ? "selected" : ""}>Semester 4</option>
-            <option value="5" ${matrixCplMkSemFilter === "5" ? "selected" : ""}>Semester 5</option>
-            <option value="6" ${matrixCplMkSemFilter === "6" ? "selected" : ""}>Semester 6</option>
-          </select>
-          ${(matrixCplMkSearch || matrixCplMkJenisFilter !== "all" || matrixCplMkSemFilter !== "all") ? `
-            <button class="matrix-btn-tool" id="matrix-cpl-mk-btn-reset">Reset Filter</button>
-          ` : ""}
+
         </div>
         <div class="matrix-toolbar-right">
           <button type="button" id="matrix-cpl-mk-toggle-mode" class="matrix-mode-badge ${matrixCplMkInteractive ? "active" : ""}">
@@ -3119,7 +3159,7 @@ function renderSusunanMk() {
   const prakPct = totalSks ? Math.round((totalSksPrak / totalSks) * 100) : 0;
   const teoriPct = 100 - prakPct;
 
-  const semesters = [1, 2, 3, 4, 5, 6];
+  const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
   const activeSemesters = susunanSemFilter === "all" ? semesters : [parseInt(susunanSemFilter, 10)];
 
   $("view-container").innerHTML = `
@@ -3152,9 +3192,9 @@ function renderSusunanMk() {
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
           </div>
           <div class="matrix-stat-info">
-            <span class="matrix-stat-val">~19.3 SKS</span>
+            <span class="matrix-stat-val">18.0 SKS</span>
             <span class="matrix-stat-label">Rerata Beban Semester</span>
-            <span class="matrix-stat-sub">Beban studi seimbang 6 semester</span>
+            <span class="matrix-stat-sub">Beban studi seimbang 8 semester (D4)</span>
           </div>
         </div>
 
@@ -3203,11 +3243,13 @@ function renderSusunanMk() {
 
           const semNames = {
             1: "Tahap Fondasi: Logika, Algoritma & Rekayasa Dasar",
-            2: "Tahap Penguatan: Object-Oriented & Basis Data Lanjut",
-            3: "Tahap Penerapan: Web Enterprise, Mobile & QA Testing",
-            4: "Tahap Skalabilitas: DevOps, Keamanan Sistem & AI Automation",
-            5: "Tahap Industri: Magang Terstruktur Industri (Co-op)",
-            6: "Tahap Mandiri: Proyek Akhir & Uji Sertifikasi Profesi"
+            2: "Tahap Penguatan: Pemrograman Berorientasi Objek & Basis Data",
+            3: "Tahap Penerapan: Web, Mobile, Jaringan & Gudang Data",
+            4: "Tahap Lanjutan: DevOps, Keamanan, QA Testing & UI/UX",
+            5: "Tahap Keahlian: Kecerdasan Buatan (AI), Big Data & Cloud",
+            6: "Tahap Integrasi: NLP, Visi Komputer & Sistem Cerdas",
+            7: "Tahap Industri: Magang Terstruktur Industri (Co-op / Internship)",
+            8: "Tahap Profesional: Proyek Tingkat Akhir (PTA) & Sertifikasi Profesi"
           };
 
           return `
@@ -3311,7 +3353,7 @@ function renderOrganisasiMk() {
   $("bar").style.display = "none";
 
   const allMk = db.mk || [];
-  const semesters = [1, 2, 3, 4, 5, 6];
+  const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
 
   let selectedPrereqs = [];
   let selectedDependents = [];
@@ -3432,14 +3474,14 @@ function renderPemenuhanCpl() {
 
   const allCpl = db.cpl || [];
   const allMk = db.mk || [];
-  const semesters = [1, 2, 3, 4, 5, 6];
+  const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
 
   const filteredCpl = allCpl.filter(c => {
     if (pemenuhanSearch) {
       const term = (c.kode + " " + (c.nama || "")).toLowerCase();
       if (!term.includes(pemenuhanSearch)) return false;
     }
-    if (pemenuhanJenisFilter !== "all" && c.jenis !== pemenuhanJenisFilter) return false;
+    // Filter dropdowns removed
     return true;
   });
 
@@ -3484,9 +3526,9 @@ function renderPemenuhanCpl() {
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
           </div>
           <div class="matrix-stat-info">
-            <span class="matrix-stat-val">Semester 5 &ndash; 6</span>
-            <span class="matrix-stat-label">Tahap Pengujian Nyata</span>
-            <span class="matrix-stat-sub">Magang Co-op &amp; Proyek Akhir</span>
+            <span class="matrix-stat-val">Semester 7 &ndash; 8</span>
+            <span class="matrix-stat-label">Tahap Magang &amp; PTA</span>
+            <span class="matrix-stat-sub">Magang Industri Co-op &amp; Proyek Akhir</span>
           </div>
         </div>
       </div>
@@ -3497,11 +3539,7 @@ function renderPemenuhanCpl() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input id="pemenuhan-q" type="search" placeholder="Cari CPL..." value="${esc(pemenuhanSearch)}" />
           </div>
-          <select id="pemenuhan-flt-jenis" class="matrix-select">
-            <option value="all" ${pemenuhanJenisFilter === "all" ? "selected" : ""}>Semua Jenis CPL (${allCpl.length})</option>
-            <option value="Hard skill" ${pemenuhanJenisFilter === "Hard skill" ? "selected" : ""}>Hard skill</option>
-            <option value="Soft skill" ${pemenuhanJenisFilter === "Soft skill" ? "selected" : ""}>Soft skill</option>
-          </select>
+
         </div>
       </div>
 
@@ -3603,7 +3641,7 @@ function renderCplCpmkMk() {
   });
 
   const filteredCpl = allCpl.filter(c => {
-    if (cpmkCplFilter !== "all" && c.kode !== cpmkCplFilter) return false;
+    // Filter dropdowns removed
     return true;
   });
 
@@ -3661,16 +3699,13 @@ function renderCplCpmkMk() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input id="cpmk-decomp-q" type="search" placeholder="Cari CPMK / Sub-CPMK / MK..." value="${esc(cpmkSearch)}" />
           </div>
-          <select id="cpmk-decomp-flt-cpl" class="matrix-select">
-            <option value="all" ${cpmkCplFilter === "all" ? "selected" : ""}>Semua CPL Induk (${allCpl.length})</option>
-            ${allCpl.map(c => `<option value="${esc(c.kode)}" ${cpmkCplFilter === c.kode ? "selected" : ""}>${esc(c.kode)}</option>`).join("")}
-          </select>
+
         </div>
       </div>
 
       <div class="cpl-cpmk-wrap">
         ${filteredCpl.map(cpl => {
-          let cpmkList = allCpmk.filter(cp => (cp.cpl || []).includes(cpl.kode));
+          let cpmkList = allCpmk.filter(cp => (Array.isArray(cp.cpl) ? cp.cpl.includes(cpl.kode) : cp.cpl === cpl.kode));
           if (cpmkSearch) {
             const q = cpmkSearch.toLowerCase();
             cpmkList = cpmkList.filter(cp => {
@@ -3679,7 +3714,7 @@ function renderCplCpmkMk() {
             });
           }
 
-          if (cpmkList.length === 0 && (cpmkSearch || cpmkCplFilter !== "all")) return "";
+          if (cpmkList.length === 0 && cpmkSearch) return "";
 
           return `
             <div class="cpl-cpmk-card">
@@ -3726,7 +3761,8 @@ function renderCplCpmkMk() {
                           ${subList.map(s => `
                             <li class="subcpmk-row">
                               <span class="subcpmk-code">${esc(s.kode)}:</span>
-                              <span>${esc(s.nama)}</span>
+                              <span>${esc(s.nama || s.deskripsi)}</span>
+                              ${s.unit_skkni ? `<span class="tag hard" style="font-size:10px;margin-left:6px">${esc(s.unit_skkni)}</span>` : ""}
                             </li>
                           `).join("")}
                         </ul>
@@ -3762,7 +3798,7 @@ function renderCpmkSemester() {
 
   const allMk = db.mk || [];
   const allCpmk = db.cpmk || [];
-  const semesters = [1, 2, 3, 4, 5, 6];
+  const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
 
   let semMks = allMk.filter(m => m.sem === cpmkSemActive);
   if (cpmkSemSearch) {
@@ -3832,7 +3868,7 @@ function renderCpmkSemester() {
                   <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px">
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px">
                       <span class="cpmk-code-pill" style="font-size:11px;padding:2px 6px">${esc(cp.kode)}</span>
-                      <span style="font-size:11px;color:var(--text-muted)">Induk: ${(cp.cpl || []).join(", ")}</span>
+                      <span style="font-size:11px;color:var(--text-muted)">Induk: ${Array.isArray(cp.cpl) ? cp.cpl.join(", ") : cp.cpl}</span>
                     </div>
                     <div style="font-size:12.5px;font-weight:600;color:var(--text);line-height:1.35;margin-bottom:6px">
                       ${esc(cp.nama)}
@@ -3840,7 +3876,7 @@ function renderCpmkSemester() {
                     ${(cp.sub_cpmk && cp.sub_cpmk.length) ? `
                       <div style="font-size:11px;color:var(--text-secondary);border-top:1px dashed #e2e8f0;padding-top:6px;display:flex;flex-direction:column;gap:3px">
                         ${cp.sub_cpmk.map(s => `
-                          <div>&bull; <b>${esc(s.kode)}:</b> ${esc(s.nama)}</div>
+                          <div>&bull; <b>${esc(s.kode)}:</b> ${esc(s.nama || s.deskripsi)}${s.unit_skkni ? ` <span class="tag hard" style="font-size:10px;padding:0 4px">${esc(s.unit_skkni)}</span>` : ""}</div>
                         `).join("")}
                       </div>
                     ` : ""}
@@ -3981,6 +4017,15 @@ function showForm(i) {
       init.pl = [];
       init.bk = [];
       init.mk = [];
+    } else if (tab === "sub_cpmk") {
+      const defaultCpl = db.cpl[0] ? db.cpl[0].kode : "CPL01";
+      const relatedCpmk = (db.cpmk || []).find(c => c.cpl === defaultCpl);
+      init.cpl = defaultCpl;
+      init.cpmk = relatedCpmk ? relatedCpmk.kode : "CPMK.01.1";
+      const count = (db.sub_cpmk || []).length + 1;
+      init.kode = `Sub-CPMK.${defaultCpl.replace(/\D/g, "")}.1.${count}`;
+      init.deskripsi = "";
+      init.unit_skkni = "";
     } else {
       init.kode = nextCode(tab, e.pre);
     }
@@ -4151,7 +4196,7 @@ function save() {
     err.mk =
       "Peringatan Kurikulum: Bahan Kajian tidak boleh null MK. Pilih minimal satu mata kuliah pengampu.";
   }
-  if (tab === "cpmk" && !err.kode && !/^CPMK\d{2}\.\d{2}$/.test(o.kode)) {
+  if (tab === "cpmk" && !err.kode && !/^CPMK[\.\d]\d{2}\.[\d\.]+$/i.test(o.kode)) {
     err.kode =
       "Format kode CPMK harus terstandarisasi, contoh: CPMK01.01 atau CPMK02.02";
   }
@@ -4232,8 +4277,11 @@ function askDel(i) {
     used = db.cpl.filter((c) => (c.pl || []).includes(r.kode)).length;
     reason = `masih dipakai oleh ${used} CPL. Hapus atau alihkan relasi CPL tersebut lebih dahulu agar data tetap konsisten.`;
   } else if (tab === "cpl") {
-    used = db.cpmk.filter((c) => c.cpl === r.kode).length;
+    used = (db.cpmk || []).filter((c) => c.cpl === r.kode).length;
     reason = `masih menjadi induk dari ${used} CPMK. Hapus CPMK turunannya lebih dahulu.`;
+  } else if (tab === "cpmk") {
+    used = (db.sub_cpmk || []).filter((s) => s.cpmk === r.kode).length;
+    reason = `masih menjadi induk dari ${used} Sub-CPMK. Hapus Sub-CPMK turunannya lebih dahulu.`;
   } else if (tab === "mk") {
     used = db.cpmk.filter((c) => c.mk === r.kode).length;
     reason = `masih mengampu ${used} CPMK. Ubah atau hapus CPMK terkait lebih dahulu.`;
@@ -4570,7 +4618,7 @@ document.addEventListener("mouseout", (ev) => {
 });
 
 $("q").addEventListener("input", render);
-$("flt").addEventListener("change", render);
+if ($("flt")) $("flt").addEventListener("change", render);
 $("modal").addEventListener("submit", (ev) => {
   ev.preventDefault();
   save();
