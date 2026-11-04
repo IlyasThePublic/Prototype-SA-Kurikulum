@@ -2700,7 +2700,7 @@ button.kapsul-sub_cpmk:hover {
    ENHANCED STYLES FOR ALL 11 OBE CURRICULUM OUTPUTS
    ========================================================== */
 
-/* 1. Matrix Column Headers & Cells for BK & MK */
+/* 1. Matrix Column Headers & Cells for BK, MK & CPL */
 .matrix-table th.th-bk,
 .matrix-table th.th-mk {
   width: 58px;
@@ -2710,12 +2710,21 @@ button.kapsul-sub_cpmk:hover {
   padding: 6px 3px;
 }
 
+.matrix-table th.th-cpl {
+  width: 90px;
+  min-width: 80px;
+  text-align: center;
+  padding: 6px 3px;
+}
+
 .matrix-table th.th-bk.col-hover,
-.matrix-table th.th-mk.col-hover {
+.matrix-table th.th-mk.col-hover,
+.matrix-table th.th-cpl.col-hover {
   background: #e0f2fe !important;
   color: var(--primary) !important;
 }
 
+.cpl-head-btn,
 .bk-head-btn,
 .mk-head-btn {
   background: transparent;
@@ -2733,10 +2742,23 @@ button.kapsul-sub_cpmk:hover {
   transition: all 0.15s ease;
 }
 
+.cpl-head-btn:hover,
 .bk-head-btn:hover,
 .mk-head-btn:hover {
   background: #eff6ff;
   border-color: #bfdbfe;
+}
+
+.cpl-head-code {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  border: 1px solid #bae6fd;
 }
 
 .bk-head-code {
@@ -2761,6 +2783,19 @@ button.kapsul-sub_cpmk:hover {
   font-size: 11px;
   letter-spacing: 0.01em;
   border: 1px solid #bbf7d0;
+}
+
+.matrix-tripartit-cell {
+  padding: 8px 4px !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+}
+
+.matrix-tripartit-cell .kapsul-group {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
 }
 
 .mk-sem-tag {

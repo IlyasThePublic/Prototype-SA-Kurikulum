@@ -34,6 +34,7 @@ function hydrateDb(data) {
   const cplBk = rel.cpl_bk || [];
   const bkMk = rel.bk_mk || [];
   const cplMk = rel.cpl_mk || [];
+  const bkCplMk = rel.bk_cpl_mk || [];
   const mkCpmk = rel.mk_cpmk || [];
   const subCpmkList = (data.sub_cpmk || []).map((s) => ({
     ...s,
@@ -145,6 +146,7 @@ function hydrateDb(data) {
     mk,
     cpmk,
     sub_cpmk: subCpmkList,
+    bk_cpl_mk: bkCplMk,
     logs,
   };
 }
@@ -2175,7 +2177,7 @@ let matrixCplMkJenisFilter = "all";
 let matrixCplMkInteractive = false;
 let matrixCplMkHoverCol = null;
 
-let tripartitView = "bk";
+let tripartitView = "matrix";
 let tripartitSearch = "";
 let tripartitStatusFilter = "all";
 
@@ -2501,6 +2503,9 @@ function renderMatrixBkCplMk() {
       <div class="matrix-toolbar">
         <div class="matrix-toolbar-left">
           <div class="tripartit-tabs">
+            <button type="button" class="tripartit-tab-btn ${tripartitView === "matrix" ? "active" : ""}" data-tripartit-tab="matrix">
+              Matriks 2D (BK &times; CPL &rarr; MK)
+            </button>
             <button type="button" class="tripartit-tab-btn ${tripartitView === "bk" ? "active" : ""}" data-tripartit-tab="bk">
               Tinjauan per Bahan Kajian (BK)
             </button>
@@ -2510,18 +2515,23 @@ function renderMatrixBkCplMk() {
           </div>
           <div class="matrix-search" style="margin-left:8px">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input id="tripartit-q" type="search" placeholder="Cari kode/nama..." value="${esc(tripartitSearch)}" />
+            <input id="tripartit-q" type="search" placeholder="Cari kode/nama/MK..." value="${esc(tripartitSearch)}" />
           </div>
         </div>
       </div>
 
       <div class="matrix-scroll-wrap" style="border:1px solid var(--border);border-radius:12px;background:#fff">
-        ${tripartitView === "bk" ? renderTripartitBkView(allBk, allCpl, allMk) : renderTripartitMkView(allMk, allBk, allCpl)}
+        ${tripartitView === "matrix"
+          ? renderTripartitMatrixView(allBk, allCpl, allMk)
+          : tripartitView === "bk"
+          ? renderTripartitBkView(allBk, allCpl, allMk)
+          : renderTripartitMkView(allMk, allBk, allCpl)
+        }
       </div>
 
       <div class="matrix-guide-card">
         <div style="font-size:12.5px;color:var(--text);font-weight:600;margin-bottom:4px">
-          Kaidah Baku Integrasi Tripartit Kurikulum OBE (Sheet 5-6-7):
+          Kaidah Baku Integrasi Tripartit Kurikulum OBE (Sheet 5-6-7-8):
         </div>
         <div style="font-size:12px;color:var(--text-secondary);line-height:1.5">
           1. <b>Bahan Kajian Wajib Dikemas:</b> Setiap Bahan Kajian wajib terwadahi minimal pada 1 Mata Kuliah (aturan: <code>validasi tidak boleh null</code>).<br>
@@ -2530,6 +2540,98 @@ function renderMatrixBkCplMk() {
         </div>
       </div>
     </div>
+  `;
+}
+
+function renderTripartitMatrixView(allBk, allCpl, allMk) {
+  const triples = (db.relasi && db.relasi.bk_cpl_mk) || db.bk_cpl_mk || [];
+  const tripleMap = new Map();
+  triples.forEach((t) => {
+    const key = `${t.bk}|${t.cpl}`;
+    if (!tripleMap.has(key)) tripleMap.set(key, []);
+    tripleMap.get(key).push(t.mk);
+  });
+
+  const filtered = allBk.filter((b) => {
+    if (tripartitSearch) {
+      const term = (b.kode + " " + (b.nama || "")).toLowerCase();
+      const hasMk = (b.mk || []).some((m) => String(m).toLowerCase().includes(tripartitSearch));
+      if (!term.includes(tripartitSearch) && !hasMk) return false;
+    }
+    return true;
+  });
+
+  return `
+    <table class="matrix-table view-only">
+      <thead>
+        <tr>
+          <th class="th-cpl-code" scope="col">Kode BK</th>
+          <th class="th-cpl-name" scope="col">Bahan Kajian</th>
+          ${allCpl.map((c) => {
+            const cplTriples = triples.filter((t) => t.cpl === c.kode);
+            return `
+              <th class="th-col th-cpl" data-col="${esc(c.kode)}" scope="col">
+                <button
+                  type="button"
+                  class="cpl-head-btn"
+                  data-matrix-cpl-info="${esc(c.kode)}"
+                  title="Klik untuk melihat detail: ${esc(c.kode)} &bull; ${esc(c.nama || c.uraian || '')}"
+                >
+                  <span class="cpl-head-code">${esc(c.kode)}</span>
+                  <span class="matrix-tf-pill ${cplTriples.length > 0 ? "" : "empty"}">${cplTriples.length} MK</span>
+                </button>
+              </th>
+            `;
+          }).join("")}
+        </tr>
+      </thead>
+      <tbody>
+        ${filtered.length ? filtered.map((b) => {
+          return `
+            <tr data-row="${esc(b.kode)}">
+              <td class="td-cpl-code">
+                ${renderCapsule("bk", b.kode, { title: b.nama, extraAttrs: `data-matrix-bk-info="${esc(b.kode)}"` })}
+              </td>
+              <td class="td-cpl-name">
+                <div style="font-weight:600;color:var(--text);line-height:1.35">${esc(b.nama)}</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${esc(b.kategori || "Inti Keilmuan")}</div>
+              </td>
+              ${allCpl.map((c) => {
+                let mks = tripleMap.get(`${b.kode}|${c.kode}`) || [];
+                if (mks.length === 0 && Array.isArray(b.mk) && Array.isArray(c.mk)) {
+                  mks = b.mk.filter((m) => c.mk.includes(m));
+                }
+                const hasMk = mks.length > 0;
+                return `
+                  <td class="matrix-cell matrix-tripartit-cell" data-col="${esc(c.kode)}">
+                    ${hasMk
+                      ? `<div class="kapsul-group">
+                          ${mks.map((mKode) => {
+                            const mObj = allMk.find((m) => m.kode === mKode);
+                            const semLabel = mObj ? ` (S${mObj.sem})` : "";
+                            return renderCapsule("mk", mKode, {
+                              label: `${mKode}${semLabel}`,
+                              title: mObj ? `${mObj.nama} (Semester ${mObj.sem})` : mKode,
+                              extraAttrs: `data-matrix-mk-info="${esc(mKode)}"`
+                            });
+                          }).join("")}
+                        </div>`
+                      : `<span class="matrix-dash" style="color:var(--text-muted);opacity:0.4">&mdash;</span>`
+                    }
+                  </td>
+                `;
+              }).join("")}
+            </tr>
+          `;
+        }).join("") : `
+          <tr>
+            <td colspan="${allCpl.length + 2}" style="text-align:center;padding:48px 16px">
+              <div class="empty"><b>Tidak ada Bahan Kajian yang cocok</b><br>Sesuaikan kata kunci pencarian Anda.</div>
+            </td>
+          </tr>
+        `}
+      </tbody>
+    </table>
   `;
 }
 
@@ -2547,9 +2649,9 @@ function renderTripartitBkView(allBk, allCpl, allMk) {
       <thead>
         <tr>
           <th style="width:120px">Kode BK</th>
-          <th>Nama Bahan Kajian</th>
+          <th>Bahan Kajian</th>
           <th style="width:230px">CPL yang Membutuhkan</th>
-          <th style="width:310px">Mata Kuliah Penampung</th>
+          <th style="width:310px">Mata Kuliah Pengemas (MK)</th>
           <th style="width:140px;text-align:center">Validasi Integritas</th>
         </tr>
       </thead>
@@ -2614,9 +2716,9 @@ function renderTripartitMkView(allMk, allBk, allCpl) {
           <th style="width:120px">Kode MK</th>
           <th>Nama Mata Kuliah</th>
           <th style="width:130px">Kategori / SKS</th>
-          <th style="width:250px">Bahan Kajian Pengisi</th>
+          <th style="width:250px">Bahan Kajian Pengisi (BK)</th>
           <th style="width:250px">CPL yang Dibebankan</th>
-          <th style="width:140px;text-align:center">Keterpaduan</th>
+          <th style="width:140px;text-align:center">Keterpaduan OBE</th>
         </tr>
       </thead>
       <tbody>
@@ -4025,6 +4127,16 @@ document.addEventListener("input", (ev) => {
     const mId = matrixInput.dataset.matrixId;
     matrixState.search[mId] = matrixInput.value.trim().toLowerCase();
     renderMatrix2D(mId);
+    return;
+  }
+  if (ev.target.id === "tripartit-q") {
+    tripartitSearch = ev.target.value.trim().toLowerCase();
+    renderMatrixBkCplMk();
+    return;
+  }
+  if (ev.target.id === "pemenuhan-q") {
+    pemenuhanSearch = ev.target.value.trim().toLowerCase();
+    renderPemenuhanCpl();
     return;
   }
   if (ev.target.id === "log-q") {
