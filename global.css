@@ -344,6 +344,8 @@ h1 {
   gap: 16px;
   align-items: center;
   padding: 16px;
+  min-height: 72px;
+  box-sizing: border-box;
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 64px;
@@ -467,8 +469,9 @@ th {
   white-space: nowrap;
   border-bottom: 1px solid var(--border);
   position: sticky;
-  top: 136px;
+  top: 135px;
   z-index: 20;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 td {
@@ -487,6 +490,171 @@ tbody tr:hover {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   color: var(--text);
+}
+
+/* ==========================================================================
+   STANDAR KAPSUL ENTITAS MASTER KURIKULUM OBE
+   ========================================================================== */
+.kapsul {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 24px;
+  line-height: 1;
+  padding: 0 10px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  text-decoration: none;
+  font-family: inherit;
+  margin: 0;
+  vertical-align: middle;
+}
+
+/* Kapsul Button / Interactive State (Feel like a button) */
+.kapsul.kapsul-btn,
+button.kapsul,
+.kapsul[role="button"] {
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease !important;
+}
+
+.kapsul.kapsul-btn:hover,
+button.kapsul:hover,
+.kapsul[role="button"]:hover {
+  filter: brightness(0.94);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.kapsul.kapsul-btn:active,
+button.kapsul:active,
+.kapsul[role="button"]:active {
+  transform: scale(0.94) translateY(1px) !important;
+  filter: brightness(0.88);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+
+.kapsul.kapsul-btn:focus-visible,
+button.kapsul:focus-visible,
+.kapsul[role="button"]:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+/* Kapsul Entitas: 6 Master OBE */
+/* 1. PL: Ungu / Violet */
+.kapsul-pl {
+  background: #f3e8ff;
+  color: #7e22ce;
+  border-color: #d8b4fe;
+}
+.kapsul-pl.kapsul-btn:hover,
+button.kapsul-pl:hover {
+  background: #e9d5ff;
+  border-color: #c084fc;
+}
+
+/* 2. CPL: Sky / Biru */
+.kapsul-cpl {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+.kapsul-cpl.kapsul-btn:hover,
+button.kapsul-cpl:hover {
+  background: #bae6fd;
+  border-color: #7dd3fc;
+}
+
+/* 3. BK: Amber / Oranye */
+.kapsul-bk {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fde68a;
+}
+.kapsul-bk.kapsul-btn:hover,
+button.kapsul-bk:hover {
+  background: #fde68a;
+  border-color: #fcd34d;
+}
+
+/* 4. MK: Emerald / Hijau */
+.kapsul-mk {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+.kapsul-mk.kapsul-btn:hover,
+button.kapsul-mk:hover {
+  background: #bbf7d0;
+  border-color: #86efac;
+}
+
+/* 5. CPMK: Rose / Merah Bata */
+.kapsul-cpmk {
+  background: #ffe4e6;
+  color: #be123c;
+  border-color: #fecdd3;
+}
+.kapsul-cpmk.kapsul-btn:hover,
+button.kapsul-cpmk:hover {
+  background: #fecdd3;
+  border-color: #fda4af;
+}
+
+/* 6. Sub-CPMK: Indigo / Cobalt */
+.kapsul-sub_cpmk {
+  background: #e0e7ff;
+  color: #4338ca;
+  border-color: #c7d2fe;
+}
+.kapsul-sub_cpmk.kapsul-btn:hover,
+button.kapsul-sub_cpmk:hover {
+  background: #c7d2fe;
+  border-color: #a5b4fc;
+}
+
+/* Status & Variasi */
+.kapsul-warn {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border-color: #fde68a;
+  font-weight: 500;
+}
+
+.kapsul-neutral {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #e2e8f0;
+}
+
+.kapsul-primary {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: #bfdbfe;
+}
+
+.kapsul-sm {
+  height: 20px;
+  padding: 0 6px;
+  font-size: 10.5px;
+  border-radius: 6px;
+}
+
+.kapsul-lg {
+  height: 28px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 8px;
 }
 
 /* Tags & Badges */
@@ -632,7 +800,8 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   padding: 16px;
-  z-index: 1000;
+  z-index: 9999;
+  backdrop-filter: blur(2px);
 }
 
 .ov.on {
@@ -648,7 +817,7 @@ tbody tr:hover {
   overflow: auto;
   padding: 24px;
   position: relative;
-  z-index: 1001;
+  z-index: 10000;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
 }
 
@@ -1287,7 +1456,9 @@ tbody tr:hover {
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 16px;
+  min-height: 72px;
+  box-sizing: border-box;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   position: sticky;
@@ -1492,6 +1663,12 @@ tbody tr:hover {
   background: #ffe4e6;
   color: #be123c;
   border: 1px solid #fecdd3;
+}
+
+.badge-master.sub_cpmk {
+  background: #e0e7ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
 }
 
 /* Action Badges */
@@ -2478,6 +2655,36 @@ tbody tr:hover {
   border-radius: 99px !important;
   margin: 0 auto !important;
   transition: all 0.15s ease;
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+  cursor: pointer;
+}
+
+.matrix-cpl-btn:hover {
+  background: #bae6fd;
+  border-color: #7dd3fc;
+  filter: brightness(0.95);
+}
+
+.matrix-cpl-btn:active {
+  transform: scale(0.94) translateY(1px) !important;
+  filter: brightness(0.9);
+}
+
+.matrix-cpl-btn.neutral,
+.matrix-cpl-btn.kapsul-bk,
+.matrix-cpl-btn.bk {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.matrix-cpl-btn.neutral:hover,
+.matrix-cpl-btn.kapsul-bk:hover,
+.matrix-cpl-btn.bk:hover {
+  background: #fde68a;
+  border-color: #fcd34d;
 }
 
 .th-sticky-code,
@@ -2541,17 +2748,19 @@ tbody tr:hover {
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 0.02em;
+  border: 1px solid #fde68a;
 }
 
 .mk-head-code {
   display: inline-block;
-  padding: 2px 5px;
+  padding: 2px 6px;
   border-radius: 6px;
-  background: #e0e7ff;
-  color: #3730a3;
+  background: #dcfce7;
+  color: #047857;
   font-weight: 700;
-  font-size: 10.5px;
+  font-size: 11px;
   letter-spacing: 0.01em;
+  border: 1px solid #bbf7d0;
 }
 
 .mk-sem-tag {
@@ -2646,7 +2855,7 @@ tbody tr:hover {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
-  overflow: hidden;
+  overflow: clip;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
@@ -2704,6 +2913,44 @@ tbody tr:hover {
   background: #f8fafc !important;
   font-weight: 600;
   border-top: 2px solid var(--border);
+}
+
+/* Susunan Mata Kuliah Table */
+.susunan-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 780px;
+  font-size: 13px;
+}
+
+.susunan-table th {
+  background: #f8fafc;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  position: static !important;
+  text-align: left;
+  white-space: nowrap;
+  box-shadow: none !important;
+  top: auto !important;
+}
+
+.susunan-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  color: var(--text);
+  background: var(--surface);
+}
+
+.susunan-table tbody tr:hover td {
+  background: var(--primary-subtle);
+}
+
+.susunan-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 /* 4. Organisasi Mata Kuliah (Peta Alur / Flowchart Board) */
@@ -2915,12 +3162,16 @@ tbody tr:hover {
 
 .cpmk-code-pill {
   padding: 3px 8px;
-  border-radius: 6px;
-  background: #e0f2fe;
-  color: #0369a1;
+  border-radius: 9999px;
+  background: #ffe4e6;
+  color: #be123c;
+  border: 1px solid #fecdd3;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 11.5px;
   letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .subcpmk-drawer {
@@ -3019,4 +3270,43 @@ tbody tr:hover {
   color: var(--primary);
   font-weight: 600;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Tripartite Matrix Table (BK - CPL - MK) */
+.tripartit-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 850px;
+  font-size: 13px;
+}
+
+.tripartit-table th {
+  background: #f8fafc;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 130px;
+  z-index: 20;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tripartit-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  background: #fff;
+  color: var(--text);
+}
+
+.tripartit-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tripartit-table tbody tr:hover td {
+  background: var(--primary-subtle);
 }
