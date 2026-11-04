@@ -36,9 +36,11 @@ function hydrateDb(data) {
   const cplMk = rel.cpl_mk || [];
   const bkCplMk = rel.bk_cpl_mk || [];
   const mkCpmk = rel.mk_cpmk || [];
+  const mkSubCpmk = rel.mk_sub_cpmk || [];
   const subCpmkList = (data.sub_cpmk || []).map((s) => ({
     ...s,
     nama: s.deskripsi || s.nama || s.kode,
+    mk: s.mk && s.mk.length ? s.mk : mkSubCpmk.filter((r) => r.sub_cpmk === s.kode).map((r) => r.mk),
   }));
 
   // Profil Lulusan (4 Profil Utama D4 TRPL)
@@ -628,8 +630,8 @@ const E = {
     },
   },
   sub_cpmk: {
-    group: "Data Master",
-    label: "Sub-CPMK (Kemampuan Akhir)",
+    group: "Tabel Kurikulum",
+    label: "12a Sub CPMK",
     add: "Tambah Sub-CPMK",
     lead: "Kemampuan akhir yang direncanakan pada tiap tahap pembelajaran (170 Sub-CPMK). Dirumuskan berdasarkan CPL dan CPMK, serta mengacu pada unit kompetensi SKKNI.",
     pre: "Sub-CPMK",
@@ -637,14 +639,15 @@ const E = {
       { k: "kode", l: "Kode Sub-CPMK", h: "Format standar: Sub-CPMK.xx.y.z, contoh Sub-CPMK.01.1.1" },
       { k: "cpl", l: "CPL Induk", t: "sel-cpl" },
       { k: "cpmk", l: "CPMK Induk", t: "sel-cpmk", h: "Pilih CPMK induk yang dirumuskan ke Sub-CPMK ini." },
-      { k: "deskripsi", l: "Pernyataan Kemampuan Akhir", t: "area" },
-      { k: "unit_skkni", l: "Unit SKKNI Acuan", opt: 1 },
+      { k: "deskripsi", l: "Kemampuan Akhir (Sub-CPMK)", t: "area" },
+      { k: "unit_skkni", l: "Unit Terkait SKKNI", opt: 1 },
     ],
     cols: [
       "Kode Sub-CPMK",
       "Kemampuan Akhir (Sub-CPMK)",
       "CPL & CPMK Induk",
-      "Acuan Unit SKKNI",
+      "Mata Kuliah Pengampu (MK)",
+      "Unit Terkait SKKNI",
     ],
     row: (r) => [
       renderCapsule("sub_cpmk", r.kode, { title: r.deskripsi || r.nama }),
@@ -653,6 +656,19 @@ const E = {
         ${renderRelationRow("cpl", r.cpl)}
         ${renderRelationRow("cpmk", r.cpmk)}
       </div>`,
+      (r.mk && r.mk.length)
+        ? `<div class="pl-list" style="display:flex;flex-wrap:wrap;gap:4px">
+            ${r.mk.map((mKode) => {
+              const mkObj = (db.mk || []).find((m) => m.kode === mKode);
+              const label = mkObj ? `${mKode} (S${mkObj.sem})` : mKode;
+              return renderCapsule("mk", mKode, {
+                label,
+                title: mkObj ? `${mkObj.nama} (Semester ${mkObj.sem})` : mKode,
+                extraAttrs: `data-matrix-mk-info="${esc(mKode)}"`
+              });
+            }).join("")}
+          </div>`
+        : `<span style="color:var(--text-muted);font-size:11.5px">-</span>`,
       r.unit_skkni
         ? `<span class="kapsul kapsul-neutral" title="Unit SKKNI: ${esc(r.unit_skkni)}">${esc(r.unit_skkni)}</span>`
         : `<span style="color:var(--text-muted);font-size:11px">-</span>`,
@@ -1034,6 +1050,12 @@ function renderMaster(t, q) {
           (r.profesi_detail || "") +
           " " +
           (r.unit_skkni || "") +
+          " " +
+          (r.cpl || "") +
+          " " +
+          (r.cpmk || "") +
+          " " +
+          (r.mk && Array.isArray(r.mk) ? r.mk.join(" ") : "") +
           " " +
           (r.sumber || "")
         )
