@@ -3116,12 +3116,13 @@ function renderPemenuhanCpl() {
   const allMk = db.mk || [];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
 
+  const q = (pemenuhanSearch || "").toLowerCase();
   const filteredCpl = allCpl.filter(c => {
-    if (pemenuhanSearch) {
-      const term = (c.kode + " " + (c.nama || "")).toLowerCase();
-      if (!term.includes(pemenuhanSearch)) return false;
+    if (q) {
+      const term = (c.kode + " " + (c.nama || "") + " " + (c.uraian || "")).toLowerCase();
+      const hasMk = (c.mk || []).some(m => String(m).toLowerCase().includes(q));
+      if (!term.includes(q) && !hasMk) return false;
     }
-    // Filter dropdowns removed
     return true;
   });
 
@@ -3177,7 +3178,7 @@ function renderPemenuhanCpl() {
         <div class="matrix-toolbar-left">
           <div class="matrix-search">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input id="pemenuhan-q" type="search" placeholder="Cari CPL..." value="${esc(pemenuhanSearch)}" />
+            <input id="pemenuhan-q" type="search" placeholder="Cari CPL (kode / uraian / MK)..." value="${esc(pemenuhanSearch)}" />
           </div>
 
         </div>
@@ -3187,14 +3188,14 @@ function renderPemenuhanCpl() {
         <table class="matrix-table view-only">
           <thead>
             <tr>
-              <th class="th-cpl-code" scope="col">Kode CPL</th>
-              <th class="th-cpl-name" scope="col">Capaian Pembelajaran Lulusan (CPL)</th>
+              <th class="th-cpl-code" scope="col">CPL</th>
+              <th class="th-cpl-name" scope="col">Uraian CPL</th>
               ${semesters.map(s => `
-                <th style="min-width:140px;max-width:200px;text-align:center" scope="col">
+                <th style="min-width:130px;max-width:190px;text-align:center" scope="col">
                   Semester ${s}
                 </th>
               `).join("")}
-              <th style="width:130px;text-align:center" scope="col">Total MK</th>
+              <th style="width:110px;text-align:center" scope="col">Total MK</th>
             </tr>
           </thead>
           <tbody>
@@ -3209,19 +3210,20 @@ function renderPemenuhanCpl() {
                     </button>
                   </td>
                   <td class="td-cpl-name">
-                    <div style="font-weight:600;color:var(--text);line-height:1.4">${esc(cpl.nama)}</div>
+                    <div style="font-weight:600;color:var(--text);line-height:1.4">${esc(cpl.nama || cpl.uraian || "")}</div>
+                    ${cpl.sumber ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.3">${esc(cpl.sumber.split('\n')[0])}</div>` : ""}
                   </td>
                   ${semesters.map(s => {
                     const semMks = allMk.filter(m => m.sem === s && assignedMkCodes.includes(m.kode));
                     return `
-                      <td class="pemenuhan-cell">
+                      <td class="pemenuhan-cell" style="vertical-align:middle;text-align:center">
                         ${semMks.length ? `
-                          <div class="pemenuhan-badges-wrap">
-                            ${semMks.map(m => `
-                              <span class="pemenuhan-mk-badge" data-matrix-mk-info="${esc(m.kode)}" title="${esc(m.kode)}: ${esc(m.nama)}">
-                                ${esc(m.kode)}
-                              </span>
-                            `).join("")}
+                          <div class="pemenuhan-badges-wrap" style="justify-content:center">
+                            ${semMks.map(m => renderCapsule("mk", m.kode, {
+                              label: `${m.kode}`,
+                              title: `${m.kode}: ${m.nama} (Semester ${m.sem})`,
+                              extraAttrs: `data-matrix-mk-info="${esc(m.kode)}"`
+                            })).join("")}
                           </div>
                         ` : '<div class="pemenuhan-empty">&mdash;</div>'}
                       </td>
@@ -3234,7 +3236,7 @@ function renderPemenuhanCpl() {
               `;
             }).join("") : `
               <tr>
-                <td colspan="9" style="text-align:center;padding:48px 16px">
+                <td colspan="11" style="text-align:center;padding:48px 16px">
                   <div class="empty"><b>Tidak ada CPL yang sesuai dengan filter</b></div>
                 </td>
               </tr>
