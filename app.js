@@ -2867,7 +2867,7 @@ function renderSusunanMk() {
         ${activeSemesters.map(sem => {
           let semMk = allMk.filter(m => m.sem === sem);
           if (susunanSearch) {
-            semMk = semMk.filter(m => (m.kode + " " + (m.nama || "")).toLowerCase().includes(susunanSearch));
+            semMk = semMk.filter(m => (m.kode + " " + (m.nama || "") + " " + (m.nama_en || "")).toLowerCase().includes(susunanSearch));
           }
 
           let subTeori = 0;
@@ -2906,18 +2906,18 @@ function renderSusunanMk() {
               </div>
 
               <div class="scroll">
-                <table class="susunan-table" style="min-width:780px">
+                <table class="susunan-table" style="min-width:850px">
                   <thead>
                     <tr>
-                      <th style="width:50px;text-align:center">No</th>
-                      <th style="width:110px">Kode MK</th>
+                      <th style="width:48px;text-align:center">No</th>
+                      <th style="width:115px">Kode MK</th>
                       <th>Nama Mata Kuliah</th>
-                      <th style="width:110px">Kategori</th>
-                      <th style="width:100px">Jenis</th>
-                      <th style="width:80px;text-align:center">SKS T</th>
-                      <th style="width:80px;text-align:center">SKS P</th>
-                      <th style="width:80px;text-align:center">Total</th>
-                      <th style="width:180px">Mata Kuliah Prasyarat</th>
+                      <th style="width:105px">Kategori</th>
+                      <th style="width:95px">Tipe</th>
+                      <th style="width:100px;text-align:center">SKS Teori (T)</th>
+                      <th style="width:110px;text-align:center">SKS Praktik (P)</th>
+                      <th style="width:90px;text-align:center">Total SKS</th>
+                      <th style="width:170px">Mata Kuliah Prasyarat</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -2931,13 +2931,17 @@ function renderSusunanMk() {
                             ${renderCapsule("mk", m.kode, { title: m.nama, extraAttrs: `data-matrix-mk-info="${esc(m.kode)}"` })}
                           </td>
                           <td>
-                            <div style="font-weight:600;color:var(--text)">${esc(m.nama)}</div>
+                            <div style="display:flex;align-items:center;gap:6px">
+                              <span style="font-weight:600;color:var(--text)">${esc(m.nama)}</span>
+                              ${m.ads_pbl ? '<span class="tag neutral" style="font-size:9.5px;padding:1px 5px;background:#fef3c7;color:#b45309;border:1px solid #fde68a" title="Model Pembelajaran Astra Dual System / Project-Based Learning">ADS/PBL</span>' : ""}
+                            </div>
+                            ${m.nama_en ? `<div style="font-size:11px;color:var(--text-muted);font-style:italic;margin-top:2px">${esc(m.nama_en)}</div>` : ""}
                           </td>
                           <td>
                             <span class="pill-kat ${isUmum ? "umum" : "inti"}">${esc(m.kat)}</span>
                           </td>
                           <td>
-                            <span class="pill-jenis ${isPrak ? "prak" : "teori"}">${esc(m.jenis)}</span>
+                            <span class="pill-jenis ${isPrak ? "prak" : "teori"}">${esc(m.jenis || (isPrak ? "Praktik" : "Teori"))}</span>
                           </td>
                           <td style="text-align:center;font-weight:500">${esc(m.sksTeori || 0)}</td>
                           <td style="text-align:center;font-weight:500">${esc(m.sksPrak || 0)}</td>
@@ -2958,10 +2962,10 @@ function renderSusunanMk() {
                       </tr>
                     `}
                     <tr class="susunan-subtotal-row">
-                      <td colspan="5" style="text-align:right">Subtotal Semester ${sem}:</td>
-                      <td style="text-align:center">${subTeori}</td>
-                      <td style="text-align:center">${subPrak}</td>
-                      <td style="text-align:center;color:var(--primary);font-size:14px">${subTotal}</td>
+                      <td colspan="5" style="text-align:right;font-weight:600;color:var(--text-secondary)">Subtotal Semester ${sem}:</td>
+                      <td style="text-align:center;font-weight:600">${subTeori} SKS</td>
+                      <td style="text-align:center;font-weight:600">${subPrak} SKS</td>
+                      <td style="text-align:center;font-weight:700;color:var(--primary);font-size:13.5px">${subTotal} SKS</td>
                       <td></td>
                     </tr>
                   </tbody>
@@ -4132,6 +4136,11 @@ document.addEventListener("input", (ev) => {
   if (ev.target.id === "tripartit-q") {
     tripartitSearch = ev.target.value.trim().toLowerCase();
     renderMatrixBkCplMk();
+    return;
+  }
+  if (ev.target.id === "susunan-q") {
+    susunanSearch = ev.target.value.trim().toLowerCase();
+    renderSusunanMk();
     return;
   }
   if (ev.target.id === "pemenuhan-q") {
