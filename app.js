@@ -2216,6 +2216,8 @@ let pemenuhanJenisFilter = "all";
 let cpmkSearch = "";
 let cpmkCplFilter = "all";
 let cpmkMkFilter = "all";
+let cplCpmkView = "tree";
+let cpmkCollapseAllState = false;
 let cpmkExpanded = {};
 
 let cpmkSemActive = 1;
@@ -3279,14 +3281,31 @@ function renderPemenuhanCpl() {
 // ==========================================================
 // 8. MATRIKS RELASI CPL-CPMK-MK (Dekomposisi & Sub-CPMK)
 // ==========================================================
+function matchesCplCpmkItem(s, cp, cpl, q) {
+  if (!q) return true;
+  const subMks = (s && s.mk && s.mk.length) ? s.mk : (cp ? (cp.mk || []) : []);
+  const mkNames = subMks.map(k => {
+    const mkObj = (db.mk || []).find(m => m.kode === k);
+    return mkObj ? `${mkObj.nama} ${mkObj.kode}` : k;
+  }).join(" ");
+  const text = (
+    (cpl ? ((cpl.kode || "") + " " + (cpl.nama || cpl.uraian || "") + " " + (cpl.sumber || "")) : "") + " " +
+    (cp ? ((cp.kode || "") + " " + (cp.nama || cp.deskripsi || "")) : "") + " " +
+    (s ? ((s.kode || "") + " " + (s.nama || s.deskripsi || "") + " " + (s.unit_skkni || "")) : "") + " " +
+    subMks.join(" ") + " " +
+    mkNames
+  ).toLowerCase();
+  return text.includes(q);
+}
+
 function renderCplCpmkMk() {
   if ($("log-header-container")) $("log-header-container").innerHTML = "";
   if ($("btn-master-log")) $("btn-master-log").style.display = "none";
 
-  $("crumb").textContent = "Analisis & Pemenuhan CPL / CPL–CPMK–MK";
-  $("title").textContent = "Matriks Dekomposisi CPL – CPMK – Mata Kuliah";
+  $("crumb").textContent = "Tabel Kurikulum / 12 CPL_CPMK_MK";
+  $("title").textContent = "12 CPL_CPMK_MK (Matriks Dekomposisi CPL – CPMK – MK)";
   $("lead").textContent =
-    "Penjabaran Capaian Pembelajaran Lulusan (CPL) menjadi Capaian Pembelajaran Mata Kuliah (CPMK) dan Sub-CPMK terstandar. Mengakomodasi relasi 1 CPMK memiliki banyak Sub-CPMK, dan 1 CPMK dapat dibebankan pada beberapa Mata Kuliah.";
+    "Penjabaran Capaian Pembelajaran Lulusan (CPL) menjadi Capaian Pembelajaran Mata Kuliah (CPMK) dan Kemampuan Akhir (Sub-CPMK) terstandar beserta mata kuliah pengampu dan unit kompetensi SKKNI.";
   $("bar").style.display = "none";
 
   const allCpl = db.cpl || [];
@@ -3298,11 +3317,6 @@ function renderCplCpmkMk() {
   allCpmk.forEach(c => {
     totalSub += ((c.sub_cpmk || []).length);
     if ((c.mk || []).length > 1) multiMkCpmkCount++;
-  });
-
-  const filteredCpl = allCpl.filter(c => {
-    // Filter dropdowns removed
-    return true;
   });
 
   $("view-container").innerHTML = `
@@ -3348,96 +3362,414 @@ function renderCplCpmkMk() {
           <div class="matrix-stat-info">
             <span class="matrix-stat-val" style="color:var(--success)">Standarisasi Baku</span>
             <span class="matrix-stat-label">Format Penomoran Kode</span>
-            <span class="matrix-stat-sub">CPMKxx.yy &bull; SubCPMKxx.yy.zz</span>
+            <span class="matrix-stat-sub">CPMK.xx.y &bull; Sub-CPMK.xx.y.z</span>
           </div>
         </div>
       </div>
 
       <div class="matrix-toolbar">
-        <div class="matrix-toolbar-left">
-          <div class="matrix-search">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input id="cpmk-decomp-q" type="search" placeholder="Cari CPMK / Sub-CPMK / MK..." value="${esc(cpmkSearch)}" />
+        <div class="matrix-toolbar-left" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div class="tripartit-tabs">
+            <button type="button" class="tripartit-tab-btn ${cplCpmkView === "tree" ? "active" : ""}" data-cpl-cpmk-tab="tree">
+              Hierarki Dekomposisi (Kartu)
+            </button>
+            <button type="button" class="tripartit-tab-btn ${cplCpmkView === "table" ? "active" : ""}" data-cpl-cpmk-tab="table">
+              Tabel Matriks (Format Excel Sheet 12)
+            </button>
           </div>
-
+          ${cplCpmkView === "tree" ? `
+            <button type="button" id="btn-toggle-all-cpmk" class="cpl-filter-btn" style="padding:6px 14px">
+              ${cpmkCollapseAllState ? "Bentangkan Semua CPMK" : "Ciutkan Semua CPMK"}
+            </button>
+          ` : ""}
+          <div class="matrix-search" style="margin-left:auto">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input id="cpmk-decomp-q" type="search" placeholder="Cari CPL / CPMK / Sub-CPMK / MK / SKKNI..." value="${esc(cpmkSearch)}" />
+          </div>
         </div>
       </div>
 
-      <div class="cpl-cpmk-wrap">
-        ${filteredCpl.map(cpl => {
-          let cpmkList = allCpmk.filter(cp => (Array.isArray(cp.cpl) ? cp.cpl.includes(cpl.kode) : cp.cpl === cpl.kode));
-          if (cpmkSearch) {
-            const q = cpmkSearch.toLowerCase();
-            cpmkList = cpmkList.filter(cp => {
-              const str = (cp.kode + " " + cp.nama + " " + (cp.mk || []).join(" ") + " " + (cp.sub_cpmk || []).map(s => s.nama).join(" ")).toLowerCase();
-              return str.includes(q);
-            });
-          }
-
-          if (cpmkList.length === 0 && cpmkSearch) return "";
-
+      <div class="cpl-filter-bar">
+        <button type="button" class="cpl-filter-btn ${cpmkCplFilter === "all" ? "active" : ""}" data-cpl-filter="all">
+          <span>Semua CPL</span>
+          <span class="cpl-filter-count">${allCpl.length}</span>
+        </button>
+        ${allCpl.map(c => {
+          const cpmks = allCpmk.filter(cp => (Array.isArray(cp.cpl) ? cp.cpl.includes(c.kode) : cp.cpl === c.kode));
           return `
-            <div class="cpl-cpmk-card">
-              <div class="cpl-cpmk-head">
-                <div style="flex:1">
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-                    ${renderCapsule("cpl", cpl.kode)}
-                    <span style="font-size:12px;color:var(--text-muted)">${cpmkList.length} CPMK Terkait</span>
-                  </div>
-                  <h3 style="font-size:15px;margin:0;font-weight:600;color:var(--text)">${esc(cpl.nama)}</h3>
-                </div>
-              </div>
-
-              <div class="cpl-cpmk-body">
-                ${cpmkList.length ? cpmkList.map(cp => {
-                  const mappedMks = (cp.mk || []).map(k => allMk.find(m => m.kode === k)).filter(Boolean);
-                  const subList = cp.sub_cpmk || [];
-
-                  return `
-                    <div class="cpmk-item-card">
-                      <div class="cpmk-item-header">
-                        <div style="flex:1">
-                          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-                            ${renderCapsule("cpmk", cp.kode)}
-                            <span style="font-size:12px;color:var(--text-muted)">Dibebankan pada ${mappedMks.length} Mata Kuliah</span>
-                          </div>
-                          <div style="font-size:13.5px;font-weight:600;color:var(--text);line-height:1.4">${esc(cp.nama)}</div>
-                        </div>
-                      </div>
-
-                      <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                        <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">Mata Kuliah Pengampu:</span>
-                        ${mappedMks.length ? mappedMks.map(m => `
-                          ${renderCapsule("mk", m.kode, { label: `${m.kode} - ${m.nama} (Sem ${m.sem})`, title: `${m.nama} (Semester ${m.sem})`, extraAttrs: `data-matrix-mk-info="${esc(m.kode)}"` })}
-                        `).join("") : '<span style="font-size:12px;color:var(--warning)">Belum ada MK penampung</span>'}
-                      </div>
-
-                      <div class="subcpmk-drawer">
-                        <div class="subcpmk-title">Rincian Sub-CPMK (${subList.length}):</div>
-                        <ul class="subcpmk-list">
-                          ${subList.map(s => `
-                            <li class="subcpmk-row">
-                              ${renderCapsule("sub_cpmk", s.kode, { title: s.nama || s.deskripsi })}
-                              <span style="margin-left:6px">${esc(s.nama || s.deskripsi)}</span>
-                              ${s.unit_skkni ? `<span class="tag hard" style="font-size:10px;margin-left:6px">${esc(s.unit_skkni)}</span>` : ""}
-                            </li>
-                          `).join("")}
-                        </ul>
-                      </div>
-                    </div>
-                  `;
-                }).join("") : `
-                  <div style="color:var(--text-muted);font-size:13px;padding:8px 0">
-                    Belum ada CPMK yang diturunkan untuk CPL ini.
-                  </div>
-                `}
-              </div>
-            </div>
+            <button type="button" class="cpl-filter-btn ${cpmkCplFilter === c.kode ? "active" : ""}" data-cpl-filter="${esc(c.kode)}">
+              <span>${esc(c.kode)}</span>
+              <span class="cpl-filter-count">${cpmks.length}</span>
+            </button>
           `;
         }).join("")}
       </div>
+
+      <div id="cpl-cpmk-content-wrap">
+        ${renderCplCpmkContentBody()}
+      </div>
     </div>
   `;
+
+  attachCplCpmkEvents();
+}
+
+function renderCplCpmkContentBody() {
+  if (cplCpmkView === "table") {
+    return renderCplCpmkTableView();
+  }
+  return renderCplCpmkTreeView();
+}
+
+function renderCplCpmkTreeView() {
+  const allCpl = db.cpl || [];
+  const allCpmk = db.cpmk || [];
+  const allMk = db.mk || [];
+  const q = (cpmkSearch || "").trim().toLowerCase();
+
+  const cplList = allCpl.filter(c => cpmkCplFilter === "all" || c.kode === cpmkCplFilter);
+
+  let renderedCplCards = "";
+
+  cplList.forEach(cpl => {
+    let cpmkList = allCpmk.filter(cp => (Array.isArray(cp.cpl) ? cp.cpl.includes(cpl.kode) : cp.cpl === cpl.kode));
+
+    const filteredCpmkList = [];
+    cpmkList.forEach(cp => {
+      let subs = cp.sub_cpmk || [];
+      if (q) {
+        subs = subs.filter(s => matchesCplCpmkItem(s, cp, cpl, q));
+        const cpmkDirectMatch = matchesCplCpmkItem(null, cp, cpl, q);
+        if (subs.length > 0 || cpmkDirectMatch) {
+          filteredCpmkList.push({
+            ...cp,
+            sub_cpmk: subs.length > 0 ? subs : (cp.sub_cpmk || []),
+          });
+        }
+      } else {
+        filteredCpmkList.push(cp);
+      }
+    });
+
+    if (filteredCpmkList.length === 0 && q) return;
+
+    const totalSubInCpl = filteredCpmkList.reduce((acc, cp) => acc + (cp.sub_cpmk || []).length, 0);
+
+    renderedCplCards += `
+      <div class="cpl-cpmk-card">
+        <div class="cpl-cpmk-head">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              ${renderCapsule("cpl", cpl.kode, { title: cpl.nama || cpl.uraian })}
+              <span style="font-size:12px;color:var(--text-muted)">${filteredCpmkList.length} CPMK Terkait</span>
+            </div>
+            <h3 style="font-size:15px;margin:0 0 4px;font-weight:600;color:var(--text);line-height:1.4">${esc(cpl.nama || cpl.uraian)}</h3>
+            ${cpl.sumber ? `<div style="font-size:11.5px;color:var(--text-muted);font-style:italic">Sumber: ${esc(cpl.sumber.split("\n")[0])}</div>` : ""}
+          </div>
+          <div class="cpl-cpmk-head-badges">
+            <span class="kapsul kapsul-neutral" style="font-size:11px">${filteredCpmkList.length} CPMK</span>
+            <span class="kapsul kapsul-neutral" style="font-size:11px">${totalSubInCpl} Sub-CPMK</span>
+          </div>
+        </div>
+
+        <div class="cpl-cpmk-body">
+          ${filteredCpmkList.length ? filteredCpmkList.map(cp => {
+            const mappedMks = (cp.mk || []).map(k => allMk.find(m => m.kode === k)).filter(Boolean);
+            const subList = cp.sub_cpmk || [];
+            const isCollapsed = cpmkCollapseAllState || (cpmkExpanded[cp.kode] === false);
+
+            return `
+              <div class="cpmk-item-card">
+                <div class="cpmk-item-header" data-toggle-cpmk="${esc(cp.kode)}" title="Klik untuk menciutkan / membentangkan rincian">
+                  <div style="flex:1;display:flex;align-items:flex-start;gap:10px">
+                    ${renderCapsule("cpmk", cp.kode, { title: cp.nama || cp.deskripsi })}
+                    <div style="flex:1">
+                      <div style="font-size:13.5px;font-weight:600;color:var(--text);line-height:1.4">${esc(cp.nama || cp.deskripsi)}</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+                    <span class="kapsul kapsul-neutral" style="font-size:11px">${mappedMks.length} MK</span>
+                    <span class="kapsul kapsul-neutral" style="font-size:11px">${subList.length} Sub-CPMK</span>
+                    <span class="cpmk-chevron" style="transform:rotate(${isCollapsed ? "0deg" : "180deg"})">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="cpmk-item-content ${isCollapsed ? "collapsed" : ""}">
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:4px">
+                    <span style="font-size:11.5px;font-weight:600;color:var(--text-secondary)">Mata Kuliah Pengampu:</span>
+                    ${mappedMks.length ? mappedMks.map(m => `
+                      ${renderCapsule("mk", m.kode, {
+                        label: `${m.kode} (S${m.sem})`,
+                        title: `${m.nama} (Semester ${m.sem})`,
+                        extraAttrs: `data-matrix-mk-info="${esc(m.kode)}"`
+                      })}
+                    `).join("") : '<span style="font-size:12px;color:var(--warning);font-style:italic">Belum ada MK penampung</span>'}
+                  </div>
+
+                  <div class="cpmk-sub-table-wrap">
+                    <table class="cpmk-sub-table">
+                      <thead>
+                        <tr>
+                          <th style="width:145px">Kode Sub-CPMK</th>
+                          <th>Kemampuan Akhir (Sub-CPMK)</th>
+                          <th style="width:200px">MK Pengampu</th>
+                          <th style="width:150px">Unit Terkait SKKNI</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${subList.length ? subList.map(s => {
+                          const subMks = (s.mk && s.mk.length) ? s.mk : (cp.mk || []);
+                          return `
+                            <tr>
+                              <td style="white-space:nowrap">
+                                ${renderCapsule("sub_cpmk", s.kode, { title: s.nama || s.deskripsi })}
+                              </td>
+                              <td>
+                                <div style="font-weight:500">${esc(s.nama || s.deskripsi)}</div>
+                              </td>
+                              <td>
+                                <div style="display:flex;flex-wrap:wrap;gap:4px">
+                                  ${subMks.map(mKode => {
+                                    const mkObj = allMk.find(m => m.kode === mKode);
+                                    return renderCapsule("mk", mKode, {
+                                      label: mkObj ? `${mKode} (S${mkObj.sem})` : mKode,
+                                      title: mkObj ? `${mkObj.nama} (Semester ${mkObj.sem})` : mKode,
+                                      extraAttrs: `data-matrix-mk-info="${esc(mKode)}"`
+                                    });
+                                  }).join("")}
+                                </div>
+                              </td>
+                              <td>
+                                ${s.unit_skkni 
+                                  ? `<span class="kapsul kapsul-neutral" title="Unit SKKNI: ${esc(s.unit_skkni)}">${esc(s.unit_skkni)}</span>` 
+                                  : '<span style="color:var(--text-muted);font-size:11px">-</span>'}
+                              </td>
+                            </tr>
+                          `;
+                        }).join("") : `
+                          <tr>
+                            <td colspan="4" style="text-align:center;color:var(--text-muted);padding:14px;font-style:italic">
+                              Belum ada Sub-CPMK terperinci untuk CPMK ini.
+                            </td>
+                          </tr>
+                        `}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("") : `
+            <div style="color:var(--text-muted);font-size:13px;padding:8px 0;font-style:italic">
+              Belum ada CPMK yang diturunkan untuk CPL ini.
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+  });
+
+  if (!renderedCplCards) {
+    return `
+      <div style="text-align:center;padding:48px 16px;background:#fff;border-radius:12px;border:1px solid var(--border)">
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">Tidak ada data dekomposisi yang cocok</div>
+        <div style="font-size:12px;color:var(--text-muted)">Coba kata kunci pencarian lain atau pilih CPL yang berbeda.</div>
+      </div>
+    `;
+  }
+
+  return `<div class="cpl-cpmk-wrap">${renderedCplCards}</div>`;
+}
+
+function renderCplCpmkTableView() {
+  const allCpl = db.cpl || [];
+  const allCpmk = db.cpmk || [];
+  const allMk = db.mk || [];
+  const q = (cpmkSearch || "").trim().toLowerCase();
+
+  const cplList = allCpl.filter(c => cpmkCplFilter === "all" || c.kode === cpmkCplFilter);
+
+  let rowsHtml = "";
+  let rowNo = 1;
+
+  cplList.forEach(cpl => {
+    let cpmks = allCpmk.filter(cp => (Array.isArray(cp.cpl) ? cp.cpl.includes(cpl.kode) : cp.cpl === cpl.kode));
+    let cplSubCount = 0;
+    const cpmkItems = [];
+
+    cpmks.forEach(cp => {
+      let subs = cp.sub_cpmk || [];
+      if (q) {
+        subs = subs.filter(s => matchesCplCpmkItem(s, cp, cpl, q));
+      }
+      if (subs.length > 0) {
+        cplSubCount += subs.length;
+        cpmkItems.push({ cpmk: cp, subs });
+      }
+    });
+
+    if (cplSubCount === 0) return;
+
+    let cplRendered = false;
+    cpmkItems.forEach(item => {
+      const { cpmk, subs } = item;
+      subs.forEach((sub, sIdx) => {
+        let tr = `<tr>`;
+        if (!cplRendered && sIdx === 0) {
+          tr += `
+            <td class="cell-cpl-group" rowspan="${cplSubCount}" style="text-align:center;font-weight:600;color:var(--text-muted)">${rowNo++}</td>
+            <td class="cell-cpl-group" rowspan="${cplSubCount}" style="white-space:nowrap">
+              ${renderCapsule("cpl", cpl.kode, { title: cpl.nama || cpl.uraian })}
+            </td>
+            <td class="cell-cpl-group" rowspan="${cplSubCount}" style="font-size:12.5px;line-height:1.4">
+              <div style="font-weight:600;color:var(--text);margin-bottom:4px">${esc(cpl.nama || cpl.uraian)}</div>
+              ${cpl.sumber ? `<div style="font-size:11px;color:var(--text-muted);font-style:italic">${esc(cpl.sumber.split("\n")[0])}</div>` : ""}
+            </td>
+          `;
+          cplRendered = true;
+        }
+        if (sIdx === 0) {
+          tr += `
+            <td class="cell-cpmk-group" rowspan="${subs.length}" style="white-space:nowrap">
+              ${renderCapsule("cpmk", cpmk.kode, { title: cpmk.nama || cpmk.deskripsi })}
+            </td>
+            <td class="cell-cpmk-group" rowspan="${subs.length}" style="font-size:12.5px;line-height:1.4">
+              <div style="font-weight:600;color:var(--text)">${esc(cpmk.nama || cpmk.deskripsi)}</div>
+            </td>
+          `;
+        }
+
+        const subMks = (sub.mk && sub.mk.length) ? sub.mk : (cpmk.mk || []);
+
+        tr += `
+          <td style="white-space:nowrap">
+            ${renderCapsule("sub_cpmk", sub.kode, { title: sub.nama || sub.deskripsi })}
+          </td>
+          <td style="font-size:12px;line-height:1.4">
+            ${esc(sub.nama || sub.deskripsi)}
+          </td>
+          <td>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              ${subMks.map(mKode => {
+                const mkObj = allMk.find(m => m.kode === mKode);
+                return renderCapsule("mk", mKode, {
+                  label: mkObj ? `${mKode} (S${mkObj.sem})` : mKode,
+                  title: mkObj ? `${mkObj.nama} (Semester ${mkObj.sem})` : mKode,
+                  extraAttrs: `data-matrix-mk-info="${esc(mKode)}"`
+                });
+              }).join("")}
+            </div>
+          </td>
+          <td>
+            ${sub.unit_skkni 
+              ? `<span class="kapsul kapsul-neutral" title="Unit SKKNI: ${esc(sub.unit_skkni)}">${esc(sub.unit_skkni)}</span>`
+              : '<span style="color:var(--text-muted);font-size:11px">-</span>'}
+          </td>
+        </tr>`;
+        rowsHtml += tr;
+      });
+    });
+  });
+
+  if (!rowsHtml) {
+    return `
+      <div style="text-align:center;padding:48px 16px;background:#fff;border-radius:12px;border:1px solid var(--border)">
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">Tidak ada baris matriks yang cocok</div>
+        <div style="font-size:12px;color:var(--text-muted)">Coba kata kunci pencarian lain atau pilih CPL yang berbeda.</div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="matrix-scroll-wrap" style="border:1px solid var(--border);border-radius:12px;background:#fff">
+      <table class="tripartit-table cpl-cpmk-excel-table">
+        <thead>
+          <tr>
+            <th style="width:45px;text-align:center">No.</th>
+            <th style="width:95px">CPL</th>
+            <th style="width:230px">Deskripsi CPL</th>
+            <th style="width:115px">Kode CPMK</th>
+            <th style="width:240px">Capaian Pembelajaran MK (CPMK)</th>
+            <th style="width:145px">Kode Sub-CPMK</th>
+            <th style="width:250px">Kemampuan Akhir (Sub-CPMK)</th>
+            <th style="width:190px">Mata Kuliah Pengampu (MK)</th>
+            <th style="width:150px">Unit Terkait SKKNI</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function attachCplCpmkEvents() {
+  const searchInput = $("cpmk-decomp-q");
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      cpmkSearch = e.target.value;
+      const wrap = $("cpl-cpmk-content-wrap");
+      if (wrap) {
+        wrap.innerHTML = renderCplCpmkContentBody();
+        attachCplCpmkAccordionEvents();
+      }
+    });
+  }
+
+  document.querySelectorAll("[data-cpl-cpmk-tab]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      cplCpmkView = btn.dataset.cplCpmkTab;
+      renderCplCpmkMk();
+    });
+  });
+
+  document.querySelectorAll("[data-cpl-filter]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      cpmkCplFilter = btn.dataset.cplFilter;
+      renderCplCpmkMk();
+    });
+  });
+
+  const btnToggleAll = $("btn-toggle-all-cpmk");
+  if (btnToggleAll) {
+    btnToggleAll.addEventListener("click", () => {
+      cpmkCollapseAllState = !cpmkCollapseAllState;
+      (db.cpmk || []).forEach(cp => {
+        cpmkExpanded[cp.kode] = !cpmkCollapseAllState;
+      });
+      renderCplCpmkMk();
+    });
+  }
+
+  attachCplCpmkAccordionEvents();
+}
+
+function attachCplCpmkAccordionEvents() {
+  document.querySelectorAll("[data-toggle-cpmk]").forEach(hdr => {
+    hdr.addEventListener("click", (e) => {
+      if (e.target.closest(".kapsul")) return;
+      const kode = hdr.dataset.toggleCpmk;
+      const card = hdr.closest(".cpmk-item-card");
+      if (!card) return;
+      const content = card.querySelector(".cpmk-item-content");
+      const chevron = card.querySelector(".cpmk-chevron");
+      if (!content) return;
+
+      const isCurrentlyCollapsed = content.classList.contains("collapsed");
+      if (isCurrentlyCollapsed) {
+        content.classList.remove("collapsed");
+        if (chevron) chevron.style.transform = "rotate(180deg)";
+        cpmkExpanded[kode] = true;
+      } else {
+        content.classList.add("collapsed");
+        if (chevron) chevron.style.transform = "rotate(0deg)";
+        cpmkExpanded[kode] = false;
+      }
+    });
+  });
 }
 
 // ==========================================================

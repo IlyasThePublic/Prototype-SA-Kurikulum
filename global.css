@@ -3146,13 +3146,14 @@ button.kapsul-sub_cpmk:hover {
 .cpl-cpmk-wrap {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
   padding: 4px 0 32px;
 }
 
 .cpl-cpmk-card {
   background: var(--surface);
   border: 1px solid var(--border);
+  border-left: 4px solid #0284c7;
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -3168,87 +3169,180 @@ button.kapsul-sub_cpmk:hover {
   gap: 16px;
 }
 
+.cpl-cpmk-head-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 .cpl-cpmk-body {
   padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .cpmk-item-card {
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 14px 16px;
-  transition: border-color 0.15s ease;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .cpmk-item-card:hover {
   border-color: #cbd5e1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .cpmk-item-header {
+  padding: 12px 16px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 10px;
+  cursor: pointer;
+  user-select: none;
+  background: #fff;
+  transition: background 0.15s ease;
 }
 
-.cpmk-code-pill {
-  padding: 3px 8px;
-  border-radius: 9999px;
-  background: #ffe4e6;
-  color: #be123c;
-  border: 1px solid #fecdd3;
-  font-weight: 700;
-  font-size: 11.5px;
-  letter-spacing: 0.02em;
+.cpmk-item-header:hover {
+  background: #f8fafc;
+}
+
+.cpmk-chevron {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-}
-
-.subcpmk-drawer {
-  margin-top: 10px;
-  padding: 10px 14px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.subcpmk-title {
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
   color: var(--text-muted);
-  letter-spacing: 0.04em;
-  margin-bottom: 6px;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
 }
 
-.subcpmk-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.cpmk-item-content {
+  padding: 0 16px 14px;
+  border-top: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
 }
 
-.subcpmk-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 12.5px;
+.cpmk-item-content.collapsed {
+  display: none;
+}
+
+.cpmk-sub-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.cpmk-sub-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.cpmk-sub-table th {
+  background: #f8fafc;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.cpmk-sub-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: top;
   color: var(--text);
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
-.subcpmk-code {
-  font-weight: 700;
-  color: var(--primary);
-  font-size: 11.5px;
+.cpmk-sub-table tr:last-child td {
+  border-bottom: none;
+}
+
+.cpmk-sub-table tr:hover td {
+  background: #fbfcfe;
+}
+
+/* CPL Filter Pill Bar */
+.cpl-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 2px 10px;
+  scrollbar-width: thin;
+}
+
+.cpl-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
   white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.cpl-filter-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: var(--text);
+}
+
+.cpl-filter-btn.active {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25);
+}
+
+.cpl-filter-count {
+  font-size: 10.5px;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.06);
+  font-weight: 600;
+}
+
+.cpl-filter-btn.active .cpl-filter-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+/* Excel Sheet 12 Table View */
+.cpl-cpmk-excel-table th {
+  position: sticky;
+  top: 130px;
+  z-index: 20;
+}
+
+.cpl-cpmk-excel-table td.cell-cpl-group {
+  background: #f8fafc;
+  border-right: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.cpl-cpmk-excel-table td.cell-cpmk-group {
+  background: #fff;
+  border-right: 1px solid var(--border);
+  vertical-align: top;
 }
 
 /* 7. CPMK per Semester Operational Grid */
