@@ -343,12 +343,24 @@ function renderCapsule(type, code, options = {}) {
   const colorClass = cfg.colorClass || "kapsul-neutral";
   const titleAttr = options.title ? `title="${esc(options.title)}"` : "";
   const extraClass = options.extraClass ? ` ${options.extraClass}` : "";
-  const extraAttrs = options.extraAttrs ? ` ${options.extraAttrs}` : "";
-  const dataAttrs = `data-entity="${esc(type)}" data-code="${esc(code)}"${extraAttrs}`;
+  let extraAttrs = options.extraAttrs ? ` ${options.extraAttrs}` : "";
   const asButton = options.asButton !== false;
   const tag = asButton ? "button" : "span";
   const typeAttr = asButton ? 'type="button"' : 'role="button" tabindex="0"';
   const label = options.label ? esc(options.label) : esc(code);
+
+  const infoAttrMap = {
+    pl: "data-matrix-pl-info",
+    cpl: "data-matrix-cpl-info",
+    bk: "data-matrix-bk-info",
+    mk: "data-matrix-mk-info",
+    cpmk: "data-matrix-cpmk-info",
+    sub_cpmk: "data-matrix-sub-cpmk-info",
+  };
+  if (asButton && infoAttrMap[type] && !extraAttrs.includes(infoAttrMap[type])) {
+    extraAttrs += ` ${infoAttrMap[type]}="${esc(code)}"`;
+  }
+  const dataAttrs = `data-entity="${esc(type)}" data-code="${esc(code)}"${extraAttrs}`;
 
   return `<${tag} ${typeAttr} class="kapsul ${colorClass} kapsul-btn${extraClass}" ${dataAttrs} ${titleAttr}>${label}</${tag}>`;
 }
@@ -504,14 +516,14 @@ const E = {
   },
   mk: {
     group: "Data Master",
-    label: "Mata Kuliah (MK)",
+    label: "Master Mata Kuliah (MK)",
     add: "Tambah MK",
     lead: "Daftar 46 mata kuliah program studi TRPL lengkap dengan kategori, distribusi SKS (Teori & Praktik), penempatan semester 1-8, dan prasyarat.",
     pre: "MK",
     fields: [
       {
         k: "kat",
-        l: "Kategori MK",
+        l: "Kategori Mata Kuliah",
         t: "sel",
         o: ["Inti RPL", "Umum"],
         h: "Awalan kode: KRPL untuk Inti RPL, URPL untuk Umum, IRPL untuk Magang.",
@@ -537,7 +549,7 @@ const E = {
       },
       {
         k: "jenis",
-        l: "Bentuk Pelaksanaan",
+        l: "Tipe Pembelajaran",
         t: "sel",
         o: ["Praktik", "Teori"],
       },
@@ -548,34 +560,37 @@ const E = {
       },
     ],
     cols: [
-      "Kode",
-      "Mata Kuliah",
+      "Kode MK",
+      "Nama Mata Kuliah",
       "Semester",
       "Kategori",
-      "SKS (T / P / Total)",
-      "Jenis",
-      "Prasyarat",
+      "Bobot SKS (T/P/Total)",
+      "Tipe Pembelajaran",
+      "Mata Kuliah Prasyarat",
     ],
     row: (r) => [
       renderCapsule("mk", r.kode, { title: r.nama }),
-      `<b>${esc(r.nama)}</b>${r.nama_en ? `<br><small style="color:var(--text-secondary);font-style:italic">${esc(r.nama_en)}</small>` : ""}`,
-      `<span class="kapsul kapsul-neutral" style="font-size:11px">Sem ${r.sem || 1}</span>`,
-      `<span class="kapsul kapsul-neutral" style="font-size:11px">${esc(r.kat)}</span>`,
-      `<b>${(r.sksTeori || 0) + (r.sksPrak || 0)} SKS</b> (${r.sksTeori || 0}T / ${r.sksPrak || 0}P)`,
-      `<span class="kapsul ${r.jenis === "Praktik" ? "kapsul-mk" : "kapsul-neutral"}">${r.jenis}</span>`,
+      `<div><b>${esc(r.nama)}</b>${r.ads_pbl ? ' <span class="badge" style="background:#fef3c7;color:#b45309;font-size:10px;padding:1px 6px;border-radius:4px;border:1px solid #fde68a;font-weight:600" title="Astra Dual System / Project-Based Learning">ADS/PBL</span>' : ""}${r.nama_en ? `<br><small style="color:var(--text-secondary);font-style:italic">${esc(r.nama_en)}</small>` : ""}</div>`,
+      `<span class="kapsul kapsul-neutral" style="font-size:11px">Semester ${r.sem || 1}</span>`,
+      `<span class="kapsul kapsul-neutral" style="font-size:11px">${esc(r.kat || (r.kategori && r.kategori.includes("Umum") ? "Umum" : "Inti RPL"))}</span>`,
+      `<b>${(r.sksTeori || 0) + (r.sksPrak || 0)} SKS</b> <span style="color:var(--text-secondary);font-size:11px">(${r.sksTeori || 0}T / ${r.sksPrak || 0}P)</span>`,
+      `<span class="kapsul ${r.jenis === "Praktik" || (r.tipe && r.tipe.includes("Praktek")) ? "kapsul-mk" : "kapsul-neutral"}">${r.jenis || (r.tipe && r.tipe.includes("Praktek") ? "Praktik" : "Teori")}</span>`,
       r.prasyarat && r.prasyarat.length
         ? `<div style="display:flex;flex-wrap:wrap;gap:4px">${r.prasyarat
             .map((p) => {
               const mkItem = (db.mk || []).find((m) => m.kode === p);
-              return renderCapsule("mk", p, { title: mkItem ? mkItem.nama : p });
+              return renderCapsule("mk", p, {
+                title: mkItem ? `${mkItem.nama} (Semester ${mkItem.sem})` : p,
+                extraAttrs: `data-matrix-mk-info="${esc(p)}"`
+              });
             })
             .join("")}</div>`
-        : '<span style="color:var(--text-muted)">-</span>',
+        : '<span style="color:var(--text-muted);font-size:11.5px">-</span>',
     ],
   },
   cpmk: {
     group: "Data Master",
-    label: "Capaian Pembelajaran Mata Kuliah (CPMK)",
+    label: "Master Capaian MK (CPMK)",
     add: "Tambah CPMK",
     lead: "Capaian pembelajaran spesifik yang diturunkan dari CPL dan diukur pada mata kuliah tertentu. Penomoran kode terstandarisasi CPMK.xx.y sesuai nomor CPL induk.",
     pre: "CPMK",
@@ -588,23 +603,23 @@ const E = {
       },
       {
         k: "mk",
-        l: "Mata Kuliah Pengampu",
+        l: "Mata Kuliah Pengampu (MK)",
         t: "multi-mk",
         h: "Pilih MK yang mengukur CPMK ini.",
       },
       {
         k: "kode",
-        l: "Kode CPMK (Terstandarisasi)",
+        l: "Kode CPMK",
         h: "Format standar: CPMK.xx.y, contoh CPMK.01.1",
       },
-      { k: "nama", l: "Pernyataan Capaian Mata Kuliah" },
+      { k: "nama", l: "Capaian Pembelajaran MK (CPMK)" },
     ],
     cols: [
       "Kode CPMK",
-      "Pernyataan Capaian MK",
+      "Capaian Pembelajaran MK (CPMK)",
       "CPL Induk",
-      "Mata Kuliah Pengampu",
-      "Sub-CPMK",
+      "Mata Kuliah Pengampu (MK)",
+      "Sub-CPMK Terkait",
     ],
     row: (r) => {
       const assignedCpl = Array.isArray(r.cpl)
@@ -621,11 +636,21 @@ const E = {
           ? `<div class="pl-list">${assignedCpl.map((c) => renderRelationRow("cpl", c)).join("")}</div>`
           : `<span class="kapsul kapsul-warn">Belum ada CPL</span>`,
         assignedMk.length
-          ? `<div class="pl-list">${assignedMk.map((m) => renderRelationRow("mk", m)).join("")}</div>`
+          ? `<div class="pl-list" style="display:flex;flex-wrap:wrap;gap:4px">
+              ${assignedMk.map((mKode) => {
+                const mkObj = (db.mk || []).find((m) => m.kode === mKode);
+                const label = mkObj ? `${mKode} (S${mkObj.sem})` : mKode;
+                return renderCapsule("mk", mKode, {
+                  label,
+                  title: mkObj ? `${mkObj.nama} (Semester ${mkObj.sem})` : mKode,
+                  extraAttrs: `data-matrix-mk-info="${esc(mKode)}"`
+                });
+              }).join("")}
+            </div>`
           : `<span class="kapsul kapsul-warn">Belum ada MK (Null)</span>`,
         subList.length
-          ? `<button type="button" class="kapsul kapsul-sub_cpmk kapsul-btn" data-entity="sub_cpmk" data-parent="${esc(r.kode)}" title="${subList.length} Sub-CPMK terhubung">${subList.length} Sub-CPMK</button>`
-          : `<span style="color:var(--text-muted)">-</span>`,
+          ? `<button type="button" class="kapsul kapsul-sub_cpmk kapsul-btn" data-matrix-cpmk-info="${esc(r.kode)}" data-entity="sub_cpmk" data-parent="${esc(r.kode)}" title="${subList.length} Sub-CPMK terhubung - Klik untuk lihat rincian">${subList.length} Sub-CPMK</button>`
+          : `<span style="color:var(--text-muted);font-size:11.5px">-</span>`,
       ];
     },
   },
@@ -1039,11 +1064,23 @@ function renderMaster(t, q) {
       ([r]) =>
         !q ||
         (
-          r.kode +
+          (r.kode || "") +
           " " +
           (r.nama || "") +
           " " +
+          (r.nama_en || "") +
+          " " +
           (r.deskripsi || "") +
+          " " +
+          (r.kat || "") +
+          " " +
+          (r.kategori || "") +
+          " " +
+          (r.jenis || "") +
+          " " +
+          (r.tipe || "") +
+          " " +
+          (r.sem ? "semester " + r.sem + " sem " + r.sem : "") +
           " " +
           (r.profesi || "") +
           " " +
@@ -1055,7 +1092,9 @@ function renderMaster(t, q) {
           " " +
           (r.cpmk || "") +
           " " +
-          (r.mk && Array.isArray(r.mk) ? r.mk.join(" ") : "") +
+          (r.mk && Array.isArray(r.mk) ? r.mk.join(" ") : (r.mk || "")) +
+          " " +
+          (r.prasyarat && Array.isArray(r.prasyarat) ? r.prasyarat.join(" ") : "") +
           " " +
           (r.sumber || "")
         )
@@ -2370,7 +2409,7 @@ function openMatrixMkDetail(mkKode) {
                 <div style="flex:1">
                   <div style="font-weight:600;font-size:12.5px">${esc(cp.nama)}</div>
                   <div style="font-size:11px;color:var(--text-muted);margin-top:2px">
-                    Induk: ${(cp.cpl || []).join(", ")} &bull; ${(cp.sub_cpmk || []).length} Sub-CPMK
+                    Induk: ${Array.isArray(cp.cpl) ? cp.cpl.join(", ") : (cp.cpl || "-")} &bull; ${(cp.sub_cpmk || []).length} Sub-CPMK
                   </div>
                 </div>
               </div>
@@ -2392,9 +2431,13 @@ function openMatrixCpmkDetail(cpmkKode) {
   const cpmk = (db.cpmk || []).find((c) => c.kode === cpmkKode);
   if (!cpmk) return;
 
-  const assignedCpl = (cpmk.cpl || []).map((k) => (db.cpl || []).find((c) => c.kode === k)).filter(Boolean);
-  const assignedMk = (cpmk.mk || []).map((k) => (db.mk || []).find((m) => m.kode === k)).filter(Boolean);
-  const subList = cpmk.sub_cpmk || [];
+  const rawCpl = Array.isArray(cpmk.cpl) ? cpmk.cpl : cpmk.cpl ? [cpmk.cpl] : [];
+  const assignedCpl = rawCpl.map((k) => (db.cpl || []).find((c) => c.kode === k)).filter(Boolean);
+  const rawMk = Array.isArray(cpmk.mk) ? cpmk.mk : cpmk.mk ? [cpmk.mk] : [];
+  const assignedMk = rawMk.map((k) => (db.mk || []).find((m) => m.kode === k)).filter(Boolean);
+  const subList = (cpmk.sub_cpmk && cpmk.sub_cpmk.length)
+    ? cpmk.sub_cpmk
+    : (db.sub_cpmk || []).filter((s) => s.cpmk === cpmkKode);
 
   open(`
     <div class="matrix-modal-wrap">
@@ -2406,7 +2449,11 @@ function openMatrixCpmkDetail(cpmkKode) {
         <span class="tag neutral">${subList.length} Sub-CPMK</span>
       </div>
 
-      <h2 style="font-size:17px;margin:0 0 10px;line-height:1.4">${esc(cpmk.nama)}</h2>
+      <h2 style="font-size:17px;margin:0 0 10px;line-height:1.4">${esc(cpmk.nama || cpmk.deskripsi)}</h2>
+
+      <div style="font-size:12px;color:var(--text-muted);background:var(--bg);padding:8px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:16px">
+        Dikelola oleh: <b>${esc(cpmk.by || USER)}</b> &bull; Terakhir diubah: <b>${esc(cpmk.at || "-")}</b>
+      </div>
 
       <div style="margin-bottom:14px">
         <span style="font-size:12px;font-weight:600;color:var(--text-muted)">CPL Induk:</span>
@@ -2416,9 +2463,13 @@ function openMatrixCpmkDetail(cpmkKode) {
       </div>
 
       <div style="margin-bottom:14px">
-        <span style="font-size:12px;font-weight:600;color:var(--text-muted)">Mata Kuliah Pengampu:</span>
+        <span style="font-size:12px;font-weight:600;color:var(--text-muted)">Mata Kuliah Pengampu (${assignedMk.length}):</span>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
-          ${assignedMk.map((m) => renderCapsule("mk", m.kode, { title: `${m.nama} (Sem ${m.sem})` })).join("")}
+          ${
+            assignedMk.length
+              ? assignedMk.map((m) => renderCapsule("mk", m.kode, { label: `${m.kode} (S${m.sem})`, title: `${m.nama} (Semester ${m.sem})` })).join("")
+              : '<span style="font-size:12px;color:var(--text-muted)">Belum ada mata kuliah pengampu yang dipetakan.</span>'
+          }
         </div>
       </div>
 
@@ -2432,7 +2483,7 @@ function openMatrixCpmkDetail(cpmkKode) {
               <div class="matrix-modal-item">
                 ${renderCapsule("sub_cpmk", s.kode || ("Sub-CPMK." + (idx + 1)), { title: s.nama || s.deskripsi })}
                 <div style="flex:1;font-size:12.5px;line-height:1.4">
-                  ${esc(s.nama)}
+                  ${esc(s.nama || s.deskripsi)}
                 </div>
               </div>
             `,
@@ -2441,6 +2492,74 @@ function openMatrixCpmkDetail(cpmkKode) {
             : '<div style="font-size:12px;color:var(--text-muted)">Belum ada Sub-CPMK terperinci.</div>'
         }
       </div>
+
+      <div class="mf" style="margin-top:20px">
+        <button class="btn" data-x style="margin:0">Tutup</button>
+      </div>
+    </div>
+  `);
+}
+
+function openMatrixSubCpmkDetail(subKode) {
+  const sub = (db.sub_cpmk || []).find((s) => s.kode === subKode);
+  if (!sub) return;
+
+  const cplObj = (db.cpl || []).find((c) => c.kode === sub.cpl);
+  const cpmkObj = (db.cpmk || []).find((c) => c.kode === sub.cpmk);
+  const rawMk = Array.isArray(sub.mk) ? sub.mk : sub.mk ? [sub.mk] : [];
+  const assignedMk = rawMk.map((k) => (db.mk || []).find((m) => m.kode === k)).filter(Boolean);
+
+  open(`
+    <div class="matrix-modal-wrap">
+      <div class="matrix-modal-header">
+        <div>
+          ${renderCapsule("sub_cpmk", sub.kode, { asButton: false, extraClass: "kapsul-lg" })}
+          <span style="font-size:12px;color:var(--text-muted);margin-left:8px">Sub-CPMK (Kemampuan Akhir)</span>
+        </div>
+        ${sub.unit_skkni ? `<span class="kapsul kapsul-neutral" title="Unit SKKNI">${esc(sub.unit_skkni)}</span>` : ""}
+      </div>
+
+      <h2 style="font-size:16px;margin:0 0 12px;line-height:1.45;color:var(--text)">${esc(sub.nama || sub.deskripsi)}</h2>
+
+      <div style="font-size:12px;color:var(--text-muted);background:var(--bg);padding:8px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:16px">
+        Dikelola oleh: <b>${esc(sub.by || USER)}</b> &bull; Terakhir diubah: <b>${esc(sub.at || "-")}</b>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <span style="font-size:12px;font-weight:600;color:var(--text-muted)">CPL Induk:</span>
+        <div style="margin-top:4px">
+          ${renderRelationRow("cpl", sub.cpl, cplObj ? cplObj.nama : sub.cpl)}
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <span style="font-size:12px;font-weight:600;color:var(--text-muted)">CPMK Induk:</span>
+        <div style="margin-top:4px">
+          ${renderRelationRow("cpmk", sub.cpmk, cpmkObj ? (cpmkObj.nama || cpmkObj.deskripsi) : sub.cpmk)}
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <span style="font-size:12px;font-weight:600;color:var(--text-muted)">Mata Kuliah Pengampu (${assignedMk.length}):</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+          ${
+            assignedMk.length
+              ? assignedMk.map((m) => renderCapsule("mk", m.kode, { label: `${m.kode} (S${m.sem})`, title: `${m.nama} (Semester ${m.sem})` })).join("")
+              : '<span style="font-size:12px;color:var(--text-muted)">Belum ada mata kuliah pengampu yang dipetakan.</span>'
+          }
+        </div>
+      </div>
+
+      ${
+        sub.unit_skkni
+          ? `<div style="margin-bottom:14px">
+              <span style="font-size:12px;font-weight:600;color:var(--text-muted)">Unit Terkait SKKNI:</span>
+              <div style="margin-top:4px">
+                <span class="kapsul kapsul-neutral" style="font-size:12px;padding:4px 10px">${esc(sub.unit_skkni)}</span>
+              </div>
+            </div>`
+          : ""
+      }
 
       <div class="mf" style="margin-top:20px">
         <button class="btn" data-x style="margin:0">Tutup</button>
@@ -4407,6 +4526,8 @@ document.addEventListener("click", (ev) => {
     openMatrixMkDetail(b.dataset.matrixMkInfo);
   } else if (b.dataset.matrixCpmkInfo) {
     openMatrixCpmkDetail(b.dataset.matrixCpmkInfo);
+  } else if (b.dataset.matrixSubCpmkInfo) {
+    openMatrixSubCpmkDetail(b.dataset.matrixSubCpmkInfo);
   } else if (b.dataset.tripartitTab) {
     tripartitView = b.dataset.tripartitTab;
     renderMatrixBkCplMk();
